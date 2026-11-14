@@ -344,8 +344,9 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     // Measured page: 21.5 KB on the XIAO rig with both MQTT pages, the time zone list and two Tempest stations (2026-11-09).
     // The navigation (issue #21) added about 2.5 KB, counted from the source, not measured on the rig.
     // The newer-version check added 2.0 KB (marker + script), also counted from the source.
+    // Measured again with the check: 29.8 KB on the same rig (2026-11-14), up from 27.9 KB on 1.7.0.
     // Below the page size every append reallocs a big block on a heap with no PSRAM
-    h.reserve(29000);
+    h.reserve(31000);
     h += PAGE_HEAD;
     h += NAV;
     // The marker is a block: it takes the line break's place, and no height while empty (script off)

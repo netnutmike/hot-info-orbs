@@ -8,11 +8,6 @@ first. If something looks wrong, go to
 In this guide the five displays are **orb 1 to orb 5, left to right**, and
 "the orbs" means the whole set.
 
-> **Parts marked with a version**, such as (1.7.0), need that firmware version
-> or later. The settings page shows which version you are running on its first
-> line, and from 1.8.0 whether a newer one is out. To get the newest, see
-> [Updating later](../README.md#updating-later-over-wifi-no-cable).
-
 **Contents**
 
 - [The three buttons](#the-three-buttons)
@@ -20,14 +15,14 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 - [What you see at start-up](#what-you-see-at-start-up)
 - [Finding the orbs' address](#finding-the-orbs-address)
 - [The settings page](#the-settings-page)
-- [The info page](#the-info-page-170)
-- [What the amber and red marks mean](#what-the-amber-and-red-marks-mean-170)
+- [The info page](#the-info-page)
+- [What the amber and red marks mean](#what-the-amber-and-red-marks-mean)
 - [When WiFi goes down](#when-wifi-goes-down)
 - [Changing the WiFi network](#changing-the-wifi-network)
 - [Running from a phone hotspot](#running-from-a-phone-hotspot)
 - [Weather from your own Tempest stations](#weather-from-your-own-tempest-stations)
 - [Dimming and switching off at night](#dimming-and-switching-off-at-night)
-- [The log](#the-log-170)
+- [The log](#the-log)
 - [The password](#the-password)
 - [Starting over](#starting-over)
 
@@ -40,7 +35,7 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 | **Left** | short | previous page |
 | **Right** | short | next page |
 | **Middle** | short, or about half a second | depends on the page showing: see the table below |
-| **Middle** | hold 2 seconds | the [info page](#the-info-page-170) (1.7.0) |
+| **Middle** | hold 2 seconds | the [info page](#the-info-page) |
 | **Right** | hold while plugging in power | forget the WiFi network: see [Changing the WiFi network](#changing-the-wifi-network) |
 
 The buttons keep their places when the orbs are set to **Upside down**: on an
@@ -122,7 +117,7 @@ Everything you change, you change from a web browser on a phone or computer
 
 - **At start-up:** orb 5 shows it for 5 seconds. Unplug the orbs and plug
   them back in to see it again.
-- **On the info page** (1.7.0): hold the middle button 2 seconds and read
+- **On the info page**: hold the middle button 2 seconds and read
   orb 3.
 - **From your router:** its list of connected devices shows the orbs as
   `info-orbs`.
@@ -132,8 +127,8 @@ Then browse to:
 | Address | What it is |
 |---|---|
 | `http://<address>/settings` | the [settings page](#the-settings-page) |
-| `http://<address>/update` | install a new firmware version ([README](../README.md#updating-later-over-wifi-no-cable)); links to the newest one (1.8.0) |
-| `http://<address>/log` | the [log](#the-log-170) (1.7.0) |
+| `http://<address>/update` | install a new firmware version ([README](../README.md#updating-later-over-wifi-no-cable)); links to the newest one |
+| `http://<address>/log` | the [log](#the-log) |
 
 For example, `http://192.168.1.57/settings`.
 
@@ -153,7 +148,7 @@ running, and the WiFi signal as a mark and a number in dBm: ✔ for -65 or
 better, ⚠ to -75, ✖ below that (closer to zero is stronger; -60 is better
 than -80).
 
-Under the version, the page says whether a newer one is out (1.8.0):
+Under the version, the page says whether a newer one is out:
 
 | The line | What it means |
 |---|---|
@@ -189,7 +184,7 @@ Your settings stay through restarts, power cuts and
 
 | Section | What is in it |
 |---|---|
-| **Rotation** | **Seconds per page**: 0 stays on one page; 5 to 3600 moves to the next page after that many seconds. **Show**: tick the pages you want. Tick one to keep it on screen, or several to rotate through them. **Clock only when WiFi is out** (1.7.0): Off keeps the page up with its marks; On switches to the clock while WiFi is down. See [the marks](#what-the-amber-and-red-marks-mean-170). |
+| **Rotation** | **Seconds per page**: 0 stays on one page; 5 to 3600 moves to the next page after that many seconds. **Show**: tick the pages you want. Tick one to keep it on screen, or several to rotate through them. **Clock only when WiFi is out**: Off keeps the page up with its marks; On switches to the clock while WiFi is down. See [the marks](#what-the-amber-and-red-marks-mean). |
 | **Clock** | The clock face at start-up, 12-hour or 24-hour, the AM/PM mark, the digit color and the color of the unlit segments. |
 | **Weather** | °F and mph, or °C and km/h. Light or dark screens. |
 | **Stocks** | One to five tickers, with commas between them, one per orb. Crypto is written `BTC/USD`. To pick an exchange, add the country: `APC&country=Germany`. |
@@ -208,7 +203,7 @@ The button beside **Save and restart**. It forgets every setting saved from
 the page, your keys included, and asks before it does. WiFi and the start-up
 picture are not touched.
 
-## The info page (1.7.0)
+## The info page
 
 **Hold the middle button for 2 seconds.** The info page appears while you
 are still holding. It works from any page. Press any button to close it, or
@@ -249,7 +244,7 @@ settings page. It is the first thing to read when something looks wrong.
 Times here are never in seconds: `<1 min`, `12 min`, `2 h 05 min`,
 `3 d 04 h`.
 
-## What the amber and red marks mean (1.7.0)
+## What the amber and red marks mean
 
 The orbs keep showing the last data they got when they cannot get new data.
 The marks tell you when what you are looking at is old.
@@ -304,7 +299,7 @@ With it **On**, once WiFi has been down for 10 seconds:
 
 You do not need to do anything. The orbs get themselves back on.
 
-**While they are running** (1.7.0):
+**While they are running**:
 
 | When | What the orbs do |
 |---|---|
@@ -320,7 +315,7 @@ the router is back.
 
 **At start-up**, the orbs need WiFi before they show any page. If they cannot
 join, orbs 4 and 5 say why and how to fix it. They also keep trying by
-themselves (1.7.0):
+themselves:
 
 | Orbs 4 and 5 say | What the orbs do by themselves |
 |---|---|
@@ -404,7 +399,7 @@ Type times as 24-hour (`22:00`, `7:30`) or with am and pm (`10pm`,
 `7:30am`). A schedule can run past midnight, such as from `22:00` until
 `7:00`. Where the two overlap, off wins.
 
-## The log (1.7.0)
+## The log
 
 The orbs keep a record of what happens to them: each start and why, WiFi
 going down and coming back, a page that stops refreshing and when it

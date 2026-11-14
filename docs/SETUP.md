@@ -107,12 +107,11 @@ Twelve Data key that is built into the software from upstream. You cannot set
 your own, and if that key's allowance runs out, every set's stocks page goes
 stale together.
 
-**No time zone key.** Before firmware 1.2.0 the orb asked TimeZoneDB for its
-offset, which took a second key. Now the time comes from NTP
-(`pool.ntp.org`) as before, and the firmware turns it into local time from a
+**No time zone key.** The time comes from NTP (`pool.ntp.org`), and the
+firmware turns it into local time from a
 table of daylight-saving rules built into it
-(`firmware/src/core/settings/TimeZones.h`). An old `secrets.h` that still has
-`TIMEZONE_API_KEY` builds fine; the line is ignored.
+(`firmware/src/core/settings/TimeZones.h`). A `secrets.h` that has a
+`TIMEZONE_API_KEY` line builds fine; the line is ignored.
 
 ## 5. Set your preferences in `config.h`
 
@@ -310,7 +309,7 @@ November 2026. The headings stay so that older links still land.*
 ## 9. Change settings from a browser
 
 Moved to the user guide: [The settings page](USER-GUIDE.md#the-settings-page),
-[The log](USER-GUIDE.md#the-log-170) and
+[The log](USER-GUIDE.md#the-log) and
 [What you see at start-up](USER-GUIDE.md#what-you-see-at-start-up).
 
 For a build of your own, two things differ from the ready-made file:
@@ -330,8 +329,7 @@ Nothing to build: it works on the ready-made release file too.
 Building it yourself, you can instead put the token in `secrets.h`
 (`#define TEMPEST_TOKEN "..."`) and the stations in `config.h` (the commented
 `TEMPEST_STATION_1` lines in the template). Those are only defaults: whatever
-the page saves wins. In firmware 1.2.0 and earlier the token could only come from
-`secrets.h`, and without it the Tempest code was not compiled in at all.
+the page saves wins.
 
 ## 11. Optional: run it from a phone hotspot
 

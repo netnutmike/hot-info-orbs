@@ -10,8 +10,8 @@
 > When something goes wrong, see [Troubleshooting](TROUBLESHOOTING.md).
 
 Written for someone who has never used PlatformIO. If you have, skip to
-[step 3](#3-create-your-two-config-files) — the only thing that has changed from
-upstream is that there are now **two** files to copy, not one.
+[step 3](#3-create-your-two-config-files). The first difference you will meet
+from upstream is that there are **two** files to copy, not one.
 
 Budget about 45 minutes the first time. Most of that is downloads.
 
@@ -83,13 +83,13 @@ file, put placeholders in it, not your own keys.
 
 ## 4. Get your API key
 
-One key, free, about a minute, and **you need your own**. A key shared across
-several orbs burns one free-tier quota and gets rate-limited, and whoever owns
-it can revoke it without warning.
+One key, free, about a minute, and **you need your own**. A key shared between
+people burns one free allowance for all of them, and whoever owns it can
+revoke it without warning.
 
 | Key               | Register at                                                          | What it does                                                                                                     |
 |-------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| `WEATHER_API_KEY` | [visualcrossing.com/sign-up](https://www.visualcrossing.com/sign-up) | Current conditions and forecast for the weather orb. Free tier is ~1000 records/day, far more than one orb uses. |
+| `WEATHER_API_KEY` | [visualcrossing.com/sign-up](https://www.visualcrossing.com/sign-up) | Current conditions and forecast for the weather orb. The free tier is 1000 records a day. Each forecast is one record, and one set asks at most every 10 minutes, about 150 a day. |
 
 Paste it between the quotes in `secrets.h`:
 
@@ -98,9 +98,16 @@ Paste it between the quotes in `secrets.h`:
 ```
 
 Leaving it empty fails the build with a message naming the key. It will not let
-you flash a half-configured orb.
+you flash a half-configured orb. (A comment in `config.h.template` says the key
+can be left blank and pasted on the settings page. That is true of the
+ready-made release file, not of your own build.)
 
-**No time zone key.** Until firmware 1.2.0 the orb asked TimeZoneDB for its
+**Stocks need no key of yours.** The stock prices come through one shared
+Twelve Data key that is built into the software from upstream. You cannot set
+your own, and if that key's allowance runs out, every set's stocks page goes
+stale together.
+
+**No time zone key.** Before firmware 1.2.0 the orb asked TimeZoneDB for its
 offset, which took a second key. Now the time comes from NTP
 (`pool.ntp.org`) as before, and the firmware turns it into local time from a
 table of daylight-saving rules built into it
@@ -118,11 +125,11 @@ The four settings most people want to change:
 ```c
 #define TIMEZONE_API_LOCATION "America/New_York"  // a name from TimeZones.h
 #define WEATHER_LOCATION "The Villages, FL"       // city, state
-//#define WEATHER_UNITS_METRIC                    // uncomment for celsius
-#define STOCK_TICKER_LIST "SPY,QQQ,AAPL,MSFT,BTC/USD"  // exactly 5
+//#define WEATHER_UNITS_METRIC                    // uncomment for Celsius
+#define STOCK_TICKER_LIST "SPY,QQQ,AAPL,MSFT,BTC/USD"  // up to 5
 ```
 
-Worth knowing about the ticker list: it takes five symbols. Crypto and forex
+Worth knowing about the ticker list: it takes one to five symbols, one per orb. Crypto and forex
 need a currency pair (`BTC/USD`). For a symbol that trades on more than one
 exchange, append the country (`APC&country=Germany`).
 
@@ -138,18 +145,29 @@ Other things you can turn on here: dim hours and screens-off hours (separate sch
 The first build downloads the ESP32 platform and compiler — several hundred MB,
 several minutes, once. Later builds take about 15 seconds.
 
-When it starts, one orb shows **Welcome** and how full the firmware slot is,
-e.g. `Flash 43%`. The project keeps that under 92% so updates always fit.
+When it starts, orb 1 shows **Welcome** and how full the firmware slot is,
+e.g. `Flash 49%`. The project keeps that under 92% so updates always fit.
 
 If upload cannot find the board, put it in download mode by hand: unplug the
 USB cable, hold the **B** (boot) button on the XIAO, plug the cable back in,
-release, then click Upload. (The XIAO's two buttons are marked B and R. If
-no new port appears, try the other button: R only restarts the board.)
+release, then click Upload. The XIAO's two tiny buttons are marked B and R;
+R only restarts the board, so it is never the one for download mode.
+
+**Which port.** On Windows the orbs appear as a `COM` port, on a Mac as
+`/dev/cu.usbmodem…`, on Linux as `/dev/ttyACM0`. PlatformIO usually picks it
+by itself. On Linux, install PlatformIO's udev rules and add yourself to the
+`dialout` group (log out and in again), or the port is there but refuses the
+upload.
+
+**Typing `pio` commands.** The commands on this page assume a PlatformIO
+terminal: in VS Code, open the PlatformIO icon, then **Quick Access →
+Miscellaneous → New Terminal**. An ordinary terminal usually does not have
+`pio` on its path.
 
 ## 7. Connect it to WiFi
 
 The orbs create their own WiFi network on first boot, and the screens show its
-name: `Info-Orbs_` followed by two characters, for example `Info-Orbs_84`.
+name on orb 5: `Info-Orbs_` followed by two characters, for example `Info-Orbs_84`.
 On a phone or computer, join that network, and a configuration page opens
 automatically (if it does not, browse to `http://192.168.4.1`). Pick your home
 network from the list and enter its password.
@@ -162,8 +180,9 @@ with only 256 possible endings two orbs can still match, so set them up one
 at a time.
 
 This is stored on the device, not in your files. You do not reflash to change
-WiFi later: hold the **right** button while plugging in power. The orbs show
-`Wifi Settings reset`, forget the network, and open the setup network again.
+WiFi later: hold the **right** button while plugging in power (the button on the right
+when the orbs are the right way up; **Upside down** does not move the
+buttons). Orb 4 shows `Wifi Settings reset`, and the orbs forget the network and open the setup network again.
 The orbs remember only one network at a time.
 
 If the orbs cannot join, orbs 4 and 5 say why. The user guide covers
@@ -172,15 +191,19 @@ and Troubleshooting has [each screen and its fix](TROUBLESHOOTING.md#wifi-setup)
 
 ## 8. Later updates: no cable needed
 
-Once the orbs are on your WiFi, new firmware goes over the network. The **first**
-flash has to be over USB (step 6), because it also writes the partition layout
-that makes network updates possible.
+Once the orbs are on your WiFi, new firmware goes over the network. Orbs that
+have never been flashed need one USB flash first, either step 6 or the
+Quick start, because that writes the partition layout that makes network
+updates possible. Orbs installed with the Quick start already have it, so
+your own build can go straight over WiFi.
 
 - **From a browser:** build as usual, then open `http://info-orbs.local/update`,
   choose `.pio/build/xiao-esp32s3/firmware.bin` and press Upload. If
   `.local` names do not resolve on your computer, use the IP address shown on
   the orbs when they connect.
-- **From PlatformIO:** `pio run -e ota -t upload`. This needs the orb to connect
+- **From PlatformIO:** `pio run -e ota -t upload`. With a password set (below),
+  first add `upload_flags = --auth=<your password>` under `[env:ota]` in
+  `platformio_local.ini` (see [Building more than one set](#building-more-than-one-set)), or the upload is refused. This needs the orb to connect
   *back* to your computer, which fails when the two are on different subnets,
   and a failed attempt restarts the orb. If it says `No response from device`,
   wait until the update page loads again and use the browser.
@@ -212,6 +235,7 @@ by hand instead, know the layout (`partitions.csv`):
 | `0x10000`  | `app0`                                                   |
 | `0x3D0000` | `app1`                                                   |
 | `0x790000` | filesystem: the uploaded start-up picture                |
+| `0x7F0000` | `coredump`: what the software left behind after a crash  |
 
 - **`info_orbs_fw_combo.bin` goes at `0x0` only.** It is the whole 8 MB chip,
   blank everywhere past the app, so it is also a factory reset.
@@ -224,12 +248,17 @@ by hand instead, know the layout (`partitions.csv`):
   session so the bootloader falls back to `app0`:
 
   ```bash
-  esptool.py --chip esp32s3 write_flash 0x10000 firmware.bin
-  esptool.py --chip esp32s3 erase_region 0xe000 0x2000
+  pio pkg exec -p tool-esptoolpy -- esptool.py --chip esp32s3 write_flash 0x10000 firmware.bin
+  pio pkg exec -p tool-esptoolpy -- esptool.py --chip esp32s3 erase_region 0xe000 0x2000
   ```
 
-  `pio run -t upload` never hits this: it writes `boot_app0.bin` to `0xE000`
-  with every upload. The orbs' `/update` page never hits it either, which is
+  (`esptool.py` on its own is usually not on your path; `pio pkg exec` runs
+  the copy PlatformIO installed.)
+
+  A USB upload from PlatformIO (`pio run -e xiao-esp32s3 -t upload`, or
+  **Upload** in step 6) never hits this: it writes `boot_app0.bin` to
+  `0xE000` with every upload. Name the environment: a bare
+  `pio run -t upload` also runs the `ota` upload, because both are defaults. The orbs' `/update` page never hits it either, which is
   why the Quick start uses it.
 
 ## Building more than one set
@@ -237,7 +266,8 @@ by hand instead, know the layout (`partitions.csv`):
 Many members build several. Each set keeps its own WiFi network, settings-page
 choices and start-up picture inside itself, so you set each one up on its own.
 You can use the same API keys and the same `config.h` and `secrets.h` for all
-of your own sets. Each set uses the keys' free daily allowance separately.
+of your own sets. Sets that share a key share its free allowance of 1000 a
+day; at about 150 a day each, one key covers about six sets.
 
 **WiFi: one at a time, or not at all.** Each new set starts its own setup
 network, `Info-Orbs_` plus two characters. Two sets can end up with the same

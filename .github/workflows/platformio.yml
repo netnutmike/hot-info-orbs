@@ -54,3 +54,8 @@ jobs:
       - name: Host unit tests
         if: runner.os != 'Windows'
         run: pio test -e native
+
+      # The newer-version check is a script the browser runs, so the C++ host
+      # tests above cannot reach it. This runs it in the runner's node.
+      - name: Update check script test
+        run: python tools/test_update_check.py

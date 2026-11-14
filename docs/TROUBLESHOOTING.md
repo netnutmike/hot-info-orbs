@@ -8,9 +8,10 @@ fix: do the
 [Quick start](../README.md#quick-start-no-software-to-install-on-your-pc)
 again.
 
-> **Parts marked (1.7.0)** need firmware 1.7.0 or later. The settings page
-> shows which version you are running on its first line. To get the newest,
-> see [Updating later](../README.md#updating-later-over-wifi-no-cable).
+> **Parts marked with a version**, such as (1.7.0), need that firmware version
+> or later. The settings page shows which version you are running on its first
+> line, and from 1.8.0 whether a newer one is out. To get the newest, see
+> [Updating later](../README.md#updating-later-over-wifi-no-cable).
 
 - [Installing](#installing)
 - [WiFi setup](#wifi-setup)
@@ -124,6 +125,9 @@ Problems with a
 |---|---|
 | The orbs show **Update failed, old firmware kept** | Nothing changed; the orbs keep running the old version. Check that you chose `firmware.bin` (not the combo file, which is for USB) and upload again. |
 | The page still shows the old version after an update | Look too soon and the old version is still answering: the orbs take several seconds to restart. Wait until the orbs show a page again, reload, and read the first line. |
+| The settings page says **Could not check for a newer version** (1.8.0) | The phone or computer you are reading on asks GitHub for the newest version, and got no answer: it has no internet, something on it blocks the request, or your network has asked more than 60 times in the last hour. The orbs are fine. The **download firmware.bin** link on the update page still gets the newest file. |
+| No line about a newer version under the version (1.8.0) | Scripts are turned off in the browser, or the firmware is older than 1.8.0. Use the **download firmware.bin** link on the update page, or the one in the [README](../README.md#updating-later-over-wifi-no-cable). |
+| **Local build, not a release file** (1.8.0) | The orbs run software built from the source. Normal if you build your own. To go back to the release, download `firmware.bin` from the update page and upload it. |
 | The orbs do not come back after an update | Unplug them and plug them back in. A new version that cannot get back on WiFi is undone at the next restart, and the old one runs again. |
 | Still dark | Do the [Quick start](../README.md#quick-start-no-software-to-install-on-your-pc) again. It wipes the board, so WiFi and the weather key go back in afterwards. |
 

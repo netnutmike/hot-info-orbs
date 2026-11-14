@@ -643,3 +643,39 @@ picture face. While its ring is on, a picture face also stops blinking its
 colon, since each blink is a whole-orb repaint under the ring and "No WiFi". The ring wipes its band
 before it draws, so a digit's corners lose their last 2 or 3 px under it.
 Worked out from the code and the font; not yet looked at on the panels.
+
+## The newer-version line is the browser's work, and three things about GitHub decide what it says (2026-11-14)
+
+The check on the settings and update pages (1.8.0, `UpdateCheck.h`) runs in
+the browser of whoever reads the page. The orb's own internet says nothing
+about it, and the orbs' displays never show it. Measured with `curl` on
+2026-11-14:
+
+- `api.github.com/repos/<repo>/releases/latest` answers a request from
+  another origin (`access-control-allow-origin: *`), **60 calls an hour per
+  public address** without a login. Past that, the page says "Could not
+  check". Every load of either page is one call.
+- The release file is another matter: `releases/latest/download/firmware.bin`
+  redirects twice and ends with **no** cross-origin header. A link to it
+  works; a script cannot read it. That is why there is no "download and
+  install" button.
+- "Latest" is whichever release is **marked Latest** on GitHub, not the
+  highest number. If a release whose tag is not `firmware-X.Y.Z` (a board
+  run, say) is ever marked Latest, every orb says "Could not check", and the
+  download link looks for `firmware.bin` in a release that has none. Keep
+  Latest on a firmware release.
+
+**The release file has to be built clean, from the commit the release
+targets.** A release orb reads "This is the newest version" only when its
+build commit (`git describe --always --dirty`, short hash) is the start of the
+release's `target_commitish`. Build from a dirty tree, or from a commit beside
+the tag, and every orb running that file reads "Local build, not a release
+file". A release created without `--target <sha>` records a branch name
+instead of a commit; then the page cannot tell, and treats any build with the
+newest number as the release.
+
+The compare lives in a script, so `pio test -e native` does not run it:
+`python3 tools/test_update_check.py` does (node, or the `jsc` in macOS). That
+tool finds the script in the header by its `<script>` tags, so no comment
+there may spell a pair of them out: an earlier marker was matched in a
+comment instead of the script, and the engine choked on the comment's `...`.

@@ -679,3 +679,19 @@ The compare lives in a script, so `pio test -e native` does not run it:
 tool finds the script in the header by its `<script>` tags, so no comment
 there may spell a pair of them out: an earlier marker was matched in a
 comment instead of the script, and the engine choked on the comment's `...`.
+
+## Every Info Orbs build shares one Twelve Data key (2026-11-14)
+
+The stocks page asks `api.twelvedata.com/quote` once per ticker with an API key
+written into `StockWidget.cpp:84`. It is not ours: it arrived with upstream's
+stock rework (d2cab6a, brett-dot-tech, 2024-10-27). Checked 2026-11-14, the
+same key is in upstream `brett-dot-tech/info-orbs` main and in
+`JoeAWagner/orbital-orbs`, the firmware the HackerBox 0129 "Orbital" build
+guide links. So every upstream set, every HackerBox kit and every HOT set
+draws on one free-tier allowance that nobody here controls.
+
+What it means: if that allowance runs out, or its owner revokes the key, every
+stocks orb goes empty while weather keeps working, and it looks like a fault
+in this firmware. TROUBLESHOOTING has the row. The fix is a settings-page key
+field like the weather one: a firmware change, held for after the 1.8.0
+freeze. Twelve Data's current free limits were not checked.

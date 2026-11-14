@@ -3,6 +3,7 @@
 #include "DeviceLogStore.h"
 #include "SettingsValidation.h"
 #include "TimeZones.h"
+#include "UpdateCheck.h"
 #include "IrisPalette.h"
 #include "LidPalette.h"
 #include "weatherwidget/TempestSource.h"
@@ -342,11 +343,14 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     String h;
     // Measured page: 21.5 KB on the XIAO rig with both MQTT pages, the time zone list and two Tempest stations (2026-11-09).
     // The navigation (issue #21) added about 2.5 KB, counted from the source, not measured on the rig.
+    // The newer-version check added 2.0 KB (marker + script), also counted from the source.
+    // Measured again with the check: 29.8 KB on the same rig (2026-11-14), up from 27.9 KB on 1.7.0.
     // Below the page size every append reallocs a big block on a heap with no PSRAM
-    h.reserve(27000);
+    h.reserve(31000);
     h += PAGE_HEAD;
     h += NAV;
-    h += "<p>Running " FIRMWARE_VERSION ", commit " BUILD_COMMIT ", built " BUILD_TIME "<br>Up " + uptime() + ". ";
+    // The marker is a block: it takes the line break's place, and no height while empty (script off)
+    h += "<p>Running " FIRMWARE_VERSION ", commit " BUILD_COMMIT ", built " BUILD_TIME UPDATE_CHECK_MARKER_SETTINGS "Up " + uptime() + ". ";
     {
         // Glyph as well as the number. Rule-of-thumb bands, not measured on the orb
         const int rssi = WiFi.RSSI();
@@ -590,6 +594,7 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     h += "<form id='bootrst' method='POST' action='/settings/boot/reset' onsubmit=\"return confirm('Go back to the built-in logo?')\"></form>";
     h += "<p><a href='/update'>Firmware update</a></p>";
     h += NAV_JS;
+    h += UPDATE_CHECK_SCRIPT;
     h += "</body></html>";
     return h;
 }

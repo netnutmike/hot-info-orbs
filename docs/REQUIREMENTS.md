@@ -329,6 +329,39 @@ using the core's `verifyRollbackLater()` hook; the prebuilt bootloader has
 rollback enabled. Version shows on the boot screen and the update page. Still
 open: the *Should* — devices do not check for updates themselves.
 
+**Status 2026-11-14, for 1.8.0: the *Should* is met from the browser, not from
+the orb.** The settings page and the update page carry a script
+(`firmware/src/core/ota/UpdateCheck.h`) that asks the GitHub releases API for
+the release marked Latest and writes one line under the running version:
+newer available (with a link to `/update` on the settings page), newest, local
+build, ahead of the newest release, or could not check. Each state has its own
+words, and the two that matter a glyph; none is told by color. The update page
+also has two plain links, to the newest `firmware.bin` and its release notes,
+which GitHub redirects and which work with scripts off. No new route: the
+check is part of two pages that are already behind the optional password, and
+it uses no host name, so it works when the page is opened by address.
+
+Rejected: the orb fetching the newest tag itself. It works with scripts off,
+but adds an HTTPS fetch, its memory and a rate-limited call to every orb,
+during soak, and the page is always read on a device that has internet anyway.
+Also not possible: one press that downloads and installs. The release file is
+served without a cross-origin header, so a page on the orb cannot read it; the
+owner still downloads `firmware.bin` and uploads it.
+
+A local build is told from a release file by its commit: a build whose
+version equals the newest release but whose commit is not the release's
+commit says "Local build".
+
+What is still not done: the orbs do not check by themselves. Nothing shows on
+the displays, only on the two pages, and only while someone reads them.
+
+Tested: the compare and the wording on the host
+(`python3 tools/test_update_check.py`, 28 cases), and all six page states in a
+browser against the live GitHub answer on 2026-11-14 (newest release then
+1.6.1). `pio run -e release` builds, and the built file holds both markers and
+the script. **Not yet loaded from an orb**: the two pages as the firmware
+serves them have not been opened on hardware, on a phone or a computer.
+
 The orbs sit on a desk or shelf, often in a case. Fixing a bug currently means
 retrieving the device, opening it if necessary, finding a data-capable USB
 cable, and running a toolchain the owner may not have installed. In practice

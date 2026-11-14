@@ -8,9 +8,10 @@ first. If something looks wrong, go to
 In this guide the five displays are **orb 1 to orb 5, left to right**, and
 "the orbs" means the whole set.
 
-> **Parts marked (1.7.0)** need firmware 1.7.0 or later. The settings page
-> shows which version you are running on its first line. To get the newest,
-> see [Updating later](../README.md#updating-later-over-wifi-no-cable).
+> **Parts marked with a version**, such as (1.7.0), need that firmware version
+> or later. The settings page shows which version you are running on its first
+> line, and from 1.8.0 whether a newer one is out. To get the newest, see
+> [Updating later](../README.md#updating-later-over-wifi-no-cable).
 
 **Contents**
 
@@ -123,7 +124,7 @@ Then browse to:
 | Address | What it is |
 |---|---|
 | `http://<address>/settings` | the [settings page](#the-settings-page) |
-| `http://<address>/update` | install a new firmware version ([README](../README.md#updating-later-over-wifi-no-cable)) |
+| `http://<address>/update` | install a new firmware version ([README](../README.md#updating-later-over-wifi-no-cable)); links to the newest one (1.8.0) |
 | `http://<address>/log` | the [log](#the-log-170) (1.7.0) |
 
 For example, `http://192.168.1.57/settings`.
@@ -142,6 +143,20 @@ working, read the address again.
 The top of the page shows the firmware version, how long the orbs have been
 running, and the WiFi signal: ✔ good, ⚠ fair, ✖ weak, with the number in dBm
 (closer to zero is stronger; -60 is better than -80).
+
+Under the version, the page says whether a newer one is out (1.8.0):
+
+| The line | What it means |
+|---|---|
+| **⬆ Version 1.9.0 is available.** Update page | A newer version is out. **Update page** takes you to `/update`, which has the download link. |
+| ✔ This is the newest version. | Nothing to do. |
+| Local build, not a release file. | The orbs run software built from the source, not a downloaded release. Normal if you build your own. |
+| This build is newer than the newest release. | The same, with a version number ahead of the newest release. |
+| Could not check for a newer version. | See [Troubleshooting](TROUBLESHOOTING.md#updating). The orbs are fine. |
+
+The phone or computer you are reading on does the asking, not the orbs: it
+asks GitHub, where the releases are, each time the page loads. So the line
+needs internet on that device, and the orbs never check by themselves.
 
 Change what you want, then press **Save and restart** at the bottom. The orbs
 restart, which takes about 15 seconds, and the page reloads by itself. If a

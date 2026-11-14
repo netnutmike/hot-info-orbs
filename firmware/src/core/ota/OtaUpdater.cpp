@@ -1,5 +1,6 @@
 #include "OtaUpdater.h"
 #include "DeviceLogStore.h"
+#include "UpdateCheck.h"
 #include "Utils.h"
 #include "build_id.h"
 #include "config_helper.h"
@@ -28,18 +29,23 @@ extern "C" bool verifyRollbackLater() {
                                 "and change the settings. Set OTA_PASSWORD in secrets.h.</p>"
 #endif
 
+// The two release links are plain HTML on purpose: they work with scripts off
+// and with no answer from the version check (UpdateCheck.h). The page is closed
+// in the GET handler, after the check's script.
 static const char *uploadPage =
-    "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width'>"
+    "<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width'>"
     "<title>Info Orbs update</title></head><body style='font-family:sans-serif'>"
     "<h2>Info Orbs firmware update</h2>"
-    "<p>Running: " FIRMWARE_VERSION ", commit " BUILD_COMMIT ", built " BUILD_TIME "</p>"
+    "<p>Running: " FIRMWARE_VERSION ", commit " BUILD_COMMIT ", built " BUILD_TIME UPDATE_CHECK_MARKER_UPDATE "</p>"
     NO_PASSWORD_WARNING
+    "<p>Newest release: <a href='" UPDATE_CHECK_FILE_URL "'>download firmware.bin</a> &middot; "
+    "<a href='" UPDATE_CHECK_NOTES_URL "'>release notes</a></p>"
     "<form method='POST' action='/update' enctype='multipart/form-data'>"
     "<input type='file' name='firmware' accept='.bin'> "
     "<input type='submit' value='Upload'></form>"
-    "<p>Use <code>.pio/build/&lt;env&gt;/firmware.bin</code>. The orbs restart when it is done.</p>"
-    "<p><a href='/settings'>Settings</a></p>"
-    "</body></html>";
+    "<p>Choose the <code>firmware.bin</code> you downloaded, or your own build's "
+    "<code>.pio/build/&lt;env&gt;/firmware.bin</code>. The orbs restart when it is done.</p>"
+    "<p><a href='/settings'>Settings</a></p>";
 
 OtaUpdater::OtaUpdater(ScreenManager &manager) : m_manager(manager) {}
 
@@ -111,7 +117,10 @@ void OtaUpdater::setupWebUpdate() {
         if (!authorized()) {
             return;
         }
-        s_server.send(200, "text/html", uploadPage);
+        String page = uploadPage;
+        page += UPDATE_CHECK_SCRIPT;
+        page += "</body></html>";
+        s_server.send(200, "text/html", page);
     });
 
     s_server.on(

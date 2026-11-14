@@ -57,6 +57,11 @@ settings and start-up picture.
 3. Choose `firmware.bin` and press **Upload**. The orbs restart on their own
    when it is done, with your WiFi, key and settings kept.
 
+From 1.8.0 the orbs' own pages do steps 1 and 2 for you: the first lines of
+the settings page say when a newer version is out (**⬆ Version … is
+available**), and the update page has a **download firmware.bin** link that is
+always the newest release.
+
 **Update failed, or the orbs stay dark?** Nothing is broken: do the
 [Quick start](#quick-start-no-software-to-install-on-your-pc) again. It wipes
 the board, so WiFi and the weather key go back in at steps 6 and 7.
@@ -138,7 +143,7 @@ orb 5 when they join (four numbers with dots, like `192.168.1.57`).
 | Address | What it does |
 |---|---|
 | `http://<IP>/settings` | rotation time, which pages show, tickers, weather location and units, time zone, clock face and colors, night dimming, upside-down mounting, the waking eyes at start-up, what to show when WiFi is out, custom pages, your own start-up picture |
-| `http://<IP>/update` | install a new version of the software without a cable. The page also shows which version is running. |
+| `http://<IP>/update` | install a new version of the software without a cable. The page also shows which version is running and, from 1.8.0, links to the newest. |
 
 The [user guide](docs/USER-GUIDE.md) has the rest: the buttons, each page,
 every section of the settings page, the info page, what the amber and red

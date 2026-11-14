@@ -8,11 +8,6 @@ first. If something looks wrong, go to
 In this guide the five displays are **orb 1 to orb 5, left to right**, and
 "the orbs" means the whole set.
 
-> **Parts marked with a version**, such as (1.7.0), need that firmware version
-> or later. The settings page shows which version you are running on its first
-> line, and from 1.8.0 whether a newer one is out. To get the newest, see
-> [Updating later](../README.md#updating-later-over-wifi-no-cable).
-
 **Contents**
 
 - [The three buttons](#the-three-buttons)
@@ -20,14 +15,14 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 - [What you see at start-up](#what-you-see-at-start-up)
 - [Finding the orbs' address](#finding-the-orbs-address)
 - [The settings page](#the-settings-page)
-- [The info page](#the-info-page-170)
-- [What the amber and red marks mean](#what-the-amber-and-red-marks-mean-170)
+- [The info page](#the-info-page)
+- [What the amber and red marks mean](#what-the-amber-and-red-marks-mean)
 - [When WiFi goes down](#when-wifi-goes-down)
 - [Changing the WiFi network](#changing-the-wifi-network)
 - [Running from a phone hotspot](#running-from-a-phone-hotspot)
 - [Weather from your own Tempest stations](#weather-from-your-own-tempest-stations)
 - [Dimming and switching off at night](#dimming-and-switching-off-at-night)
-- [The log](#the-log-170)
+- [The log](#the-log)
 - [The password](#the-password)
 - [Starting over](#starting-over)
 
@@ -40,8 +35,12 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 | **Left** | short | previous page |
 | **Right** | short | next page |
 | **Middle** | short, or about half a second | depends on the page showing: see the table below |
-| **Middle** | hold 2 seconds | the [info page](#the-info-page-170) (1.7.0) |
+| **Middle** | hold 2 seconds | the [info page](#the-info-page) |
 | **Right** | hold while plugging in power | forget the WiFi network: see [Changing the WiFi network](#changing-the-wifi-network) |
+
+The buttons keep their places when the orbs are set to **Upside down**: on an
+upside-down set, "left" and "right" here are the buttons that are on the left
+and right when the orbs are the right way up.
 
 Left and right move only between the pages ticked under **Rotation > Show** on
 the settings page.
@@ -83,8 +82,12 @@ and MQTT pages are set up on the settings page under **Advanced**;
 press a button. To rotate by themselves, set **Rotation > Seconds per page**
 on the settings page.
 
-**How often the data refreshes.** Weather every 10 minutes, stocks every 15
-minutes. MQTT values change as the broker sends them.
+**How often the data refreshes.** Weather every 10 minutes and stocks every
+15 minutes, **while their page is on screen**. A page that is not on screen
+does not fetch; it gets fresh data as soon as it comes up again. So with the
+clock kept on screen, the info page can show weather that is hours old, and
+that is normal. MQTT values change as the broker sends them, on screen or
+not.
 
 ## What you see at start-up
 
@@ -100,8 +103,8 @@ With the waking eyes on, which is how new orbs come:
    up.
 
 With the eyes switched off, the orbs show the picture on orb 3 and plain
-text: the version, **Connecting**, then **Success** on orb 4 and the address
-on orb 5.
+text: **Welcome** on orb 1 with how full the firmware space is, the version,
+**Connecting**, then **Success** on orb 4 and the address on orb 5.
 
 Joining takes up to about 45 seconds: three tries of 15 seconds. If the orbs
 cannot join, orbs 4 and 5 say why. See
@@ -114,7 +117,7 @@ Everything you change, you change from a web browser on a phone or computer
 
 - **At start-up:** orb 5 shows it for 5 seconds. Unplug the orbs and plug
   them back in to see it again.
-- **On the info page** (1.7.0): hold the middle button 2 seconds and read
+- **On the info page**: hold the middle button 2 seconds and read
   orb 3.
 - **From your router:** its list of connected devices shows the orbs as
   `info-orbs`.
@@ -124,8 +127,8 @@ Then browse to:
 | Address | What it is |
 |---|---|
 | `http://<address>/settings` | the [settings page](#the-settings-page) |
-| `http://<address>/update` | install a new firmware version ([README](../README.md#updating-later-over-wifi-no-cable)); links to the newest one (1.8.0) |
-| `http://<address>/log` | the [log](#the-log-170) (1.7.0) |
+| `http://<address>/update` | install a new firmware version ([README](../README.md#updating-later-over-wifi-no-cable)); links to the newest one |
+| `http://<address>/log` | the [log](#the-log) |
 
 For example, `http://192.168.1.57/settings`.
 
@@ -141,18 +144,21 @@ working, read the address again.
 `http://<address>/settings`
 
 The top of the page shows the firmware version, how long the orbs have been
-running, and the WiFi signal: ✔ good, ⚠ fair, ✖ weak, with the number in dBm
-(closer to zero is stronger; -60 is better than -80).
+running, and the WiFi signal as a mark and a number in dBm: ✔ for -65 or
+better, ⚠ to -75, ✖ below that (closer to zero is stronger; -60 is better
+than -80).
 
-Under the version, the page says whether a newer one is out (1.8.0):
+Under the version, the page says whether a newer one is out:
 
 | The line | What it means |
 |---|---|
 | **⬆ Version 1.9.0 is available.** Update page | A newer version is out. **Update page** takes you to `/update`, which has the download link. |
 | ✔ This is the newest version. | Nothing to do. |
-| Local build, not a release file. | The orbs run software built from the source, not a downloaded release. Normal if you build your own. |
-| This build is newer than the newest release. | The same, with a version number ahead of the newest release. |
-| Could not check for a newer version. | See [Troubleshooting](TROUBLESHOOTING.md#updating). The orbs are fine. |
+| Local build, not a release file. Newest release: 1.8.0. Update page | The orbs run software built from the source, not a downloaded release. Normal if you build your own. |
+| This build is newer than the newest release, 1.8.0. | The same, with a version number ahead of the newest release. |
+| Could not check for a newer version. | No answer within 10 seconds. See [Troubleshooting](TROUBLESHOOTING.md#updating). The orbs are fine. |
+
+While it asks, the line reads **Checking for a newer version…**.
 
 The phone or computer you are reading on does the asking, not the orbs: it
 asks GitHub, where the releases are, each time the page loads. So the line
@@ -172,18 +178,18 @@ Your settings stay through restarts, power cuts and
 | **API keys** | Your free [Visual Crossing](https://www.visualcrossing.com/sign-up) weather key, and a Tempest token if you have a station. Once saved, a key shows as stars. Leave the box alone to keep the key, or paste a new one to replace it. |
 | **Time zone and location** | **Time zone**: pick from the list. Daylight saving is automatic. **Weather location**: your town, such as `Orlando, FL`. The page cannot check the town; a wrong one shows up as an empty weather page. |
 | **Tempest stations** | See [Weather from your own Tempest stations](#weather-from-your-own-tempest-stations). |
-| **Mounting** | **Upside down** turns the screens over and swaps the order of the orbs and buttons, for a set mounted the other way up. |
+| **Mounting** | **Upside down** turns the screens over and reverses the order of the orbs, for a set mounted the other way up. The buttons do not move: left is still the button that is on the left when the orbs are the right way up. |
 
 ### Display: what the orbs show
 
 | Section | What is in it |
 |---|---|
-| **Rotation** | **Seconds per page**: 0 stays on one page; 5 to 3600 moves to the next page after that many seconds. **Show**: tick the pages you want. Tick one to keep it on screen, or several to rotate through them. **Clock only when WiFi is out** (1.7.0): Off keeps the page up with its marks; On switches to the clock while WiFi is down. See [the marks](#what-the-amber-and-red-marks-mean-170). |
+| **Rotation** | **Seconds per page**: 0 stays on one page; 5 to 3600 moves to the next page after that many seconds. **Show**: tick the pages you want. Tick one to keep it on screen, or several to rotate through them. **Clock only when WiFi is out**: Off keeps the page up with its marks; On switches to the clock while WiFi is down. See [the marks](#what-the-amber-and-red-marks-mean). |
 | **Clock** | The clock face at start-up, 12-hour or 24-hour, the AM/PM mark, the digit color and the color of the unlit segments. |
 | **Weather** | °F and mph, or °C and km/h. Light or dark screens. |
 | **Stocks** | One to five tickers, with commas between them, one per orb. Crypto is written `BTC/USD`. To pick an exchange, add the country: `APC&country=Germany`. |
 | **Dim times**, **Screens-off times** | See [Dimming and switching off at night](#dimming-and-switching-off-at-night). |
-| **Start-up eyes** | **Waking eyes** on or off, the eye lid style, eyelashes, and the iris color. **Demo: show each in turn** plays a wake-up in every style, with its name on orb 5, and keeps playing until you pick a style. |
+| **Start-up eyes** | **Waking eyes** on or off, the eye lid style, eyelashes, and the iris color. **Demo: show each in turn** plays a wake-up in every style, with its name on orb 5, and keeps playing until you pick a style. While it plays, no pages show, the buttons do nothing and the start-up picture is skipped; the settings page still works. |
 | **Start-up picture** | Pick any photo. The page crops it to a square and shows the circle the orb will display. **Upload and restart** puts it on orb 3 at start-up. **Use the built-in logo** takes it off again. |
 
 ### Advanced: pages of your own
@@ -197,7 +203,7 @@ The button beside **Save and restart**. It forgets every setting saved from
 the page, your keys included, and asks before it does. WiFi and the start-up
 picture are not touched.
 
-## The info page (1.7.0)
+## The info page
 
 **Hold the middle button for 2 seconds.** The info page appears while you
 are still holding. It works from any page. Press any button to close it, or
@@ -210,7 +216,7 @@ settings page. It is the first thing to read when something looks wrong.
 |---|---|---|
 | 1 | **Firmware** | The version, the commit, and the date it was built. |
 | 2 | **WiFi** | The network name, the signal, and the channel. Or **No WiFi**. |
-| 3 | **Address** | The orbs' address and their `.local` name. |
+| 3 | **Address** | The orbs' address and their `.local` name, or **none, no WiFi**. |
 | 4 | **Health** | How long the orbs have been running, why they last started, and free memory. |
 | 5 | **Data** | How long ago each kind of page last got fresh data. |
 
@@ -226,17 +232,19 @@ settings page. It is the first thing to read when something looks wrong.
 | `last start: restart` | The software restarted itself: after **Save and restart**, after an update, or to get back on WiFi. Normal. |
 | `last start: reset pin` | Someone pressed the small **R** button on the XIAO. |
 | `last start: crash` or `watchdog` | The software stopped and restarted itself. Once is nothing. If it keeps happening, [send the log](TROUBLESHOOTING.md#getting-help). |
-| `last start: brownout` | The power dipped. Try another USB cable or power supply. |
+| `last start: brownout` | The power dipped. Try another USB cable, or a supply rated 2 A. |
+| `last start: deep sleep` or `not known` | Rare. `not known` can follow a reset from the USB side. Once is nothing; if it keeps happening, [send the log](TROUBLESHOOTING.md#getting-help). |
 | `memory 142 KB free` | Working memory the software has spare. It moves around. It only matters to whoever is helping you. |
 | `weather 3 min ago` | The weather page last got fresh data 3 minutes ago. With more than one weather page, this is the oldest of them. |
 | `stocks no data yet` | That page has not had data since the orbs started. |
-| `MQTT not connected` | The orbs cannot reach the MQTT broker. |
+| `MQTT not connected` | The orbs cannot reach the MQTT broker. With two MQTT pages and only one broker out of reach, it says which: `MQTT 1 not connected` or `MQTT 2 not connected`. |
+| `MQTT no data yet`, `MQTT 4 min ago` | Connected; no value has arrived yet, or the oldest value arrived that long ago. |
 | `no data pages` | Only the clock is ticked under **Show**. |
 
 Times here are never in seconds: `<1 min`, `12 min`, `2 h 05 min`,
 `3 d 04 h`.
 
-## What the amber and red marks mean (1.7.0)
+## What the amber and red marks mean
 
 The orbs keep showing the last data they got when they cannot get new data.
 The marks tell you when what you are looking at is old.
@@ -256,9 +264,12 @@ on the clock.
 - **No WiFi** appears once WiFi has been down for 10 seconds.
 - The ring goes around the orbs holding old data. Weather and stocks count as
   old after 20 minutes without a refresh. An MQTT page counts as old once its
-  broker has been out of reach for 3 minutes.
+  broker has been out of reach for 3 minutes. A Web Data page counts as old
+  at twice its own refresh time, and never sooner than 3 minutes: 3 minutes
+  at the default of 60 seconds.
 - The clock gets none of these marks. It keeps time without WiFi.
-- When WiFi comes back, the pages refresh at once and the marks go away.
+- When WiFi comes back, the marks go away, and the page on screen refreshes
+  at once if its data was old. Other pages refresh when they next come up.
 
 ### On the clock: red, with "Clock only when WiFi is out"
 
@@ -288,7 +299,7 @@ With it **On**, once WiFi has been down for 10 seconds:
 
 You do not need to do anything. The orbs get themselves back on.
 
-**While they are running** (1.7.0):
+**While they are running**:
 
 | When | What the orbs do |
 |---|---|
@@ -297,14 +308,14 @@ You do not need to do anything. The orbs get themselves back on.
 | every 30 seconds | Try to rejoin. |
 | the router is off or out of range | Keep trying for as long as it takes, and never restart. Every 10 minutes they switch their radio off and on. |
 | the router is there but will not let them in | Switch their radio off and on after 2½ minutes, and restart after 5 minutes. |
-| WiFi returns | Rejoin, refresh every page, and clear the marks. If they had switched to the clock, go back to the page that was up. |
+| WiFi returns | Rejoin, refresh the page on screen if its data is old (the others when they next come up), and clear the marks. If they had switched to the clock, go back to the page that was up. |
 
 So after a power cut or a router restart, give the orbs a few minutes after
 the router is back.
 
 **At start-up**, the orbs need WiFi before they show any page. If they cannot
 join, orbs 4 and 5 say why and how to fix it. They also keep trying by
-themselves (1.7.0):
+themselves:
 
 | Orbs 4 and 5 say | What the orbs do by themselves |
 |---|---|
@@ -320,9 +331,11 @@ they never restart under you while you are typing a password.
 The orbs remember **one** WiFi network. To move them to another:
 
 1. Unplug the orbs.
-2. Hold the **right** button and plug them back in. Let go when the screens
-   show `Wifi Settings reset`.
-3. The orbs start their own setup network. Orbs 4 and 5 show its name:
+2. Hold the **right** button and plug them back in. Let go when orb 4 shows
+   `Wifi Settings reset`. On a set mounted upside down, this is the button on
+   the left as you look at it: the buttons do not move with the **Upside
+   down** setting.
+3. The orbs start their own setup network. Orb 5 shows its name:
    `Info-Orbs_` and two characters, such as `Info-Orbs_84`. Yours will have
    its own two characters.
 4. On a phone or computer, join that network. A setup page opens by itself;
@@ -386,11 +399,12 @@ Type times as 24-hour (`22:00`, `7:30`) or with am and pm (`10pm`,
 `7:30am`). A schedule can run past midnight, such as from `22:00` until
 `7:00`. Where the two overlap, off wins.
 
-## The log (1.7.0)
+## The log
 
 The orbs keep a record of what happens to them: each start and why, WiFi
 going down and coming back, a page that stops refreshing and when it
-recovers. Each line has the date and time.
+recovers. Each line has the date and time; lines from before the orbs had
+set their clock show dashes for the date.
 
 It is at the top of the settings page: **Log: view · download**. **Download**
 saves it as `info-orbs-log.txt`, which is the file to send when you ask for
@@ -421,4 +435,4 @@ settings, update and log pages.
 |---|---|
 | put the settings back, keep the WiFi | **Reset to built-in values** on the settings page |
 | change the WiFi, keep the settings | [Changing the WiFi network](#changing-the-wifi-network) |
-| wipe everything | the [Quick start](../README.md#quick-start-no-software-to-install-on-your-pc) again. Its file erases the whole board, so WiFi and the weather key go back in afterwards. |
+| wipe everything | the [Quick start](../README.md#quick-start-no-software-to-install-on-your-pc) again. Its file erases the whole board, so WiFi, the weather key and your start-up picture go back in afterward, and the log starts empty. |

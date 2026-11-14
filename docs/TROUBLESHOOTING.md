@@ -8,11 +8,6 @@ fix: do the
 [Quick start](../README.md#quick-start-no-software-to-install-on-your-pc)
 again.
 
-> **Parts marked with a version**, such as (1.7.0), need that firmware version
-> or later. The settings page shows which version you are running on its first
-> line, and from 1.8.0 whether a newer one is out. To get the newest, see
-> [Updating later](../README.md#updating-later-over-wifi-no-cable).
-
 - [Installing](#installing)
 - [WiFi setup](#wifi-setup)
 - [Running](#running)
@@ -44,24 +39,24 @@ failed.
 | What you see | What it means, and what to do |
 |---|---|
 | **Set up WiFi**, a network name starting `Info-Orbs_`, and `192.168.4.1` | The orbs have no WiFi network saved. On a phone, join the network named on the screen. A setup page opens; choose **Configure WiFi**, pick your network, type its password, press **Save**. |
-| You joined `Info-Orbs_..` but no page opened | Browse to `http://192.168.4.1`. If the phone says the network has no internet, that is expected: stay on it. If the page still does not load, turn off the phone's mobile data for a minute, or use a laptop. |
+| You joined `Info-Orbs_…` but no page opened | Browse to `http://192.168.4.1`. If the phone says the network has no internet, that is expected: stay on it. If the page still does not load, turn off the phone's mobile data for a minute, or use a laptop. |
 | Your network is not in the setup page's list | The orbs see only **2.4 GHz** WiFi. A network that is 5 GHz only never appears. On a phone hotspot, see [Running from a phone hotspot](USER-GUIDE.md#running-from-a-phone-hotspot). Otherwise move the orbs closer to the router and press **Refresh**. |
-| Red X, **WiFi not found**, and your network's name | The orbs cannot hear the network they were given. Is the router on? Are the orbs in range? Was the name typed by hand and misspelled? The orbs keep listening and join by themselves when they hear it (1.7.0). To give them a different network, join `Info-Orbs_..` and open `http://192.168.4.1`. |
-| Red X, **Wrong password**, and your network's name | The router refused the password. Join `Info-Orbs_..`, open `http://192.168.4.1`, and type it again. Capitals matter. |
-| **Wrong password**, and you are sure it is right | A router that has **blocked** the orbs refuses them the same way. Look in the router's settings for a block list or access control. On some routers, after unblocking you must also remove ("forget") the orbs from the router's device list before it lets them back in. |
-| Red X, **WiFi didn't connect**, and your network's name | The orbs reached the network but did not finish joining. Unplug them and plug them back in to try again at once. Left alone, they retry after 5 minutes, then 10, then 20, then every 30 minutes (1.7.0). |
-| The orbs are on a failure screen and you cannot find `Info-Orbs_..` on your phone | Stand near the orbs and refresh the phone's WiFi list. If it never shows, unplug the orbs, hold the **right** button, and plug them back in: they show `Wifi Settings reset` and start the setup network fresh. |
-| Two sets show the same `Info-Orbs_..` name | It can happen: there are only 256 endings. Set them up one at a time, with the other unplugged. |
+| Red X, **WiFi not found**, and your network's name | The orbs cannot hear the network they were given. Is the router on? Are the orbs in range? Is the small stick-on antenna clipped onto the XIAO's tiny U.FL socket? Without it the orbs hear almost nothing. Was the name typed by hand and misspelled? The orbs keep listening and join by themselves when they hear it. To give them a different network, join `Info-Orbs_…` and open `http://192.168.4.1`. |
+| Red X, **Wrong password**, and your network's name | The router refused the password. Join `Info-Orbs_…`, open `http://192.168.4.1`, and type it again. Capitals matter. If this password has worked on these orbs before, they also retry by themselves after 5 minutes, then 10, then 20, then every 30 minutes; unplug and plug them back in to try at once. |
+| **Wrong password**, and you are sure it is right | A router that has **blocked** the orbs refuses them the same way. Look in the router's settings for a block list or access control. On a UniFi network, unblocking is not enough: also **Forget** the orbs in the device list, or they stay refused. Other routers may do the same. Once the block is gone, orbs whose password has worked before come back by themselves (the row above has the timings). |
+| Red X, **WiFi didn't connect**, and your network's name | The orbs reached the network but did not finish joining. Unplug them and plug them back in to try again at once. Left alone, they retry after 5 minutes, then 10, then 20, then every 30 minutes. |
+| The orbs are on a failure screen and you cannot find `Info-Orbs_…` on your phone | Stand near the orbs and refresh the phone's WiFi list. If it never shows, unplug the orbs, hold the **right** button (the one on the right when the orbs are the right way up, even if yours are mounted upside down), and plug them back in: orb 4 shows `Wifi Settings reset` and start the setup network fresh. |
+| Two sets show the same `Info-Orbs_…` name | It can happen: there are only 256 endings. Set them up one at a time, with the other unplugged. |
 | You want to move the orbs to another network | [Changing the WiFi network](USER-GUIDE.md#changing-the-wifi-network). |
 
 ## Running
 
-### Amber and red marks (1.7.0)
+### Amber and red marks
 
 Amber marks are on the pages that show data. Red marks are only on the
 clock, and only with **Clock only when WiFi is out** switched on. The words
 and the ring's shape mean the same in either color.
-[What the amber and red marks mean](USER-GUIDE.md#what-the-amber-and-red-marks-mean-170)
+[What the amber and red marks mean](USER-GUIDE.md#what-the-amber-and-red-marks-mean)
 has the full list.
 
 | What you see | What it means, and what to do |
@@ -70,10 +65,10 @@ has the full list.
 | The orbs changed to the clock by themselves: a **broken** red ring on every orb, **No WiFi** on a red plate on orb 3 | WiFi is down, and **Clock only when WiFi is out** is On. Wait, as in the row above: the page that was up comes back with the WiFi. A button still shows the other pages. To keep pages up during an outage, set it to Off: settings page, **Rotation**. |
 | The clock shows during an outage though it is not ticked under **Show** | That is **Clock only when WiFi is out** doing its job. The clock leaves again when WiFi returns. |
 | The clock's seconds tick is gone, or the Nixie colon has stopped blinking | They rest while the clock wears its red ring. Both come back with the WiFi. |
-| **No WiFi** that comes and goes through the day | The signal is weak where the orbs sit. Hold the middle button 2 seconds and read orb 2: `fair` or `weak` is the cause. Move the orbs or the router closer together. |
-| **No WiFi** that never clears, though phones are online | Unplug the orbs and plug them back in. If they cannot join, orbs 4 and 5 say why: see [WiFi setup](#wifi-setup). |
+| **No WiFi** that comes and goes through the day | The signal is weak where the orbs sit. Hold the middle button 2 seconds and read orb 2: `fair` or `weak` is the cause. Move the orbs or the router closer together, and check that the small antenna is clipped firmly onto the XIAO. |
+| **No WiFi** that never clears, though phones are online | If the orbs can hear the router but it will not let them on, they restart by themselves after 5 minutes, and orbs 4 and 5 then say why: see [WiFi setup](#wifi-setup). To try at once, unplug them and plug them back in. If it says **Wrong password** and the password is right, the router may have blocked them. |
 | A **broken** amber ring around some orbs | WiFi has been down long enough that the data inside the ring is old. It clears when WiFi returns. |
-| A **solid** amber ring, no **No WiFi** | WiFi is up, but fresh data is not arriving. Check that the internet works on your phone, on the same WiFi. If only the weather page has the ring, see "Weather worked, then stopped" below. |
+| A **solid** amber ring, no **No WiFi** | WiFi is up, but fresh data is not arriving. Check that the internet works on your phone, on the same WiFi. If only the weather page has the ring, see "Weather page is empty" below (no key yet, or a wrong one) and "Weather worked, then stopped". If only the stocks page has it, see "Every stocks orb is empty". |
 
 ### Pages
 
@@ -84,6 +79,7 @@ has the full list.
 | Weather worked, then stopped, and the internet is fine | The free key has a daily allowance. One set uses a small part of it; a key shared between people can run out. It starts again the next day. |
 | A Tempest page is missing | A station gets a page only when a token is saved. On the settings page, **Tempest stations** shows ✔ or ✖ and the error for each station. |
 | Stocks page shows nothing for one orb | Check that ticker's spelling under **Stocks**. Crypto is written `BTC/USD`. |
+| Every stocks orb is empty or ringed, and weather is fine | The stock prices come through one shared Twelve Data key built into the software, not a key of yours. When its allowance runs out or the service is down, every set loses prices together. There is nothing to fix on your side: tell the club. |
 | A page you set up does not appear when you press the buttons | It is not ticked. Settings page, **Rotation > Show**. |
 | The orbs stay on one page | **Seconds per page** is 0, or only one page is ticked. Settings page, **Rotation**. |
 | An MQTT or Web Data page is empty | The settings page shows each one's last result under **Advanced**. See [CUSTOM-PAGES.md](CUSTOM-PAGES.md). |
@@ -104,13 +100,13 @@ has the full list.
 | One orb is lit but blank, the others are fine | Unplug the orbs and plug them back in. This has been seen once and a restart cleared it; the cause is not known. If it comes back, note which orb and whether it is the same one each time, and [tell us](#getting-help). |
 | The orbs are upside down, or in the wrong order | Settings page, **Mounting**. |
 | The eyes play over and over at start-up | **Eye lids** is set to **Demo: show each in turn**. Pick a style under **Start-up eyes**. |
-| The orbs restart by themselves | Hold the middle button 2 seconds and read **last start** on orb 4 (1.7.0). `restart` after WiFi trouble is the orbs getting themselves back on, on purpose. `brownout` means the power dipped: try another cable or power supply. `crash` or `watchdog` more than once: [send the log](#getting-help). |
+| The orbs restart by themselves | Hold the middle button 2 seconds and read **last start** on orb 4. `power on` and `reset pin` are normal. `restart` after WiFi trouble is the orbs getting themselves back on, on purpose. `brownout` means the power dipped: try another cable, or a supply rated 2 A. `not known` can follow a reset from the USB side. `crash` or `watchdog` once is worth noting; more than once: [send the log](#getting-help). |
 
 ## The settings page
 
 | What you see | What it means, and what to do |
 |---|---|
-| The browser cannot open `http://<address>/settings` | 1. The phone or computer must be on the **same WiFi** as the orbs. A guest network usually cannot reach them. 2. Read the address again: it can change. Orb 5 shows it at start-up, and orb 3 of the info page shows it any time (1.7.0). 3. Type `http://` at the front. The orbs do not answer `https://`. |
+| The browser cannot open `http://<address>/settings` | 1. The phone or computer must be on the **same WiFi** as the orbs. A guest network usually cannot reach them. 2. Read the address again: it can change. Orb 5 shows it at start-up, and orb 3 of the info page shows it any time. 3. Type `http://` at the front. The orbs do not answer `https://`. |
 | `http://info-orbs.local/settings` does not open | Use the numbers instead. The name does not work on every network or every phone, and with more than one set only one of them answers to it. |
 | The browser asks for a user name and password | Whoever built the software set one. The user name is `admin`. |
 | **Save and restart** shows a message beside a field | That value is not allowed, and nothing was saved. Fix the field and save again. |
@@ -124,12 +120,12 @@ Problems with a
 | What you see | What it means, and what to do |
 |---|---|
 | The orbs show **Update failed, old firmware kept** | Nothing changed; the orbs keep running the old version. Check that you chose `firmware.bin` (not the combo file, which is for USB) and upload again. |
-| The page still shows the old version after an update | Look too soon and the old version is still answering: the orbs take several seconds to restart. Wait until the orbs show a page again, reload, and read the first line. |
-| The settings page says **Could not check for a newer version** (1.8.0) | The phone or computer you are reading on asks GitHub for the newest version, and got no answer: it has no internet, something on it blocks the request, or your network has asked more than 60 times in the last hour. The orbs are fine. The **download firmware.bin** link on the update page still gets the newest file. |
-| No line about a newer version under the version (1.8.0) | Scripts are turned off in the browser, or the firmware is older than 1.8.0. Use the **download firmware.bin** link on the update page, or the one in the [README](../README.md#updating-later-over-wifi-no-cable). |
-| **Local build, not a release file** (1.8.0) | The orbs run software built from the source. Normal if you build your own. To go back to the release, download `firmware.bin` from the update page and upload it. |
+| The page still shows the old version after an update | Look too soon and the old version is still answering: the orbs take several seconds to restart. Wait until the orbs show a page again, reload, and read the first line. If it still shows the old version, the new one could not get back on WiFi after its restart and was undone: check the WiFi, then upload again. |
+| The settings page says **Could not check for a newer version** | The phone or computer you are reading on asks GitHub for the newest version, and got no answer: it has no internet, something on it blocks the request, or your network has asked more than 60 times in the last hour. The orbs are fine. The **download firmware.bin** link on the update page still gets the newest file. |
+| No line about a newer version under the version | Scripts are turned off in the browser. Use the **download firmware.bin** link on the update page, or the one in the [README](../README.md#updating-later-over-wifi-no-cable). |
+| **Local build, not a release file** | The orbs run software built from the source. Normal if you build your own. To go back to the release, download `firmware.bin` from the update page and upload it. |
 | The orbs do not come back after an update | Unplug them and plug them back in. A new version that cannot get back on WiFi is undone at the next restart, and the old one runs again. |
-| Still dark | Do the [Quick start](../README.md#quick-start-no-software-to-install-on-your-pc) again. It wipes the board, so WiFi and the weather key go back in afterwards. |
+| Still dark | Do the [Quick start](../README.md#quick-start-no-software-to-install-on-your-pc) again. It wipes the board, so WiFi and the weather key go back in afterward. |
 
 ## Building from source
 
@@ -140,12 +136,12 @@ Only if you build the software yourself with the
 |---|---|
 | `Copy firmware/config/secrets.h.template…` | You missed [step 3](SETUP.md#3-create-your-two-config-files). Copy both templates. |
 | `WEATHER_API_KEY is empty…` | `secrets.h` exists but the key is still `""`. See [step 4](SETUP.md#4-get-your-api-key). |
-| `ModuleNotFoundError: No module named 'intelhex'` | PlatformIO set up a fresh Python environment, often after a VS Code update, and missed a part of its flashing tool. Fix: `~/.platformio/penv/bin/python -m pip install intelhex` |
+| `ModuleNotFoundError: No module named 'intelhex'` | PlatformIO set up a fresh Python environment, often after a VS Code update, and missed a part of its flashing tool. Fix on Mac or Linux: `~/.platformio/penv/bin/python -m pip install intelhex`. On Windows: `%USERPROFILE%\.platformio\penv\Scripts\python -m pip install intelhex` |
 | Builds broke on a machine that worked before | A VS Code update replaced PlatformIO's Python environment. Reopen the project folder in VS Code, let the set-up notice at the bottom right finish, then see the `intelhex` row above. |
 | No serial port listed | Suspect the USB cable first: many carry power only. The XIAO uses the ESP32-S3's own USB, so no CP2102 or CH340 driver is needed. If the orbs still answer on WiFi they are fine: enter download mode ([step 6](SETUP.md#6-build-and-upload)) and upload again. |
 | Upload starts, then fails | Enter download mode by hand: hold **B** while plugging the cable in, then Upload. |
 | `pio run -e ota -t upload` says `No response from device` | The orbs have to connect back to your computer, which fails across subnets, and a failed try restarts them. Wait until the update page loads again and upload from the browser. |
-| Opening a serial monitor restarts the orbs | That is the XIAO's USB port. To see what the orbs have been doing, read `http://<address>/log` instead (1.7.0). |
+| Opening a serial monitor restarts the orbs | That is the XIAO's USB port. To see what the orbs have been doing, read `http://<address>/log` instead. |
 
 [TRAPS.md](TRAPS.md) has the longer stories behind these, for developers.
 
@@ -158,9 +154,11 @@ GitHub account is needed). Three things make it quick to help you:
 1. **What you see, and on which orb.** A phone photo of the five orbs is
    best.
 2. **The version.** Hold the middle button 2 seconds and read orb 1: the
-   version and the commit (1.7.0). On older firmware, it is the first line
-   of the settings page.
-3. **The log** (1.7.0). On the settings page, **Log: download** saves
+   version and the commit. It is also the first line
+   of the settings page. While the orbs show the setup network, the info
+   page does not open: read the version as the orbs start up, on orb 2
+   (orb 5 with start-up eyes).
+3. **The log**. On the settings page, **Log: download** saves
    `info-orbs-log.txt`. Attach it. It holds events only: no network name, no
    passwords, no keys, no station IDs.
 

@@ -1,4 +1,4 @@
-# HoT Info Orbs
+# HOT Info Orbs
 
 ![HOT Info Orbs in the enclosure, angled front view: Fusion render of the current design, not a photo](docs/images/master_assembly_angled.png)
 
@@ -24,12 +24,12 @@ network.
    - **Flash offset:** `0x0`
    - click **Flash firmware** and wait for it to finish.
 5. Unplug the USB cable and plug it back in. The orbs restart.
-6. **WiFi:** the screens show a network named `Info-Orbs_` and two
+6. **WiFi:** orb 5 shows a network named `Info-Orbs_` and two
    characters. Join it on a phone; a setup page opens (if not, browse to
    `http://192.168.4.1`). Pick your home WiFi and type its password.
 7. **Your free weather key and time zone:** the orbs show their **IP
    address** when they join your WiFi. On a phone or computer on the same
-   WiFi, browse to `http://<that address>/settings`. The page starts with
+   WiFi, browse to `http://<that address>/settings`. Its first section is
    **API keys**: paste a [Visual Crossing](https://www.visualcrossing.com/sign-up)
    key, free and about a minute to get. Under **Time zone and location**,
    pick your time zone from the list (it starts on New York; daylight saving
@@ -57,7 +57,7 @@ settings and start-up picture.
 3. Choose `firmware.bin` and press **Upload**. The orbs restart on their own
    when it is done, with your WiFi, key and settings kept.
 
-From 1.8.0 the orbs' own pages do steps 1 and 2 for you: the first lines of
+The orbs' own pages help with steps 1 and 2: the first lines of
 the settings page say when a newer version is out (**⬆ Version … is
 available**), and the update page has a **download firmware.bin** link that is
 always the newest release.
@@ -95,11 +95,14 @@ firmware version, WiFi, address, health and data feeds. It appears while
 you are still holding. Any button closes it, or it closes by itself after
 2 minutes. The [user guide](docs/USER-GUIDE.md) explains every line on it.
 
-- **Clock**: normal, Nixie-tube, or custom faces, in your choice of colors.
+- **Clock**: normal or Nixie-tube faces, in your choice of colors. A face
+  drawn from your own pictures needs a build of your own
+  ([SETUP.md](docs/SETUP.md)).
 - **Weather** for a town (Visual Crossing), from your own
   [Tempest](https://tempest.earth) weather stations (one page per station),
   or both.
-- **Stocks**: five tickers.
+- **Stocks**: up to five tickers, one per orb. Prices come through a shared
+  key built into the software; you need no key of your own.
 - **Custom pages** that you set up from the browser, no rebuild:
   - **Web Data** draws a JSON file from any web address.
   - **MQTT**, up to two pages, shows one live value per display from an MQTT
@@ -112,8 +115,9 @@ you are still holding. Any button closes it, or it closes by itself after
 
 **To run it** (the [Quick start](#quick-start-no-software-to-install-on-your-pc)):
 
-- The assembled orbs: carrier board, a XIAO ESP32-S3 or S3 Plus, five GC9A01
-  round displays, three buttons.
+- The assembled orbs: carrier board, a XIAO ESP32-S3 or S3 Plus with its
+  small stick-on WiFi antenna clipped on, five GC9A01 round displays, three
+  buttons. Without the antenna the orbs barely hear the router.
   **S3 or S3 Plus makes no difference to the software.** Both use the same
   file; there is nothing to change. The Plus has more memory, which the
   software does not use yet.
@@ -125,7 +129,7 @@ you are still holding. Any button closes it, or it closes by itself after
   sign up, so the orbs can ask it for data. It takes about a minute:
   [Visual Crossing](https://www.visualcrossing.com/sign-up), for weather.
   Sign up for your own. A shared key uses up one free allowance, and if it is
-  cancelled it stops working for everyone using it. The time zone needs no
+  canceled it stops working for everyone using it. The time zone needs no
   key: the firmware carries the daylight-saving rules itself.
 
 **To build the software yourself**, also:
@@ -143,7 +147,7 @@ orb 5 when they join (four numbers with dots, like `192.168.1.57`).
 | Address | What it does |
 |---|---|
 | `http://<IP>/settings` | rotation time, which pages show, tickers, weather location and units, time zone, clock face and colors, night dimming, upside-down mounting, the waking eyes at start-up, what to show when WiFi is out, custom pages, your own start-up picture |
-| `http://<IP>/update` | install a new version of the software without a cable. The page also shows which version is running and, from 1.8.0, links to the newest. |
+| `http://<IP>/update` | install a new version of the software without a cable. The page also shows which version is running and links to the newest. |
 
 The [user guide](docs/USER-GUIDE.md) has the rest: the buttons, each page,
 every section of the settings page, the info page, what the amber and red

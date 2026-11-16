@@ -1,8 +1,20 @@
 # Could this run on ESPHome instead?
 
-Evaluated 2026-08-27. **Answer: not on this hardware — ESPHome buffers each
-display in RAM and five will not fit.** The idea is sound and the reasons it
-fails are specific, so they are recorded rather than the conclusion alone.
+Evaluated 2026-08-27; the reason restated by Scott on 2026-11-15.
+
+**Answer: no, because not everyone has Home Assistant.** A club kit has to work
+for a member who has nothing but a WiFi router, so the orbs stand on their own.
+Home Assistant owners still get their data onto the orbs through MQTT pages
+(see "The part worth keeping" below), as an option on top rather than a
+requirement underneath.
+
+The evaluation also found a hardware blocker: ESPHome keeps a full framebuffer
+per display, and five of them did not fit in the RAM of the module in use at the
+time. That is recorded below as a technical finding, **not the deciding
+reason**. It may no longer hold: the section "What would change the answer"
+names PSRAM, and the XIAO ESP32-S3 chosen later carries 8 MB of it
+([VARIANT-XIAO-ESP32S3.md](VARIANT-XIAO-ESP32S3.md)). ESPHome has not been tried
+on the XIAO.
 
 ## Why it was worth asking
 
@@ -16,13 +28,13 @@ ESPHome would provide, as built-in components rather than as work:
 | Config format             | YAML instead of C++                                         |
 
 And one thing not on the requirements list that may matter more than both:
-**Home Assistant integration would remove the API keys entirely.** Weather could
+**For builders who have Home Assistant, it would remove the API keys entirely.** Weather could
 come from an existing HA weather entity rather than Visual Crossing; there would
 be no key to register, no free-tier quota, and no key to leak. For builders new
 to embedded work, YAML with no compile step is a genuinely lower wall than a C++
 toolchain.
 
-## Why it does not work
+## The RAM finding (not the deciding reason)
 
 ESPHome supports GC9A01A through the `ili9xxx` display component (added March
 2024). That component **allocates a full framebuffer per display**. There is an

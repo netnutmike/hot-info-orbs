@@ -14,6 +14,12 @@ The only 3D printed part in the enclosure is the **display standoff**. Print it 
 
 Give the shop the two fabrication drawings in this folder. Each drawing lists the material, thickness, outline, hole and notch positions, and edge finish, with every dimension in mm and inches. All outside edges are to be polished.
 
+For shops that cut from CAD files, DXF cut files of both panels are also included (`front panel - DXF cut profile.dxf`, `back panel - DXF cut profile.dxf`). Each contains only the cut geometry, in mm: one closed outline (with the USB notch on the back panel) and the four Ø3.205 mm holes. `back panel - DXF cut profile.dxf` is drawn in the same orientation as its fabrication drawing. The front panel DXFs come out of Fusion rotated 180° from the drawing's outside view. The part is identical; rotate it 180° to compare it with the drawing.
+
+**Optional display cutouts:** `front panel - DXF with display cutouts.dxf` is a variant of the front panel with five round openings for the displays, for anyone who wants them. Their diameter is set by the Fusion user parameter **disp_hole_dia** (currently 35.5 mm [1.398 in]), and they are centered on the displays. The standard `front panel - DXF cut profile.dxf` and the front panel drawing have **no** display openings.
+
+**Re-exporting the DXFs after a design change:** in `acrylic sandwich.f3d`, each panel component has a hidden sketch named **front panel - DXF cut profile** / **back panel - DXF cut profile**. It is projected from the panel body, so it updates with the model. In the Browser, right-click that sketch and choose **Save As DXF**. Save the file under the sketch's name, as the files in this folder are. For the display-cutout variant, export **front panel - DXF with display cutouts** the same way. Do not export the other panel sketches (**front panel**, **back panel**): they contain reference geometry and artwork that is not cut.
+
 | Panel | Size | Features |
 |---|---|---|
 | Front | 254.00 × 82.78 × 6.35 mm [10.000 × 3.259 × 0.250 in] | 4 × Ø3.205 mm [0.1262 in] through-holes |
@@ -29,6 +35,9 @@ Give the shop the two fabrication drawings in this folder. Each drawing lists th
 | `acrylic sandwich.jpg` | A rendered picture of the assembled enclosure, for reference. |
 | `Acrylic Sandwich - Front Panel Fabrication Drawing.pdf` | Fabrication drawing for the **front panel**, to send to the plastics shop. |
 | `Acrylic Sandwich - Back Panel Fabrication Drawing.pdf` | Fabrication drawing for the **back panel**, including the USB notch, to send to the plastics shop. |
+| `front panel - DXF cut profile.dxf` | DXF cut file (mm) for the **front panel**: outline and four holes, for shops that cut from CAD files. Exported from the **front panel - DXF cut profile** sketch. |
+| `front panel - DXF with display cutouts.dxf` | Optional DXF variant of the front panel with five round display openings (diameter = `disp_hole_dia`, currently 35.5 mm), plus the outline and four holes. Exported from the **front panel - DXF with display cutouts** sketch. |
+| `back panel - DXF cut profile.dxf` | DXF cut file (mm) for the **back panel**: outline with USB notch and four holes, for shops that cut from CAD files. Exported from the **back panel - DXF cut profile** sketch. |
 
 ## Parts list (other than the PCB and the acrylic panels)
 

@@ -176,4 +176,8 @@ within 12 mA. See `TRAPS.md`, "PPK II from a script".
 
 - The XIAO ESP32-S3 Plus.
 - Module temperature on the XIAO. Scott ruled it out on 2026-11-16: the
-  SuperMini thermal shots above are good enough.
+  SuperMini thermal shots above are good enough. **There is no XIAO thermal
+  image.** Checked 2026-11-16: the camera originals are timestamped
+  2026-10-17 16:10–16:11. That afternoon the XIAO board had only just been
+  routed (commit a0c84fc, 16:08: "XIAO board expected in manufacturing").
+  So every thermal shot shows the v1.1 SuperMini board.

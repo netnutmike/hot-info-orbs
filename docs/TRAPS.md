@@ -424,3 +424,24 @@ in seconds with `target` set to one occurrence
 screws as one line and 6 bags estimated $8.41, with "Estimated weight 1.0
 lbs" shown both times (Scott). Consolidate lines on small orders before
 worrying about weight.
+
+## PPK II from a script: four ways it lies (2026-11-16)
+
+Found while measuring the XIAO with `ppk2-api` 0.9.2 on macOS
+(`tools/ppk/`, `docs/POWER-MEASURED.md`).
+
+1. **Polling `in_waiting` loses most of the stream.** The library's
+   `get_data()` loop received about 85 kB/s of the PPK's 400 kB/s, quietly.
+   Blocking bulk reads (`ser.read(65536)` with a 50 ms timeout) got 398–399
+   kB/s. **Check the sample count against the seconds requested** (100,000 per
+   second) before trusting any figure.
+2. **A short stream decodes to garbage peaks.** Dropped bytes break the 4-byte
+   sample alignment. A capture that kept 1.3 s of 3.5 s read a **2.07 A**
+   inrush; complete captures read 770–781 mA.
+3. **The output switches off when the program holding the port exits.**
+   Separate capture runs each started from a cold orb: one caught a boot,
+   another read 0 mA for 10 s. Run the whole test in one process.
+4. **A reconnect finds the PPK still streaming**, and `get_modifiers()` then
+   fails with `UnicodeDecodeError` on sample bytes. Send stop, flush until the
+   port is quiet, then read the metadata yourself
+   (`tools/ppk/ppk_common.py`).

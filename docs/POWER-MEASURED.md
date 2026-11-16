@@ -177,7 +177,7 @@ within 12 mA. See `TRAPS.md`, "PPK II from a script".
 **Instrument:** the same thermal camera, default settings, one color shot at
 12:41. **Board:** the XIAO orb as above, fed by the PPK on the 5V pin (the same
 node as USB VBUS, see below), running firmware 1.8.0 with Stocks on.
-**Time powered before the shot:** not recorded.
+**Time powered before the shot:** about 10 minutes (Scott).
 
 | Spot | Reading |
 |---|---|
@@ -201,8 +201,10 @@ What the image shows:
 - A warm streak leaving the module's side is most likely the PPK lead
   soldered to the 5V pin. A small warm spot on the carrier, left of the module,
   was not identified.
-- If the orb had run for less than about 20 minutes, this reading is low. The
-  SuperMini took about that long to settle.
+- **It may read low.** The orb had run about 10 minutes. The SuperMini sets
+  were taken after about 20 minutes and after hours, and they agreed within
+  1 °C, but nothing was recorded at 10 minutes. A shot after 20 minutes or
+  more would settle it.
 
 ### Not measured
 

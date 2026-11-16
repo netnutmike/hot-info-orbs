@@ -4,7 +4,7 @@
 
 Reads docs/assets/power/xiao-2026-11-16/*.csv (10 kSa/s means, written by
 tools/ppk), fills the /*DATA*/ slot in report_template.html, and writes
-tools/power-report/xiao-orb-power.html (gitignored) unless told otherwise.
+docs/power-report.html (committed) unless told otherwise.
 The thermal pictures are inlined in the template. Published as a claude.ai
 artifact on 2026-11-16; the findings themselves are in docs/POWER-MEASURED.md.
 """
@@ -31,7 +31,7 @@ v = load("run_11.0min")  # on, ~11 min after boot, Stocks shown
 data["steady"] = [round(sum(v[i:i + 100]) / 100, 1) for i in range(0, len(v) - 99, 100)]  # 10 ms means
 data["steadyAvg"] = round(sum(v) / len(v), 2)
 
-out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "xiao-orb-power.html")
+out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "..", "docs", "power-report.html")
 with open(os.path.join(HERE, "report_template.html")) as f:
     tpl = f.read()
 assert tpl.count("/*DATA*/") == 1

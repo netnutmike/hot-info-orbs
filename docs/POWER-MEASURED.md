@@ -180,4 +180,8 @@ within 12 mA. See `TRAPS.md`, "PPK II from a script".
   image.** Checked 2026-11-16: the camera originals are timestamped
   2026-10-17 16:10–16:11. That afternoon the XIAO board had only just been
   routed (commit a0c84fc, 16:08: "XIAO board expected in manufacturing").
-  So every thermal shot shows the v1.1 SuperMini board.
+  So every thermal shot shows the v1.1 SuperMini board. Those shots were most
+  likely powered over **USB-C**. That is Scott's recollection, and the module
+  frame shows a cool cable-shaped object leaving the module's USB edge. A XIAO
+  thermal comparison should therefore be fed over USB-C too, not through the
+  5V pin the way the PPK run was.

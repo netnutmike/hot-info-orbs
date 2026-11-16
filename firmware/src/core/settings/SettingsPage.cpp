@@ -350,7 +350,7 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     h += PAGE_HEAD;
     h += NAV;
     // The marker is a block: it takes the line break's place, and no height while empty (script off)
-    h += "<p>Running " FIRMWARE_VERSION ", commit " BUILD_COMMIT ", built " BUILD_TIME UPDATE_CHECK_MARKER_SETTINGS "Up " + uptime() + ". ";
+    h += "<p>Running " FIRMWARE_VERSION ", commit " BUILD_COMMIT ", built " BUILD_TIME " for " BUILD_ENV UPDATE_CHECK_MARKER_SETTINGS "Up " + uptime() + ". ";
     {
         // Glyph as well as the number. Rule-of-thumb bands, not measured on the orb
         const int rssi = WiFi.RSSI();

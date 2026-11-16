@@ -3,7 +3,10 @@
 Every power figure in this project was an estimate until this. Measured on the
 first assembled board — the v1.1 prototype: five GC9A01 displays on an ESP32-S3
 SuperMini, running the ported firmware on WiFi. The project now uses a XIAO
-ESP32-S3 or XIAO ESP32-S3 Plus, which has not been measured yet.
+ESP32-S3 or XIAO ESP32-S3 Plus. **The XIAO ESP32-S3 was measured on 2026-11-16:
+about 305 mA, 1.53 W, and a 770–781 mA inrush.** See
+[XIAO ESP32-S3: measured](#xiao-esp32-s3-measured-2026-11-16) at the end. The
+S3 Plus has not been measured. XIAO module temperature: 31.4 °C in a 20.7 °C room after ~21 min (2026-11-16).
 
 **Instrument:** Nordic PPK II, source meter mode, 5.000 V, 10 kSa/s, 10 s window.
 
@@ -103,3 +106,127 @@ What this does and does not show:
 1.71 W typical, but **size the supply for the 1.15 A inrush, not the 342 mA
 average**. 2 A is a sensible floor and costs nothing; 1 A is not enough despite
 being nearly 3x the running current.
+
+## XIAO ESP32-S3: measured 2026-11-16
+
+**Board:** XIAO carrier, plain XIAO ESP32-S3 (not the Plus), five GC9A01
+displays, firmware **1.8.0** (the published release), on Wi-Fi. **Feed:** PPK II
+VOUT soldered to the XIAO's 5V pin, GND to GND, the XIAO's USB-C unplugged. The
+SuperMini was most likely fed the same way (Scott's recollection; it was not
+recorded at the time).
+
+**Instrument:** Nordic PPK II, source meter, 5.000 V, driven from a script
+(`tools/ppk/`, below) at its native **100 kSa/s**. The "10 kSa/s" figures are
+means of 10 samples, to compare with the SuperMini run, which was read in
+nRF Connect at 10 kSa/s. Raw log: `assets/power/xiao-2026-11-16/session.log`.
+
+| State (10 s window) | Average | Max (100 kSa/s) |
+|---|---|---|
+| **On**, 6 min after boot, Stocks shown | **305.51 mA → 1.53 W** | 662.5 mA |
+| On, 1 min after boot, Stocks hidden | 304.22 mA → 1.52 W | 635.5 mA |
+| On, ~75 s after a restart, Stocks shown | 301.70 mA → 1.51 W | 675.6 mA |
+| Dim, Stocks shown | 297.44 mA → 1.49 W | 452.2 mA |
+| Screens off, Stocks shown | 265.48 mA → 1.33 W | 369.4 mA |
+
+**Against the SuperMini's 341.79 mA, the XIAO orb draws about 11% less** (36 mA,
+0.18 W). Which parts of the board account for the difference was not measured.
+
+**Dim saves about 4 mA (1.4%).** That matches what the firmware does: dim
+darkens the colors drawn and leaves the backlight on.
+
+**Screens off saves about 36 mA (12%); the orb still draws 1.33 W asleep.** Off
+sends display-off and sleep-in to all five panels. The likely reason it saves so
+little is that the backlights stay lit, because the GC9A01 boards wire the
+backlight straight to power. **That cause is not established:** nobody looked
+at the screens during the off window to see whether they were fully dark.
+
+Dim and off were set over HTTP on `/settings` (hours set to cover the current
+hour), each save restarted the orb, and each window started at least 60 s after
+the restart. All dim and off settings were put back afterwards; Stocks was left
+on at Scott's request.
+
+### Inrush: 770–781 mA, four power-ons
+
+| Power-on | Peak, 100 kSa/s | Peak, 10 kSa/s | Above 500 mA |
+|---|---|---|---|
+| 1 | 781.1 mA | 766.0 mA | — |
+| 2 (cold, 30 s off) | 773.6 mA | 765.5 mA | ~14 ms |
+| 3 (cold, 30 s off) | 772.8 mA | 754.1 mA | ~11 ms |
+| 4 (cold, 30 s off) | 769.5 mA | 753.9 mA | ~11 ms |
+
+The peak is a single narrow spike at switch-on. The start-up staircase
+(100 ms means) repeats every time: **~220 → ~248 → ~258 → ~276 → ~241 → ~295 →
+~355 mA**. That has the same shape as the SuperMini's 240 → 270 → 300 → 340.
+
+**The XIAO peak is about two-thirds of the SuperMini's 1.15 A.** Why was not
+measured.
+
+**Supply advice is unchanged.** A 2 A supply covers 781 mA with room to spare.
+1 A would probably cope with the XIAO too, but the floor stays at 2 A: it costs
+nothing, and it covers the SuperMini figure.
+
+### A 2.07 A reading that was thrown out
+
+The first power-on capture read **2.07 A**. It was discarded: the reader kept
+only 1.3 s of the 3.5 s stream. When bytes are dropped, the PPK's 4-byte samples
+lose their alignment and decode as garbage. All four complete captures agree
+within 12 mA. See `TRAPS.md`, "PPK II from a script".
+
+### Module temperature: 31.4 °C after ~20 min, 2026-11-16
+
+**Instrument:** the same thermal camera, default settings, color. **Board:** the
+XIAO orb as above, fed by the PPK on the 5V pin (the same node as USB VBUS, see
+below), running firmware 1.8.0 with Stocks on. Powered on about 12:31; shots at
+12:41 and 12:52.
+
+| Spot | ~10 min (12:41) | **~21 min (12:52)** |
+|---|---|---|
+| Hottest point on the XIAO module (middle of the shield can) | 30.2 °C | **31.4 °C** |
+| Background, same frame | 21.0 °C | 20.7 °C |
+| **Rise over the room** | 9.2 °C | **10.7 °C** |
+
+![XIAO module after ~21 min, 31.4 °C hottest point](assets/thermal/xiao-module-20min-2026-11-16.jpg)
+
+**The XIAO module settles about 11 °C over the room, against the SuperMini's
+about 19 °C** (43.6 °C in a 24.5 °C frame). That fits a buck converter in place
+of the SuperMini's LDO, but the cause is not established by these shots. The
+room was 20.7 °C here and 23.9 °C for the SuperMini, so compare the rise over
+the room, not the absolute reading. Between 10 and 21 minutes the module
+gained 1.2 °C. Whether it was still climbing at 21 minutes was not measured.
+The SuperMini's 20-minute and after-hours sets agreed within 1 °C.
+
+What the images show:
+
+- The heat is spread across the shield can, which covers the ESP32-S3 and its
+  flash. **No separate hot spot marks the buck converter (U3) or its inductor
+  (L4)** in either shot. At this load the converter does not stand out. Where
+  U3 sits on the board was not identified.
+- A warm streak leaving the module's side is most likely the PPK lead
+  soldered to the 5V pin.
+- The 10-minute shot is kept as `assets/thermal/xiao-module-10min-2026-11-16.jpg`.
+
+### Not measured
+
+- The XIAO ESP32-S3 Plus.
+- Display backs on the XIAO board. They cannot be shot: the XIAO board covers
+  them, whereas the v1.1 board left them in view (Scott, 2026-11-16).
+- Module temperature on the XIAO. Scott ruled it out on 2026-11-16: the
+  SuperMini thermal shots above are good enough. He then took the two shots
+  above anyway. **Before that shot there was no XIAO thermal
+  image.** Checked 2026-11-16: the camera originals are timestamped
+  2026-10-17 16:10–16:11. That afternoon the XIAO board had only just been
+  routed (commit a0c84fc, 16:08: "XIAO board expected in manufacturing").
+  So every thermal shot shows the v1.1 SuperMini board. Those shots were most
+  likely powered over **USB-C**. That is Scott's recollection, and the module
+  frame shows a cool cable-shaped object leaving the module's USB edge.
+  **On the XIAO the feed point makes no difference.** Per Seeed's schematic
+  (`XIAO_ESP32S3_SCH_v1.2`), the header's 5V pin *is* VBUS, with no diode
+  between USB-C and the pin. The diode (D2, LMBR4010) sits after that, between
+  VBUS and the 3.3 V converter. So the PPK feed on the 5V pin heats the module
+  exactly as USB-C would. (An earlier note here, written before reading the
+  schematic, said to use USB-C. That was wrong.)
+- **The XIAO's 3.3 V comes from a buck converter, not an LDO:** U3 SGM6029
+  (600 mA) with a 470 nH inductor, L4. The SuperMini's 3.3 V is a linear
+  regulator, and that LDO was the 43 °C concern above. A buck dropping 5 V to
+  3.3 V wastes far less, so the XIAO module should run cooler. That is
+  expected, not measured.

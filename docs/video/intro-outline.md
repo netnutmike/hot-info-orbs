@@ -26,9 +26,9 @@ labeled with where each stands.
 
 ## 1. Cold open (0:00–0:15)
 
-- Five orbs on a desk cycling through their pages. No talking for the first
-  few seconds.
-- Title card: **HOT Info Orbs**, Hands-On Tech logo.
+- Title card: **HOT Info Orbs**, Hands-On Tech logo, over the orbs running.
+- Narration from the first frame. (Cut 2026-10-21: a silent 8 s hold on the
+  orbs read as a yawn, not a hook. The voice is the grabber.)
 
 ## 2. What it is (0:15–0:35)
 
@@ -37,7 +37,7 @@ labeled with where each stands.
 - It shows the time, the weather and the markets, and updates itself over
   Wi-Fi.
 - It's a club build, designed so any member can put one together and set it
-  up from a phone.
+  up from a phone or computer.
 
 ## 3. Where it came from (0:35–0:55)
 
@@ -48,7 +48,8 @@ Credit, briefly. Assume the viewer knows neither source.
   point.
 - **HackerBoxes:** a monthly electronics kit. Their kit #0129 "Orbital" was a
   version of the orbs on a newer chip.
-- A couple of club members built that kit (unnamed). The club liked it and
+- A couple of club members built that kit. Show Donald Champion's photos of
+  his build, credited to him. The club liked it and
   decided to make its own version: a new board, new features, and a build
   anyone in the club could follow.
 
@@ -72,7 +73,7 @@ then the buttons stepping between them.
 7. **For the tinkerers, two pages you build yourself**, each shown full-frame
    on the orbs: **MQTT** (live values from Home Assistant or any MQTT source,
    one per orb) and **Web Data** (a small JSON file from any web address).
-   Both set up from the phone, no new firmware.
+   Both set up from a phone or computer, no new firmware.
 
 ## 5. How it's built (1:50–2:30)
 
@@ -81,7 +82,7 @@ then the buttons stepping between them.
   Wi-Fi built in.
 - **Five 1.28" round color displays** sharing one connection to the module.
 - **Three buttons** along the board.
-- **The carrier board**, designed by club member Yang (KiCad), made by
+- **The carrier board**, designed by club members Yang and Scott (KiCad), made by
   JLCPCB. The display modules and the ESP32 plug in, so it's a socket and
   solder-the-headers build.
 - **Power:** a USB cable. The whole orb draws about 1.7 W (measured).
@@ -101,7 +102,7 @@ then the buttons stepping between them.
 Show the phone screen next to the orb reacting.
 
 - **First setup:** load the firmware once over USB. After that, no cable.
-- **Settings from a phone browser:** town, tickers, time zone, colors,
+- **Settings from a phone or computer browser:** town, tickers, time zone, colors,
   rotation speed, upside-down mounting. Save, and the orb restarts with the
   new settings.
 - **Pick your pages:** untick any page you don't want (Yang's example: he
@@ -110,7 +111,7 @@ Show the phone screen next to the orb reacting.
 - **Updates over Wi-Fi:** new firmware uploads from the browser. If an
   update fails, the orb goes back to the version that worked.
 - **Night mode:** dim hours and screens-off hours. Any button wakes it.
-- **Your own boot picture:** upload one from your phone.
+- **Your own boot picture:** upload one from your phone or computer.
 - One line over B-roll: it moves to the strongest Wi-Fi access point on its
   own, and your API keys stay out of the shared code.
 
@@ -130,7 +131,8 @@ Show the phone screen next to the orb reacting.
 - Where to get it: GitHub `scottdube/hot-info-orbs` and the feature sheet
   (scottdube.github.io/hot-info-orbs/features.html).
 - Credits on screen: Brett Turner (Info Orbs), HackerBoxes (#0129 Orbital),
-  Yang (board design), the club members who built the first kit.
+  the club members who built the first kit,
+  Donald Champion (HackerBox build photos).
 - End card: Hands-On Tech logo, orbs running.
 
 ---
@@ -166,7 +168,12 @@ Show the phone screen next to the orb reacting.
 - Introduces the whole project to newcomers; Brett Turner and HackerBoxes are
   credited as inspiration and explained, not assumed known.
 - Stocks is part of the page tour.
-- HackerBox builders (Donald and others) are not named in the video.
+- HackerBox builders are not named in the narration. **Changed 2026-10-18:**
+  Donald Champion's build photos are on screen in S07 with his photo credit,
+  and he is on the credits card. He agreed to the credit.
+- **Changed 2026-10-18:** Yang and Scott are dropped from the thanks (spoken line
+  and credits card). The board design is still credited in segment 5 ("Yang and
+  I designed the board").
 - Audience: club members, on the lightly password-protected club site.
 - Delivery: narration, voice-over or a mix, decided during the shoot.
 

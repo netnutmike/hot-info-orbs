@@ -9,7 +9,9 @@ still holds for the 46 mm board, which was copied from it.
 
 Status: **DESIGNED, NOT BUILT.** Started on branch `xiao-esp32s3`
 2026-10-14, **merged into `main` 2026-10-18.** Schematic and board are done and
-DRC-clean, the firmware compiles, and no board has been ordered or flashed.
+DRC-clean, the firmware compiles, and no board has been ordered. A standard
+XIAO ESP32-S3 module (8 MB / 8 MB PSRAM) first ran the firmware 2026-10-23,
+USB-flashed with the 8 MB table; displays and buttons not yet checked on it.
 
 **The project uses this module only: a Seeed XIAO ESP32-S3 or XIAO ESP32-S3
 Plus, the builder's choice** (Scott, 2026-10-18). The earlier ESP32-S3

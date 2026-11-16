@@ -706,3 +706,174 @@ counter just reset. A quote costs one credit per ticker, so one HOT set adds at
 most 5 a minute. Weekday market hours, and how close the busiest minutes come to
 144, are not measured. Each `/api_usage` read itself costs one credit of their
 allowance: sample sparingly, from the end of a minute.
+
+## An OTA of the XIAO build onto the v1.1 prototype boots and answers — it does not boot-loop (2026-10-22)
+
+Over USB, main's `xiao-esp32s3` image boot-loops the 4 MB prototype on the
+flash-size header. Over the web updater it does **not**: the image installed,
+the orb rejoined Wi-Fi and `/settings` reported the new commit, so every
+check in the OTA runbook passed, with the XIAO pin map driving SuperMini
+wiring (screens 1-3 on the wrong CS pins, 2026-10-20 trap above). It was
+caught only by reading the project memory afterwards, and put right by
+OTA-ing the `demo-typed-times` build from the prototype worktree 2 min later.
+
+**Before any OTA, decide which board is at the address from a record, not
+from the page.** `/update` and `/settings` show the commit and build time,
+never the environment or the pin map, so a successful flash proves nothing
+about the variant. Scott's own orb is the prototype; the XIAO env is for
+the carrier boards. Making the update page print its PlatformIO env would
+close this; not done yet.
+
+## Settings page: a failed field re-renders the saved value, not what you typed (2026-10-22)
+
+Seen on the phone during the video shoot: a red "Not saved — 1 field needs fixing" banner with `Enter 0 (off) or 5 to 3600 seconds` under a Seconds-per-page field reading **5**, which the rule accepts. In `SettingsPage.cpp` the cycle branch only writes `v.cycle` when `parseCycle` succeeds, so the page shows the stored value (5) beside an error that was about the submitted one (empty, or under 5). The checkboxes behave differently: an unticked box is read straight from the POST, so they show what was submitted. Confusing on a phone where the keyboard hides the field you just cleared. A fix would echo the raw submitted string in the field when its parse fails.
+
+**Also seen, cause not established:** after one OTA reboot (17:03 EDT) the clock orb showed "February 7 02:29 Sunday" for at least 51 s and was correct after the next reboot two minutes later. One occurrence, on the demo-typed prototype build.
+
+## Bambu H2D: the overhang-fan threshold is a no-op on Generic PLA (2026-11-06)
+
+Planned for the body-radius coupons: lower the "cooling overhang threshold" from 50% to 10% so the fan comes on earlier on the R12 radius. Generic PLA @BBL H2D already sets `fan_min_speed` = `fan_max_speed` = 100, so the part fan is at 100% on every layer after the first, and the threshold has nothing to raise. It is also a **filament** setting, so applying it to some objects means a second project filament. With different layer heights per object, Bambu Studio then refuses to slice: "The prime tower is only supported if all objects have the same variable layer height". Read the filament's fan min/max before tuning overhang fan settings. Details are in `hardware/body-radius-coupon/README.md`.
+
+## Fusion crashed driving the Animation workspace from the API
+
+2026-11-06, v0.3 `master assembly` (145 occurrences, 811 bodies). An
+explosion animation was attempted through the Fusion MCP script tool. There
+is no API for explode actions (only storyboard play/scrub), so the route was
+the UI commands plus `NuCommands.CommitCmd`. Activating the Animation
+workspace from a script blanked the canvas and flipped the active document to
+an xref (fixed by re-activating the assembly by lineage URN); the Auto
+Explode commit worked; the first script that scrubbed the playhead and saved
+a viewport frame crashed Fusion. Unsaved storyboard lost.
+
+**Retry the same evening worked, one step per script call:** Fusion came
+back with the storyboard intact in the recovered document (explode 0 → 1 s,
+all levels). Activate the assembly by URN, confirm the Animation workspace,
+then set view recording OFF, assign `viewport.camera` once (the fit camera
+pulled in to 0.9 of its distance framed the whole explosion; 0.74 clipped
+it), and loop `playheadPosition = i/90` → `doEvents` → `refresh` →
+`saveAsImageFile(1920×1080)`. 91 frames took 65 s across two calls (the MCP
+call times out at ~2 min, so batch and log to a file). The camera holds
+across scrubs while recording is off. **With view recording ON the storyboard
+restores its stored view on every scrub and on the ON transition itself**, so
+the camera cannot be changed from the API once a view is recorded; the saved
+frames carry no "View is not recording" watermark either way (t=0 frames
+byte-identical in both modes), so leave recording off. ffmpeg assembled
+`docs/assets/enclosure-explode-v0.3.mp4` (hold / explode / hold / collapse /
+hold, 10 s). Viewport shading, not a ray-traced render. The crash cause is
+still not established; nothing in the working run differed except doing one
+thing per call and setting the camera explicitly instead of `viewport.fit()`.
+The fusion-essentials add-in's reads flipped the active document mid-task;
+use only the Autodesk MCP for Animation work. Session memory
+`fusion-animation-workspace-api` has the script shape.
+
+**Second crash, same evening, same place.** Redoing the explode as One Level
+(so the PCB xref `hot_info_orbs_xiao_46mm_assy final` and its 26 children move
+as one block): `storyboards.add()` + `activate()` was fine; a script that
+pre-selected the 25 top-level occurrences and ran
+`PublisherExplodeDirectChildrenCommand.execute()` returned normally with
+`SelectCommand` active and storyboard end still 0; the next two reads
+(`activeCommand`, then a screenshot) timed out and Fusion was gone. The first
+crash of the day also followed the explode launch. **The explode launch from
+a script is the common factor; the frame capture never failed.** Rule now:
+Scott runs Auto Explode in the UI; scripts touch the storyboard only after
+its end is non-zero and the explode is drawn.
+
+**Done that way, it worked first time.** Scott added Storyboard2 and ran
+Auto Explode One Level in the UI (end 1.8 s); the script then only set the
+camera, scrubbed and saved. One Level keeps the PCB xref
+`hot_info_orbs_xiao_46mm_assy final` whole (board, sockets, five TFTs move as
+one block), which is what the published `enclosure-explode-v0.3.mp4` now
+shows. Two things to know for next time: Scott's first two "done" reports
+were the recovered Storyboard1 still active (check `storyboards.count` and
+`end` before capturing, and compare a test frame against the previous one;
+twice the file was byte-identical); and `Occurrence.boundingBox` ignores the
+explode (identical at t=0 and t=end), so re-aim the camera from a test frame:
+shift the target along the camera right vector (`dir × up`) by a fraction of
+the measured frame width, not by a bounding box.
+
+### Splitting an xref's bodies into components from the API (2026-11-06)
+
+Needed `wings right` / `wings left` in `winged end caps` as separate components so the
+master assembly can Manual Explode each cap its own way. What bit:
+
+- **A Part-type document refuses `BRepBody.createComponent()`** ("Part Design documents
+  can only contain one component"). There is no API to convert; Scott flipped it to
+  Assembly in Browser > Document Settings > Design Type and saved (v3, v4).
+- **`createComponent()` returns the moved `BRepBody`, not an Occurrence.** Get the new
+  component via `moved.parentComponent` and rename it there. Timeline gains
+  `Body->Comp1`, `Body->Comp2`; the bodies do not move.
+- **The lineage URN matched four `Document` objects**: one real tab plus the proxies the
+  master holds for its xref, at different versions (v2 Part, v3, v4). `isVisible` is True
+  on all of them and `close()` returns True without closing a proxy. A proxy accepts
+  `activate()`, shows on the canvas, accepts the split, and `save()` returns True while
+  writing nothing (server version unchanged, `isModified` stays True). The tab Fusion
+  labels `name(1)` behaved the same way. What worked: `app.documents.open(dataFile, True)`
+  fresh, then pick the candidate whose `versionNumber` equals the server's latest, split
+  there, `doc.save(desc)` → `isModified` False within 0.5 s and the server shows v5.
+- The active document flips back to the master between MCP calls; activate the target
+  inside the same script that edits it.
+
+## `find_geometry` on the whole master assembly times out; scope it
+
+2026-11-09, screw boss check. `fusion-essentials` `find_geometry` with the
+master assembly active (26 occurrences, five display STEP models) hit the
+30 s handler limit twice and could not be cancelled. The same search answers
+in seconds with `target` set to one occurrence
+(`hot_info_orbs_xiao_46mm_PCB:1`) or with the part's own document activated
+(`doc_activate name="session:<id>"`). Cylinder length is `area / (2π r)`;
+`radius` needs a tolerance of about 0.025 (r=1.6 matched the Ø3.25 holes).
+
+## Bolt Depot Economy shipping charges per line, not per pound
+
+2026-11-09. A 7-bag, two-line cart estimated $12.13 Economy; the same 600
+screws as one line and 6 bags estimated $8.41, with "Estimated weight 1.0
+lbs" shown both times (Scott). Consolidate lines on small orders before
+worrying about weight.
+
+## PPK II from a script: four ways it lies (2026-11-16)
+
+Found while measuring the XIAO with `ppk2-api` 0.9.2 on macOS
+(`tools/ppk/`, `docs/POWER-MEASURED.md`).
+
+1. **Polling `in_waiting` loses most of the stream.** The library's
+   `get_data()` loop received about 85 kB/s of the PPK's 400 kB/s, quietly.
+   Blocking bulk reads (`ser.read(65536)` with a 50 ms timeout) got 398–399
+   kB/s. **Check the sample count against the seconds requested** (100,000 per
+   second) before trusting any figure.
+2. **A short stream decodes to garbage peaks.** Dropped bytes break the 4-byte
+   sample alignment. A capture that kept 1.3 s of 3.5 s read a **2.07 A**
+   inrush; complete captures read 770–781 mA.
+3. **The output switches off when the program holding the port exits.**
+   Separate capture runs each started from a cold orb: one caught a boot,
+   another read 0 mA for 10 s. Run the whole test in one process.
+4. **A reconnect finds the PPK still streaming**, and `get_modifiers()` then
+   fails with `UnicodeDecodeError` on sample bytes. Send stop, flush until the
+   port is quiet, then read the metadata yourself
+   (`tools/ppk/ppk_common.py`).
+
+## nRF Connect for Desktop: app updates hang because macOS kills nrfutil (2026-11-16)
+
+**Symptom:** the Power Profiler update (4.4.0 → 4.4.1) hangs forever. The
+tarball downloads fine (its SHA-1 matches the index), and nothing on screen
+says why. Scott had hit the same hang once before (September).
+
+**Cause, measured:** every `nrfutil` the launcher runs out of
+`~/Library/Application Support/nrfconnect/` (the launcher's own copy and the
+`nrfutil-sandboxes/.../bin/*` binaries) is SIGKILLed at exec. Crash reports in
+`~/Library/Logs/DiagnosticReports/nrfutil-*.ips` say `SIGKILL (Code Signature
+Invalid)`, `Taskgated Invalid Signature`. Yet `codesign --verify --strict`
+passes on the same file, and a **fresh copy of the same bytes runs**. The
+launcher rewrites its `nrfutil` in place on every start (the mtime moves to
+launch time). macOS kills an already-run signed executable that has been
+overwritten in place, even with identical bytes. Launcher 5.4.1, nrfutil 9.0.0,
+macOS 27.2.1.
+
+**Fix that worked:** quit the launcher; replace each killed binary with a fresh
+copy (`cp -p f f.fresh && mv -f f.fresh f`); **delete** the launcher's own
+`nrfutil`; relaunch. The launcher then creates a new file instead of
+overwriting, and nothing is killed. Test a binary with `"$f" --version; echo $?`:
+137 means killed.
+
+**Not established:** whether it recurs on the next launch, now that the file
+exists again and will be overwritten in place. Check for new
+`nrfutil-*.ips` files before trusting the launcher.

@@ -1,0 +1,76 @@
+# v0 demo stand — throwaway end feet for the v1.1 run1 board
+
+Two identical printed L-feet that hold the first-run SuperMini board
+(`hardware/hot-info-orbs/` at tag `v1.1-run1`, 198.8 x 28.5 mm, four
+Ø3.2 mm corner holes 3 mm in from each edge) upright for the demo.
+Disposable: the XIAO board (`hardware/hot-info-orbs-xiao/`) gets a proper
+enclosure and this folder goes with the v1.1 board when it is retired.
+
+**Why the green legs failed:** they grip the board at the board plane, and the
+displays on sockets put the combined center of gravity ~8 mm in front of
+that plane, so the board tips forward unless the cable is weighed down.
+These feet put 40 mm of base in front of the board face and screw the
+board to a tab behind it.
+
+**Why screws and not a slot:** a 10° recline moves the CG back only ~2.5 mm
+of the ~8 mm it sits forward; a screwless slot stand would need ~30° of
+recline plus a front lip, and the displays come within 1.5 mm of the
+board's bottom edge, so there is no room for a lip under them anyway.
+
+**Why the board sits 20 mm up:** the SuperMini's USB-C is on the back of
+the board at mid-length and points at the bottom edge. With a 90° plug in,
+the bottom of the connector is 13 mm below the board edge (measured
+2026-10-21). The riser under the tab holds the edge 20 mm off the table,
+7 mm clear, and the cable runs out under the board toward the heel. The
+riser is 2 mm thicker than the tab, so the board edge rests on that step
+and the screws only clamp, they do not carry the board. (`SeatH` lowers
+it; 16 mm still clears the plug by 3 mm.)
+
+**Why 12 mm wide, holes 3 mm from the outer face (v5):** the foot's outer
+face is flush with the board end and the tab runs to the board's top edge,
+so the stand reads as part of the board rather than a clamp on it. v3/v4
+were 6 mm wide so one symmetric part fit both ends; Scott doubled the
+width 2026-10-21 with the holes left where they were, so the part is now
+handed, so there are two files: `-left` is the Fusion export, `-right`
+is its mirror (made by flipping the mesh, same volume). Two copies of one
+file put the right foot's holes on the wrong side of center. The 12 mm tab
+ends where the nearest display socket tails start; the assembly
+interference check shows the feet touching only the PCB.
+
+| | |
+|---|---|
+| Foot | 60 x 12 x 48 mm: flat base 4 mm, riser 6 thick x 16 high, tab 4 thick to the board's top edge, riser and tab leaning back 10° |
+| Toe / heel | 40 mm ahead of the board face, 20 mm behind |
+| Seat | board bottom edge rests on the riser step, 20 mm above the table |
+| Holes | two Ø2.6 mm through the tab, 3 and 25.5 mm above the step measured along the face, 3 mm in from the outer (flush) face — M3 x 8 self-taps |
+| Board end | flush with the foot's outer face; the foot runs 12 mm inboard |
+
+**Print:** one `-left` and one `-right` (left/right as seen from the
+front, displays toward you), flat on the base, any PLA/PETG, no supports (the 10° tab is well under the
+overhang limit). ~9 g each.
+
+**Fit:** board bottom edge on the step, back face against the tab, two
+M3 x 8 through each tab into the corner holes from behind. Plug the
+90° USB-C in pointing down; the cable exits under the board.
+
+Files: `v0-demo-stand-foot-left.stl` / `.3mf` and `-right.stl` / `.3mf`
+(mm), `foot-iso.png` (left foot).
+Fusion source: **HOT Projects / info-orbs-v0-demo-stand** (v9; v7 was a
+rebuild that dropped a profile corner and came out with a wedge base,
+never printed; parameters BaseT, TabT, TabH, SeatH, StepD, Toe, Heel, FootW,
+Lean, HoleD, HoleUp document the numbers and drive the extrude width and
+hole diameter; the side profile and hole points are drawn to numbers, not
+to those parameters — it is a throwaway). Assembly with the board model:
+**HOT Projects / info-orbs-v0-demo-stand-assy** (v11; all four foot holes
+verified on the board's corner holes; foot 2 is shown unmirrored, so it
+overhangs the board end by 6 mm there — Fusion's mirror refuses a body
+that lives in an xref component, so the right foot exists only as the
+mirrored mesh file; the board model shows the displays
+unsocketed, 8.5 mm lower than the real board, which does not affect the
+feet).
+
+**Trap (2026-10-21):** editing the foot in place from the assembly while
+an MCP session was also driving Fusion lost the edits: every MCP call
+switches the active document tab, which cancels an open dialog. Finish
+and save hand edits before any agent call, or edit in the part document
+with the agent idle.

@@ -1,9 +1,11 @@
 # HOT Info Orbs — intro video script
 
 Follows [intro-outline.md](intro-outline.md). Every line works as voice-over;
-any line can be said on camera instead. About **540 words**, which is about
-3:30 at a relaxed 150 words a minute. Add the silent cold open and pauses on
-the page tour and it lands around 3:45.
+any line can be said on camera instead. About **620 words** (it was about 500
+when first written and grew with the custom pages, the 5 V point and the
+credits). The practice read on 2026-10-18 ran **174 words a minute: 3:38 of
+speech**, and **4:29** once each shot holds until its line ends. Line-by-line
+times: [vo-practice-2026-10-18.md](vo-practice-2026-10-18.md).
 
 **[brackets]** = picture. Plain text = narration.
 
@@ -11,28 +13,25 @@ the page tour and it lands around 3:45.
 
 ## 1. Cold open (0:00–0:15)
 
-**[Five orbs on a desk, cycling Clock → Weather → Stocks. Hold 5–6 s with no
-narration, room tone only.]**
+**[Title card: HOT Info Orbs, Hands-On Tech logo, over the five orbs
+running. The narration starts on the first frame; no silent hold.]**
 
 This is the HOT Info Orbs.
-
-**[Title card: HOT Info Orbs, Hands-On Tech logo. The orbs keep running
-behind it.]**
 
 ## 2. What it is (0:15–0:35)
 
 **[Slow push-in on the orbs; cut to the board from above.]**
 
-Five little round screens on one board, run by a Wi-Fi chip about the size of
+Five round screens on one board, run by a Wi-Fi dev board about the size of
 a postage stamp. They show the time, the weather and the markets, and they
 keep themselves up to date.
 
 It's a Hands-On Tech club build, so anyone in the club can make one and set
-it up from a phone.
+it up from a phone or computer.
 
 ## 3. Where it came from (0:35–0:55)
 
-**[Still or screenshot of Brett Turner's Info Orbs project page, credited on
+**[Brett Turner's own photo of his Info Orbs, slow push in, credited on
 screen.]**
 
 The idea isn't ours. Brett Turner designed the original Info Orbs and shared
@@ -43,8 +42,8 @@ the plans and software for free.
 Later, HackerBoxes, a monthly electronics kit, sent out a version of it
 called Orbital.
 
-**[A member's built HackerBox kit, if one can be borrowed; otherwise the
-prototype.]**
+**[Donald Champion's photos of his built HackerBox kit, credited on
+screen.]**
 
 A couple of our members built that kit. We liked it enough to make our own:
 a new board, new features, and a build anyone in the club can follow.
@@ -67,8 +66,8 @@ days.
 
 **[Tempest page.]**
 
-If you own a Tempest weather station, it gets a page of its own, with live
-wind, humidity and feels-like temperature. You can add two.
+If you own a Tempest weather station, use it to drive the display. You can add
+up to two stations.
 
 **[Close-up on the weather icon orb.]**
 
@@ -87,13 +86,12 @@ own.
 
 **[Right button → MQTT page: five live Home Assistant values, one per orb.]**
 
-And for the tinkerers, two pages you build yourself. This one shows live
-values from Home Assistant, or anything else that speaks MQTT.
+And for coders, two pages you build yourself. This one shows live values
+from Home Assistant, or anything else using MQTT.
 
 **[Right button → Web Data page: the sample, five colored orbs.]**
 
-This one draws a small JSON file from any web address. You set both up from
-your phone, with no new firmware.
+This one pulls a small JSON file from any web address.
 
 ## 5. How it's built (1:50–2:30)
 
@@ -109,23 +107,16 @@ connection to it. Three buttons do the rest.
 
 **[Bare carrier board, then KiCad view of it.]**
 
-Club member Yang designed the board that ties it together, and JLCPCB makes
+Club leader Yang and I designed the board that ties it together, and JLCPCB makes
 it.
 
 **[USB cable plugging in; the orbs light up on the boot screen.]**
 
 It runs off a USB cable and draws under two watts.
 
-**[Thermal image, color: the ESP32 module, 43.6 °C on its hottest point.]**
-
-The displays run on five volts, each with its own regulator. On the original
-kit they all ran off the little computer's regulator, and builders found it
-too hot to touch. On this board it runs at about forty-three degrees Celsius,
-measured.
-
-**[Thermal image, color: the backs of three displays, 37.9 °C hottest.]**
-
-The displays carry their own share now, and stay warm, not hot.
+*Cut 2026-10-27 (Scott): the thermal beat (two thermal stills and the
+regulator / "too hot to touch" / "warm, not hot" lines) is out of the final
+video. The numbers stay in `docs/POWER-MEASURED.md`.*
 
 **[GitHub repo page.]**
 
@@ -140,7 +131,7 @@ You load the software once, over USB. After that, there's no cable.
 **[Split screen: phone on the settings page | the orb. Scroll past the
 Tempest station fields.]**
 
-Settings live on a web page you open from your phone: your town, your
+Settings live on a web page you open from your phone or computer: your town, your
 tickers, time zone, colors. Save, and the orb restarts with them.
 
 **[Phone: untick Stocks, Save; the orb's rotation skips it.]**
@@ -181,10 +172,10 @@ printed. That one is still a design.
 Everything's on GitHub, at the link on screen.
 
 **[Credits card: Brett Turner — Info Orbs · HackerBoxes — #0129 Orbital ·
-Yang — board design · the members who built the first kit.]**
+the members who built the first kit ·
+HackerBox build photos — Donald Champion.]**
 
-Thanks to Brett Turner, to HackerBoxes, to Yang for the board, and to the
-members who built the first kit.
+Thanks to Brett Turner, to HackerBoxes, and to the members who built the first kit.
 
 **[End card: Hands-On Tech logo over the orbs running. Hold 3 s.]**
 
@@ -200,9 +191,9 @@ members who built the first kit.
   Film the dim beat; if screens-off is shown, film it in a lit room and don't
   call it dark.
 - **"Under two watts"** is the measured 1.71 W at 5 V (features.html).
-- **"Too hot to touch"** is a HackerBox 0129 builder's report: 82 °C (180 °F)
+- **"Too hot to touch"** (cut 2026-10-27) is a HackerBox 0129 builder's report: 82 °C (180 °F)
   on the module running only a graphics demo (`docs/VARIANT-ESP32-S3-SUPERMINI.md`).
-- **"About forty-three degrees"** is the thermal-camera readings of 41.8–43.6 °C
+- **"About forty-three degrees"** (not in the final video) is the thermal-camera readings of 41.8–43.6 °C
   at the module's hottest point, room 75 °F, after hours of running and again
   ~20 minutes after a power cycle
   (`docs/POWER-MEASURED.md`, 2026-10-17). Surface reading, not junction.

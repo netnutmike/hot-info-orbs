@@ -36,7 +36,7 @@ static const char *uploadPage =
     "<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width'>"
     "<title>Info Orbs update</title></head><body style='font-family:sans-serif'>"
     "<h2>Info Orbs firmware update</h2>"
-    "<p>Running: " FIRMWARE_VERSION ", commit " BUILD_COMMIT ", built " BUILD_TIME UPDATE_CHECK_MARKER_UPDATE "</p>"
+    "<p>Running: " FIRMWARE_VERSION ", commit " BUILD_COMMIT ", built " BUILD_TIME " for " BUILD_ENV UPDATE_CHECK_MARKER_UPDATE "</p>"
     NO_PASSWORD_WARNING
     "<p>Newest release: <a href='" UPDATE_CHECK_FILE_URL "'>download firmware.bin</a> &middot; "
     "<a href='" UPDATE_CHECK_NOTES_URL "'>release notes</a></p>"

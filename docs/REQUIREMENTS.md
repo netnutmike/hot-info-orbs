@@ -425,9 +425,12 @@ variant. Both requirements here, already implemented by someone else. Read it
 before writing anything: it may be adoptable directly, and where it is not, it
 will still show where the partition and NVS problems actually bite.
 
-## Open question — ESPHome
+## ESPHome — answered: no
 
-Whether these requirements are better met by reimplementing on ESPHome rather
-than extending the Arduino firmware. ESPHome provides OTA, a web server, and
-`secrets.yaml` natively rather than as features to build. Evaluated separately;
-see `docs/ESPHOME-EVALUATION.md`.
+The question was whether these requirements are better met by reimplementing on
+ESPHome rather than extending the Arduino firmware. ESPHome provides OTA, a web
+server, and `secrets.yaml` natively rather than as features to build.
+
+Answered no, because not everyone has Home Assistant: a club kit has to work with
+nothing but a WiFi router. The RAM finding in `docs/ESPHOME-EVALUATION.md` is
+recorded there as a technical finding, not the deciding reason.

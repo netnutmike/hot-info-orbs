@@ -209,7 +209,8 @@ What the image shows:
 ### Not measured
 
 - The XIAO ESP32-S3 Plus.
-- Display backs on the XIAO board.
+- Display backs on the XIAO board. They cannot be shot: the XIAO board covers
+  them, whereas the v1.1 board left them in view (Scott, 2026-11-16).
 - Module temperature on the XIAO. Scott ruled it out on 2026-11-16: the
   SuperMini thermal shots above are good enough. He then took the one shot
   above anyway. **Before that shot there was no XIAO thermal

@@ -98,6 +98,14 @@ tr.ref td { color: var(--fg-2); }
 ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; max-width: 65ch; }
 footer { font-size: 13px; color: var(--fg-3); border-top: 1px solid var(--rule); padding-top: 14px; }
 code { font-family: var(--font-data); font-size: 0.92em; }
+/* Print / PDF: white paper, and never split a heading from its chart or a figure across pages. */
+@media print {
+  @page { size: letter; margin: 14mm 12mm; }
+  html, body { background: #fff !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  section, .chart, .fig, .figs, .thermal-grid, .table-wrap, .flag, tr, figure { break-inside: avoid; }
+  h1, h2, h3, .legend { break-after: avoid; }
+}
 </style>
 
 <main>
@@ -132,7 +140,7 @@ code { font-family: var(--font-data); font-size: 0.92em; }
     <h2>Running, 10 seconds</h2>
     <div class="legend"><span><i class="sw" style="background:var(--xiao)"></i>XIAO, 10 ms means</span><span><i class="sw dash"></i>Average, 305.5 mA</span></div>
     <div class="chart" id="steady"></div>
-    <p class="caption">Six minutes after boot, on, Stocks shown. The floor sits near 288 mA; the regular bumps are page redraws and Wi-Fi traffic. At 100 kSa/s the highest single reading in this window was 662.5 mA.</p>
+    <p class="caption">On, Stocks shown, about 3.5 minutes after the last restart (11 minutes after power-on). The floor sits near 288 mA; the regular bumps are page redraws and Wi-Fi traffic. At 100 kSa/s the highest single reading in this window was 662.5 mA.</p>
   </section>
 
   <section>
@@ -141,7 +149,7 @@ code { font-family: var(--font-data); font-size: 0.92em; }
       <table>
         <thead><tr><th>Capture</th><th class="r">Average</th><th class="r">Power</th><th class="r">Max, 100 kSa/s</th></tr></thead>
         <tbody>
-          <tr><td>On, 6 min after boot, Stocks shown</td><td class="r">305.51 mA</td><td class="r">1.528 W</td><td class="r">662.5 mA</td></tr>
+          <tr><td>On, ~3.5 min after the last restart, Stocks shown</td><td class="r">305.51 mA</td><td class="r">1.528 W</td><td class="r">662.5 mA</td></tr>
           <tr><td>On, 1 min after boot, Stocks hidden</td><td class="r">304.22 mA</td><td class="r">1.521 W</td><td class="r">635.5 mA</td></tr>
           <tr><td>On, 75 s after a restart, Stocks shown</td><td class="r">301.70 mA</td><td class="r">1.509 W</td><td class="r">675.6 mA</td></tr>
           <tr><td>Dim, Stocks shown</td><td class="r">297.44 mA</td><td class="r">1.487 W</td><td class="r">452.2 mA</td></tr>
@@ -198,7 +206,7 @@ code { font-family: var(--font-data); font-size: 0.92em; }
     </ul>
   </section>
 
-  <footer>Source: <code>docs/POWER-MEASURED.md</code> in the hot-info-orbs repo, branch xiao-esp32s3, commit 657fabc. Raw log and power-on traces in <code>docs/assets/power/xiao-2026-11-16/</code>.</footer>
+  <footer>Source: <code>docs/POWER-MEASURED.md</code> in the hot-info-orbs repo, branch main. This page is <code>docs/power-report.html</code> and <code>docs/power-report.pdf</code>, rebuilt by <code>tools/power-report/build_report.py</code>. Raw log and power-on traces in <code>docs/assets/power/xiao-2026-11-16/</code>.</footer>
 </main>
 
 <script>

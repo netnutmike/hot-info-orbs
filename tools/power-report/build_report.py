@@ -5,6 +5,10 @@
 Reads docs/assets/power/xiao-2026-11-16/*.csv (10 kSa/s means, written by
 tools/ppk), fills the /*DATA*/ slot in report_template.html, and writes
 docs/power-report.html (committed) unless told otherwise.
+Then print the PDF beside it (headless Chrome; the page carries print rules):
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+    --no-pdf-header-footer --virtual-time-budget=5000 \
+    --print-to-pdf=docs/power-report.pdf "file://$PWD/docs/power-report.html"
 The thermal pictures are inlined in the template. Published as a claude.ai
 artifact on 2026-11-16; the findings themselves are in docs/POWER-MEASURED.md.
 """

@@ -124,7 +124,7 @@ The charts page is rebuilt from the captures there by
 
 | State (10 s window) | Average | Max (100 kSa/s) |
 |---|---|---|
-| **On**, 6 min after boot, Stocks shown | **305.51 mA → 1.53 W** | 662.5 mA |
+| **On**, ~3.5 min after the last restart (11 min after power-on), Stocks shown | **305.51 mA → 1.53 W** | 662.5 mA |
 | On, 1 min after boot, Stocks hidden | 304.22 mA → 1.52 W | 635.5 mA |
 | On, ~75 s after a restart, Stocks shown | 301.70 mA → 1.51 W | 675.6 mA |
 | Dim, Stocks shown | 297.44 mA → 1.49 W | 452.2 mA |
@@ -146,6 +146,15 @@ Dim and off were set over HTTP on `/settings` (hours set to cover the current
 hour), each save restarted the orb, and each window started at least 60 s after
 the restart. All dim and off settings were put back afterwards; Stocks was left
 on at Scott's request.
+
+**One capture is left out of the table on purpose.** `run_06.0min.csv` (11:50:26–36,
+average 319.45 mA) began about 10 s after the "screens off" save restarted the
+orb, so it shows start-up, not a settled state: its 100 ms means step from
+~284 to ~308 mA partway through. The capture file names count minutes from
+power-on (11:44:25), not from the last restart. Corrected 2026-11-16: the
+305.51 mA row was labeled "6 min after boot"; the save times put it ~3.5 min
+after the last restart. All six steady captures and the four inrush captures are in
+`assets/power/xiao-2026-11-16/`.
 
 ### Inrush: 770–781 mA, four power-ons
 

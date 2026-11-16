@@ -221,23 +221,27 @@ What the images show:
 - The XIAO ESP32-S3 Plus.
 - Display backs on the XIAO board. They cannot be shot: the XIAO board covers
   them, whereas the v1.1 board left them in view (Scott, 2026-11-16).
-- Module temperature on the XIAO. Scott ruled it out on 2026-11-16: the
-  SuperMini thermal shots above are good enough. He then took the two shots
-  above anyway. **Before that shot there was no XIAO thermal
-  image.** Checked 2026-11-16: the camera originals are timestamped
-  2026-10-17 16:10–16:11. That afternoon the XIAO board had only just been
-  routed (commit a0c84fc, 16:08: "XIAO board expected in manufacturing").
-  So every thermal shot shows the v1.1 SuperMini board. Those shots were most
-  likely powered over **USB-C**. That is Scott's recollection, and the module
-  frame shows a cool cable-shaped object leaving the module's USB edge.
-  **On the XIAO the feed point makes no difference.** Per Seeed's schematic
+- **Why the XIAO module runs cooler.** That it runs cooler is measured: about
+  11 °C over the room against the SuperMini's about 19 °C (section above). The
+  likely reason is the 3.3 V regulator. The XIAO's comes from a buck converter,
+  U3 SGM6029 (600 mA) with a 470 nH inductor, L4. The SuperMini's is a linear
+  regulator, the 43 °C concern above. A buck dropping 5 V to 3.3 V wastes far
+  less. That fits the readings but is not established: no shot isolates U3,
+  and the two boards differ in more than the regulator.
+
+### Notes on the thermal shots
+
+- **There was no XIAO thermal image before 2026-11-16.** The camera originals
+  of the earlier set are timestamped 2026-10-17 16:10–16:11. That afternoon the
+  XIAO board had only just been routed (commit a0c84fc, 16:08: "XIAO board
+  expected in manufacturing"). So every 2026-10-17 shot shows the v1.1
+  SuperMini board.
+- Those SuperMini shots were most likely powered over **USB-C**. That is
+  Scott's recollection, and the module frame shows a cool cable-shaped object
+  leaving the module's USB edge.
+- **On the XIAO the feed point makes no difference.** Per Seeed's schematic
   (`XIAO_ESP32S3_SCH_v1.2`), the header's 5V pin *is* VBUS, with no diode
   between USB-C and the pin. The diode (D2, LMBR4010) sits after that, between
   VBUS and the 3.3 V converter. So the PPK feed on the 5V pin heats the module
   exactly as USB-C would. (An earlier note here, written before reading the
   schematic, said to use USB-C. That was wrong.)
-- **The XIAO's 3.3 V comes from a buck converter, not an LDO:** U3 SGM6029
-  (600 mA) with a 470 nH inductor, L4. The SuperMini's 3.3 V is a linear
-  regulator, and that LDO was the 43 °C concern above. A buck dropping 5 V to
-  3.3 V wastes far less, so the XIAO module should run cooler. That is
-  expected, not measured.

@@ -6,7 +6,7 @@ SuperMini, running the ported firmware on WiFi. The project now uses a XIAO
 ESP32-S3 or XIAO ESP32-S3 Plus. **The XIAO ESP32-S3 was measured on 2026-11-16:
 about 305 mA, 1.53 W, and a 770–781 mA inrush.** See
 [XIAO ESP32-S3: measured](#xiao-esp32-s3-measured-2026-11-16) at the end. The
-S3 Plus has not been measured. XIAO module temperature: 30.2 °C in a 21.0 °C room (one shot, 2026-11-16).
+S3 Plus has not been measured. XIAO module temperature: 31.4 °C in a 20.7 °C room after ~21 min (2026-11-16).
 
 **Instrument:** Nordic PPK II, source meter mode, 5.000 V, 10 kSa/s, 10 s window.
 
@@ -172,39 +172,38 @@ only 1.3 s of the 3.5 s stream. When bytes are dropped, the PPK's 4-byte samples
 lose their alignment and decode as garbage. All four complete captures agree
 within 12 mA. See `TRAPS.md`, "PPK II from a script".
 
-### Module temperature: 30.2 °C, one shot, 2026-11-16
+### Module temperature: 31.4 °C after ~20 min, 2026-11-16
 
-**Instrument:** the same thermal camera, default settings, one color shot at
-12:41. **Board:** the XIAO orb as above, fed by the PPK on the 5V pin (the same
-node as USB VBUS, see below), running firmware 1.8.0 with Stocks on.
-**Time powered before the shot:** about 10 minutes (Scott).
+**Instrument:** the same thermal camera, default settings, color. **Board:** the
+XIAO orb as above, fed by the PPK on the 5V pin (the same node as USB VBUS, see
+below), running firmware 1.8.0 with Stocks on. Powered on about 12:31; shots at
+12:41 and 12:52.
 
-| Spot | Reading |
-|---|---|
-| Hottest point on the XIAO module (middle of the shield can) | **30.2 °C** |
-| Center crosshair, on the shield | 29.9 °C |
-| Background, same frame | 21.0 °C |
+| Spot | ~10 min (12:41) | **~21 min (12:52)** |
+|---|---|---|
+| Hottest point on the XIAO module (middle of the shield can) | 30.2 °C | **31.4 °C** |
+| Background, same frame | 21.0 °C | 20.7 °C |
+| **Rise over the room** | 9.2 °C | **10.7 °C** |
 
-![XIAO module, 30.2 °C hottest point](assets/thermal/xiao-module-2026-11-16.jpg)
+![XIAO module after ~21 min, 31.4 °C hottest point](assets/thermal/xiao-module-20min-2026-11-16.jpg)
 
-**The XIAO module runs about 9 °C over the room, against the SuperMini's
-about 19 °C.** That fits a buck converter in place of the SuperMini's LDO, but
-one shot does not establish the cause. The room was 21.0 °C here and 23.9 °C
-for the SuperMini, so compare the rise over the room, not the absolute reading.
+**The XIAO module settles about 11 °C over the room, against the SuperMini's
+about 19 °C** (43.6 °C in a 24.5 °C frame). That fits a buck converter in place
+of the SuperMini's LDO, but the cause is not established by these shots. The
+room was 20.7 °C here and 23.9 °C for the SuperMini, so compare the rise over
+the room, not the absolute reading. Between 10 and 21 minutes the module
+gained 1.2 °C. Whether it was still climbing at 21 minutes was not measured.
+The SuperMini's 20-minute and after-hours sets agreed within 1 °C.
 
-What the image shows:
+What the images show:
 
 - The heat is spread across the shield can, which covers the ESP32-S3 and its
   flash. **No separate hot spot marks the buck converter (U3) or its inductor
-  (L4).** At this load the converter does not stand out. Where U3 sits on the
-  board was not identified.
+  (L4)** in either shot. At this load the converter does not stand out. Where
+  U3 sits on the board was not identified.
 - A warm streak leaving the module's side is most likely the PPK lead
-  soldered to the 5V pin. A small warm spot on the carrier, left of the module,
-  was not identified.
-- **It may read low.** The orb had run about 10 minutes. The SuperMini sets
-  were taken after about 20 minutes and after hours, and they agreed within
-  1 °C, but nothing was recorded at 10 minutes. A shot after 20 minutes or
-  more would settle it.
+  soldered to the 5V pin.
+- The 10-minute shot is kept as `assets/thermal/xiao-module-10min-2026-11-16.jpg`.
 
 ### Not measured
 
@@ -212,7 +211,7 @@ What the image shows:
 - Display backs on the XIAO board. They cannot be shot: the XIAO board covers
   them, whereas the v1.1 board left them in view (Scott, 2026-11-16).
 - Module temperature on the XIAO. Scott ruled it out on 2026-11-16: the
-  SuperMini thermal shots above are good enough. He then took the one shot
+  SuperMini thermal shots above are good enough. He then took the two shots
   above anyway. **Before that shot there was no XIAO thermal
   image.** Checked 2026-11-16: the camera originals are timestamped
   2026-10-17 16:10–16:11. That afternoon the XIAO board had only just been

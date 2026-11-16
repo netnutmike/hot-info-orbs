@@ -445,3 +445,30 @@ Found while measuring the XIAO with `ppk2-api` 0.9.2 on macOS
    fails with `UnicodeDecodeError` on sample bytes. Send stop, flush until the
    port is quiet, then read the metadata yourself
    (`tools/ppk/ppk_common.py`).
+
+## nRF Connect for Desktop: app updates hang because macOS kills nrfutil (2026-11-16)
+
+**Symptom:** the Power Profiler update (4.4.0 → 4.4.1) hangs forever. The
+tarball downloads fine (its SHA-1 matches the index), and nothing on screen
+says why. Scott had hit the same hang once before (September).
+
+**Cause, measured:** every `nrfutil` the launcher runs out of
+`~/Library/Application Support/nrfconnect/` (the launcher's own copy and the
+`nrfutil-sandboxes/.../bin/*` binaries) is SIGKILLed at exec. Crash reports in
+`~/Library/Logs/DiagnosticReports/nrfutil-*.ips` say `SIGKILL (Code Signature
+Invalid)`, `Taskgated Invalid Signature`. Yet `codesign --verify --strict`
+passes on the same file, and a **fresh copy of the same bytes runs**. The
+launcher rewrites its `nrfutil` in place on every start (the mtime moves to
+launch time). macOS kills an already-run signed executable that has been
+overwritten in place, even with identical bytes. Launcher 5.4.1, nrfutil 9.0.0,
+macOS 27.2.1.
+
+**Fix that worked:** quit the launcher; replace each killed binary with a fresh
+copy (`cp -p f f.fresh && mv -f f.fresh f`); **delete** the launcher's own
+`nrfutil`; relaunch. The launcher then creates a new file instead of
+overwriting, and nothing is killed. Test a binary with `"$f" --version; echo $?`:
+137 means killed.
+
+**Not established:** whether it recurs on the next launch, now that the file
+exists again and will be overwritten in place. Check for new
+`nrfutil-*.ips` files before trusting the launcher.

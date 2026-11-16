@@ -45,3 +45,6 @@ package-lock.json
 # make_release_bins.py output; the files go to a GitHub release, not git
 release/
 *.bak
+
+# Power report page, rebuilt by tools/power-report/build_report.py
+tools/power-report/xiao-orb-power.html

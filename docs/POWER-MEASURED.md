@@ -119,6 +119,8 @@ recorded at the time).
 (`tools/ppk/`, below) at its native **100 kSa/s**. The "10 kSa/s" figures are
 means of 10 samples, to compare with the SuperMini run, which was read in
 nRF Connect at 10 kSa/s. Raw log: `assets/power/xiao-2026-11-16/session.log`.
+The charts page is rebuilt from the captures there by
+`tools/power-report/build_report.py`.
 
 | State (10 s window) | Average | Max (100 kSa/s) |
 |---|---|---|

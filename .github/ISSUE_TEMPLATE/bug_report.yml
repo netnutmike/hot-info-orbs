@@ -1,0 +1,48 @@
+name: Bug report
+description: Something on the orbs isn't working the way it should
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting it. [The troubleshooting guide](https://github.com/scottdube/hot-info-orbs/blob/main/docs/TROUBLESHOOTING.md) covers the common problems; if it's not there, fill this in.
+  - type: input
+    id: version
+    attributes:
+      label: Firmware version
+      description: Hold the middle button for 2 seconds; the info page shows it. `http://<address>/update` shows it too.
+      placeholder: "1.8.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: board
+    attributes:
+      label: Board
+      options:
+        - XIAO ESP32-S3
+        - XIAO ESP32-S3 Plus
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and which orb or page it was on. A photo helps.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to make it happen again
+      description: The steps, if you know them. "It happened once overnight" is a fine answer.
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Open `http://<address>/log` in a browser and paste what it shows. Leave out anything you'd rather not share.
+      render: text

@@ -101,6 +101,16 @@ ROWS = [
      "hot_info_orbs_xiao_46mm.kicad_pcb", "-",
      "https://jlcpcb.com/quote/pcbOrderFaq/PCB%20Color", "https://www.pcbway.com/",
      "Order the colors explicitly: the stackup colors only drive the 3D/STEP, not the gerbers."],
+    ["USB (90 deg)", 1, "USB-C right-angle extension, male 90 deg to female straight",
+     "4 in (10 cm) flat, USB 2.0, 5-core, 65 W max; no video, no OTG",
+     "off-board, no footprint", "JUXINICE B0CSW5W4LY (Size 4 inches, Color M/F Right Angle)",
+     AMZ + "B0CSW5W4LY", "",
+     "Scott's pick 2026-11-16. Builder supplies it, not in the kit. Plugs into the XIAO; the "
+     "builder's own USB-C data cable goes into its female end. 2-pack, so one pack covers two builds. "
+     "DATA NOT VERIFIED: the listing says USB 2.0 with 5 cores (D+/D- carried) but also 'does not "
+     "support carrying the Internet'; one review of the 8 in M/M variant says power only, no data. "
+     "Flash the XIAO through one before naming it in the kit spec. Fit in the enclosure not checked. "
+     "No AliExpress source found yet."],
 ]
 assert all(len(r) == len(COLS) - 1 for r in ROWS)
 assert all(r[6] for r in ROWS), "every line needs Link 1"
@@ -122,6 +132,7 @@ PRICES = {
     "C2": (6.99, 120, None),
     "R1": (4.99, 100, None),
     "H1-H7": (7.49, 120, None),
+    "USB (90 deg)": (9.99, 2, None),  # JUXINICE 2-pack, seen 2026-11-16
 }
 PLUS_PRICE = 7.90                      # XIAO ESP32-S3 Plus on Seeed, seen 2026-10-17
 COLS = COLS[:9] + ["Price (Link 1)", "Pack qty", "Build cost"] + COLS[9:]
@@ -129,8 +140,8 @@ OUT_ROWS = []
 for r in ROWS:
     price, pack, override = PRICES.get(r[0], ("", "", None))
     OUT_ROWS.append(r[:8] + [price, pack, override] + r[8:])
-NOTE = ("Required lines only; the optional lenses are below. Link 1 prices seen 2026-10-17, "
-        "before shipping and tax. PCB not included: get a JLCPCB quote.")
+NOTE = ("Required lines only; the optional lenses are below. Link 1 prices seen 2026-10-17 "
+        "(the 90 deg USB 2026-11-16), before shipping and tax. PCB not included: get a JLCPCB quote.")
 
 
 def priced(r):

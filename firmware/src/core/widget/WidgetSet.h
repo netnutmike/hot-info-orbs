@@ -36,6 +36,12 @@ public:
     void setClockPage(Widget *clock);
     bool followOutage();
     void rotate();
+    // Issue #58 (PageLock.h): while locked the rotation stays on this page
+    // (the clock-only outage rule still wins) and a padlock sits at the
+    // bottom of the middle orb. setPageLock also puts "Locked" / "Unlocked"
+    // on that orb until endLockNote(), which repaints the page without it.
+    void setPageLock(bool locked);
+    void endLockNote();
     void buttonPressed(uint8_t buttonId, ButtonState state);
     void showLoading();
     // true = the boot eyes are still on orbs 2 and 4: the start-up "Loading"
@@ -79,6 +85,11 @@ private:
     void switchWidget();
 
     void drawStaleMark(); // over the page, after every draw of it
+    void drawLockMark(uint8_t filled); // part of drawStaleMark; filled = orbs just wiped
+    bool m_locked = false;
+    bool m_lockMarkOwed = false;
+    const char *m_lockNote = nullptr; // "Locked" / "Unlocked" while it shows
+    bool m_lockNoteOwed = false;
     bool m_wifiOut = false; // down for longer than a roam takes (stale::LinkGrace)
     stale::LinkGrace m_linkGrace;
     stale::LinkWatch m_linkWatch;

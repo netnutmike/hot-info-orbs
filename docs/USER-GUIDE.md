@@ -36,6 +36,7 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 | **Right** | short | next page |
 | **Middle** | short, or about half a second | depends on the page showing: see the table below |
 | **Middle** | hold 2 seconds | the [info page](#the-info-page) |
+| **Left and right together** | hold 2 seconds | lock the orbs on this page; the same again unlocks: see [Locking a page](#locking-a-page) |
 | **Right** | hold while plugging in power | forget the WiFi network: see [Changing the WiFi network](#changing-the-wifi-network) |
 
 The buttons keep their places when the orbs are set to **Upside down**: on an
@@ -81,6 +82,23 @@ and MQTT pages are set up on the settings page under **Advanced**;
 **Staying on one page, or rotating.** New orbs stay on one page until you
 press a button. To rotate by themselves, set **Rotation > Seconds per page**
 on the settings page.
+
+### Locking a page
+
+**Hold left and right together for 2 seconds** to keep the orbs on the page
+they show: the rotation stops. The middle orb shows **Locked** for a moment,
+and a small padlock stays at the bottom of it while the lock is on. Do the
+same again to unlock: the middle orb shows **Unlocked** and the padlock goes.
+
+- Letting go of the two buttons does nothing else: it does not change the page.
+- Left and right still change pages while locked, and the lock stays on the
+  page you move to.
+- **Clock only when WiFi is out** still takes over during an outage; the
+  locked page comes back after it.
+- A restart clears the lock.
+- **Don't hold both buttons while plugging the orbs in.** Holding right at
+  power-up forgets the WiFi network. A hold carried over from power-up never
+  locks.
 
 **How often the data refreshes.** Weather every 10 minutes and stocks every
 15 minutes, **while their page is on screen**. A page that is not on screen

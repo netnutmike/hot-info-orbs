@@ -948,3 +948,26 @@ orb's internet and DNS first, then flashed it, so it booted with no way to sync.
   the internet returns is that timer, not this fix.
 - **Separate from #52:** one 6.1 s stall at 14:42:53, during the stocks
   fetch. Data fetches still run on the loop.
+
+**Not done at da306cd (Scott, 2026-11-18):** the freeze was gone, but with no
+internet the orb still showed a made-up time as if real, took minutes to
+correct it, and left weather dark. 5f85db5 and ac96aa5 fix that:
+- "No time" face (dashes on every clock face) until SNTP sets the clock.
+- `SyncKick`: `sntp_restart()` every 15 s, and at once on WiFi back, while
+  there is no current sync.
+- Every good sync gives each page whose last fetch failed a refresh.
+- Empty weather and stock pages say so, with "no internet" when there is no
+  current sync.
+
+**A software restart keeps the system clock: measured 2026-11-18.** I flashed
+5f85db5 over a synced clock with the internet blocked. The log was dated from
+the start, and no sync was possible. That broke the first cut, which keyed the
+15 s retry and "no internet" on a valid clock: after a restart the clock was
+valid, so neither ran. Since ac96aa5 they key on `syncCurrent()`, meaning a
+sync since start that is not overdue. The clock face still keys on a valid
+time. **Power loss: not tested yet.**
+
+On ac96aa5 with the internet blocked (Scott, 15:05): the time was right, and
+the weather and stock pages said "no internet". Still to run: an unplug test
+(expect the "No time" face), then unblock and time the recovery (expect a
+sync within ~15 s).

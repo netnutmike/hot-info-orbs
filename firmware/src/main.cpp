@@ -41,6 +41,8 @@ Button buttonRight(BUTTON_RIGHT);
 
 GlobalTime *globalTime; // Initialize the global time
 devlog::TimeSyncWatch s_timeSync; // logs a missing or overdue time sync (issue #52)
+devlog::SyncKick s_syncKick; // asks again every 15 s while there is no real time
+uint32_t s_syncsSeen = 0; // time syncs the pages have been told about
 
 String connectingString{""};
 
@@ -442,6 +444,13 @@ void loop() {
                 DeviceLog::note("%s", news.c_str());
             }
         }
+        if (s_syncKick.step(millis(), globalTime->timeValid(), wifiWidget->linkUp())) {
+            globalTime->kickSync();
+        }
+        if (globalTime->syncCount() != s_syncsSeen) {
+            s_syncsSeen = globalTime->syncCount();
+            widgetSet->timeSynced(); // the internet is up: failed pages refresh now
+        }
 
         checkButtons();
 
@@ -454,7 +463,7 @@ void loop() {
                 feed->service(); // values current when a page comes up
             }
         }
-        widgetSet->updateBrightnessByTime(globalTime->getHour24() * 60 + globalTime->getMinute());
+        widgetSet->updateBrightnessByTime(globalTime->timeValid() ? globalTime->getHour24() * 60 + globalTime->getMinute() : -1);
         if (infoPage->isOpen()) {
             // The info page has the orbs: the rotation waits. It closes on any
             // button (checkButtons), after a minute, or when the panels go off.

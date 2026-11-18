@@ -14,6 +14,46 @@ constexpr uint32_t kSyncIntervalS = 15 * 60; // GlobalTime asks SNTP for this
 constexpr uint32_t kFirstSyncWarnS = 120; // no time this long after start is news
 constexpr uint32_t kSyncOverdueS = 2 * kSyncIntervalS + 5 * 60; // two missed syncs, and some
 
+// The system clock holds a real time: SNTP has set it. Before that it counts
+// from 1970, and the orb showed that as a time of day (2:26 on the rig,
+// 2026-11-18). Same line as the device log's clockSet().
+inline bool timeValid(int64_t utc) {
+    return utc > 1700000000;
+}
+
+// While there is no real time, ask SNTP again every kKickMs, and at once when
+// WiFi comes back. lwIP's own retry backs off from 15 s to 150 s, so a boot
+// with no internet took 3.5 min to show the time once it returned (rig,
+// 2026-11-18). A kick (sntp_restart) only starts a request: nothing waits.
+// Once the time is real, no kicks: the clock keeps time on its crystal, and
+// the 15 min sync takes over.
+constexpr uint32_t kKickMs = 15000;
+class SyncKick {
+public:
+    // Every loop pass. true = restart SNTP now.
+    bool step(uint32_t nowMs, bool valid, bool linkUp) {
+        if (!m_started) {
+            m_started = true; // SNTP was started at boot: the interval runs from here
+            m_last = nowMs;
+        }
+        const bool back = linkUp && !m_up;
+        m_up = linkUp;
+        if (valid || !linkUp) {
+            return false;
+        }
+        if (back || nowMs - m_last >= kKickMs) { // unsigned: right across the millis() wrap
+            m_last = nowMs;
+            return true;
+        }
+        return false;
+    }
+
+private:
+    bool m_started = false;
+    bool m_up = true; // pages only run once start-up has joined WiFi
+    uint32_t m_last = 0;
+};
+
 // Call every loop pass. upS: seconds of uptime; syncs: syncs so far;
 // lastSyncUpS: uptime of the last one (ignored while syncs is 0).
 class TimeSyncWatch {

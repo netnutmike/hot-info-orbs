@@ -101,6 +101,12 @@ private:
     void displayNixie(int displayIndex, const String &digit);
     void displayCustom(int displayIndex, const String &digit);
     void changeClockType();
+    void drawNoTime();
+
+    // No real time yet (GlobalTime::timeValid): dashes and "No time", never a
+    // made-up time (Scott on the rig, 2026-11-18)
+    bool m_noTime = false;
+    bool m_noTimeChanged = true; // the first draw paints whichever face is right
 
     ClockType m_type = DEFAULT_CLOCK; // replaced from Settings in the constructor
     bool m_ringed = false; // the red ring is on (setClockOnly)

@@ -96,6 +96,12 @@ void WidgetSet::setLinkUp(bool up) {
     m_wifiOut = m_linkGrace.out(millis(), up);
 }
 
+void WidgetSet::timeSynced() {
+    for (int8_t i = 0; i < m_widgetCount; i++) {
+        m_refreshOwed[i] = m_refreshOwed[i] || m_widgets[i]->fetchFailed();
+    }
+}
+
 void WidgetSet::setClockPage(Widget *clock) {
     m_clockPage = indexOf(clock);
 }
@@ -275,8 +281,9 @@ void WidgetSet::initializeAllWidgetsData() {
 
 void WidgetSet::updateBrightnessByTime(int minuteOfDay) {
     const SettingsValues &s = Settings::get();
-    bool isDim = s.dim && sv::inTimeRange(minuteOfDay, s.dimstartm, s.dimendm);
-    bool isOff = s.off && sv::inTimeRange(minuteOfDay, s.offstartm, s.offendm);
+    // -1 = no real time yet: no dim or night-off hours on a made-up time
+    bool isDim = minuteOfDay >= 0 && s.dim && sv::inTimeRange(minuteOfDay, s.dimstartm, s.dimendm);
+    bool isOff = minuteOfDay >= 0 && s.off && sv::inTimeRange(minuteOfDay, s.offstartm, s.offendm);
 
     if (m_woken && millis() - m_wokenAt >= 60000UL) {
         m_woken = false;

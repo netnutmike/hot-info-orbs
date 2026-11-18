@@ -32,6 +32,7 @@ public:
     String getName() override;
     static const WebDataStatus &status();
     bool dataStale() override { return m_fresh.stale(); }
+    bool fetchFailed() override { return m_fresh.lastFailed(); }
     const char *dataKind() override { return "web data"; }
     stale::LastGood lastGood() override { return m_fresh.lastGood(); }
 

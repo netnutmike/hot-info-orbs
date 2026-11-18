@@ -37,6 +37,11 @@ public:
     // Background SNTP syncs since start, and the uptime (s) of the last one
     uint32_t syncCount() const;
     uint32_t lastSyncUpSeconds() const;
+    // false = SNTP has not set the clock since power-on, and the time of day
+    // is made up (it counts from 1970). Pages show "No time" instead.
+    bool timeValid() const;
+    // Ask SNTP again now (SyncKick in TimeSyncWatch.h). Nothing waits on it.
+    void kickSync();
     void getHourAndMinute(int &hour, int &minute);
     int getHour();
     int getHour24();

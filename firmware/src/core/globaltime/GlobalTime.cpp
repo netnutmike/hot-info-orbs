@@ -81,6 +81,14 @@ uint32_t GlobalTime::lastSyncUpSeconds() const {
     return s_lastSyncMs / 1000;
 }
 
+bool GlobalTime::timeValid() const {
+    return devlog::timeValid(time(nullptr));
+}
+
+void GlobalTime::kickSync() {
+    sntp_restart();
+}
+
 void GlobalTime::getHourAndMinute(int &hour, int &minute) {
     hour = m_hour;
     minute = m_minute;

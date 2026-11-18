@@ -1,4 +1,5 @@
 // Host tests for TimeSyncWatch.h:  pio test -e native -f test_timesync
+#include "NoData.h"
 #include "TimeSyncWatch.h"
 #include <string>
 #include <unity.h>
@@ -9,6 +10,9 @@ void tearDown() {}
 using devlog::kFirstSyncWarnS;
 using devlog::kSyncOverdueS;
 using devlog::TimeSyncWatch;
+using devlog::kKickMs;
+using devlog::SyncKick;
+using devlog::timeValid;
 
 void test_a_first_sync_on_time_is_not_news() {
     TimeSyncWatch w;
@@ -60,6 +64,55 @@ void test_overdue_again_after_recovering_is_news_again() {
     TEST_ASSERT_EQUAL_STRING("no time sync for 35 min", w.step(3010 + kSyncOverdueS, 2, 3010).c_str());
 }
 
+// --- No fake time, and a quick first sync (Scott on the rig, 2026-11-18) ---
+
+void test_a_clock_never_synced_is_not_valid() {
+    TEST_ASSERT_FALSE(timeValid(0));
+    TEST_ASSERT_FALSE(timeValid(7 * 3600 + 26 * 60)); // 1970, what the rig showed as 2:26
+    TEST_ASSERT_TRUE(timeValid(1795000000)); // November 2026
+}
+
+void test_no_kick_while_the_time_is_valid() {
+    SyncKick k;
+    k.step(0, true, true);
+    TEST_ASSERT_FALSE(k.step(kKickMs * 10, true, true));
+}
+
+void test_no_time_kicks_every_interval_not_every_pass() {
+    SyncKick k;
+    TEST_ASSERT_FALSE(k.step(1000, false, true)); // start: SNTP was just started
+    TEST_ASSERT_FALSE(k.step(1000 + kKickMs - 1, false, true));
+    TEST_ASSERT_TRUE(k.step(1000 + kKickMs, false, true));
+    TEST_ASSERT_FALSE(k.step(1000 + kKickMs + 10, false, true));
+    TEST_ASSERT_TRUE(k.step(1000 + 2 * kKickMs, false, true));
+}
+
+void test_no_kick_while_wifi_is_down() {
+    SyncKick k;
+    k.step(0, false, true);
+    TEST_ASSERT_FALSE(k.step(kKickMs * 3, false, false));
+}
+
+void test_wifi_back_without_time_kicks_at_once() {
+    SyncKick k;
+    k.step(0, false, true);
+    k.step(1000, false, false);
+    TEST_ASSERT_TRUE(k.step(2000, false, true));
+    TEST_ASSERT_FALSE(k.step(2000 + kKickMs - 1, false, true)); // the interval starts again there
+}
+
+void test_wifi_back_with_valid_time_does_not_kick() {
+    SyncKick k;
+    k.step(0, true, true);
+    k.step(1000, true, false);
+    TEST_ASSERT_FALSE(k.step(2000, true, true));
+}
+
+void test_an_empty_page_blames_the_internet_only_without_a_time_sync() {
+    TEST_ASSERT_EQUAL_STRING("no internet", nodata::reason(false));
+    TEST_ASSERT_EQUAL_STRING("will retry", nodata::reason(true));
+}
+
 int main() {
     UNITY_BEGIN();
     RUN_TEST(test_a_first_sync_on_time_is_not_news);
@@ -69,5 +122,12 @@ int main() {
     RUN_TEST(test_an_overdue_sync_is_news_once);
     RUN_TEST(test_the_sync_after_an_overdue_one_says_how_long_it_was_out);
     RUN_TEST(test_overdue_again_after_recovering_is_news_again);
+    RUN_TEST(test_a_clock_never_synced_is_not_valid);
+    RUN_TEST(test_no_kick_while_the_time_is_valid);
+    RUN_TEST(test_no_time_kicks_every_interval_not_every_pass);
+    RUN_TEST(test_no_kick_while_wifi_is_down);
+    RUN_TEST(test_wifi_back_without_time_kicks_at_once);
+    RUN_TEST(test_wifi_back_with_valid_time_does_not_kick);
+    RUN_TEST(test_an_empty_page_blames_the_internet_only_without_a_time_sync);
     return UNITY_END();
 }

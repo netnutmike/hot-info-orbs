@@ -22,6 +22,9 @@ public:
     // Picks the stale mark's shape, and gets stale pages a refresh the
     // moment WiFi is back (issue #32, StalePolicy.h)
     void setLinkUp(bool up);
+    // A time sync just worked, so the internet is up: every page whose last
+    // fetch failed refreshes on its next turn on screen, not 10 or 15 min on
+    void timeSynced();
     Widget *getCurrent();
     void next();
     void prev();
@@ -42,7 +45,7 @@ public:
     bool initialUpdateDone();
     void initializeAllWidgetsData();
     void setClearScreensOnDrawCurrent();
-    void updateBrightnessByTime(int minuteOfDay); // 0..1439
+    void updateBrightnessByTime(int minuteOfDay); // 0..1439, -1 = no real time yet
     bool panelsAsleep();
     void wakeForAMinute(); // a button press during night-off hours
 

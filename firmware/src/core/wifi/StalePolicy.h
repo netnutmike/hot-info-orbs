@@ -96,14 +96,19 @@ public:
         if (ok) {
             m_good = {true, now};
         }
+        m_failed = !ok;
         m_stale = !ok && (now - m_since) >= limit; // unsigned: right across the millis() wrap
     }
     bool stale() const { return m_stale; }
     // For the info page: m_since cannot say this, it is also the first failed try
     LastGood lastGood() const { return m_good; }
+    // The last try failed. A good time sync means the internet is back, and
+    // such a page refreshes then instead of at its next 10 or 15 min turn.
+    bool lastFailed() const { return m_failed; }
 
 private:
     bool m_started = false;
+    bool m_failed = false;
     bool m_stale = false;
     uint32_t m_since = 0; // the last good refresh, or the first try
     LastGood m_good{false, 0};

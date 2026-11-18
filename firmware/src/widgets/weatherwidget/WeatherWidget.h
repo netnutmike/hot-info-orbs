@@ -4,6 +4,7 @@
 #include "GlobalTime.h"
 #include "DeviceLog.h"
 #include "StalePolicy.h"
+#include "NoData.h"
 #include "Utils.h"
 #include "WeatherDataModel.h"
 #include "WeatherSource.h"
@@ -24,6 +25,7 @@ public:
     void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
     bool dataStale() override { return m_fresh.stale(); }
+    bool fetchFailed() override { return m_fresh.lastFailed(); }
     const char *dataKind() override { return "weather"; }
     stale::LastGood lastGood() override { return m_fresh.lastGood(); }
     uint8_t dataOrbs() override { return 0x1E; } // orb 1 is the clock
@@ -40,6 +42,8 @@ private:
     void weatherText(int displayIndex);
     void threeDayWeather(int displayIndex);
     int getClockStamp();
+    void drawNoData();
+    bool m_drawnNoData = false;
     void configureColors();
 
     GlobalTime *m_time;

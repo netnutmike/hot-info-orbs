@@ -299,9 +299,14 @@ void ParqetWidget::displayClock(int8_t displayIndex, uint32_t background, uint32
 
     m_manager.fillScreen(background);
     m_manager.setFontColor(color);
-    m_manager.drawString(m_time->getDayAndMonth(), ScreenCenterX, clky + 60, 18, Align::MiddleCenter);
-
-    m_manager.drawClockTime(m_time->getHourPadded(), m_time->getMinutePadded(), ScreenCenterX, clky, 66);
+    if (m_time->timeValid()) {
+        m_manager.drawString(m_time->getDayAndMonth(), ScreenCenterX, clky + 60, 18, Align::MiddleCenter);
+        m_manager.drawClockTime(m_time->getHourPadded(), m_time->getMinutePadded(), ScreenCenterX, clky, 66);
+    } else {
+        // No made-up time or date (ClockWidget::drawNoTime)
+        m_manager.drawString("No time", ScreenCenterX, clky + 60, 18, Align::MiddleCenter);
+        m_manager.drawClockTime("--", "--", ScreenCenterX, clky, 66);
+    }
 
     m_manager.fillRect(0, 0, 240, 50, extraColor);
     m_manager.setBackgroundColor(extraColor);

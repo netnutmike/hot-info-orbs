@@ -57,6 +57,17 @@ void WeatherWidget::draw(bool force) {
         m_clockStamp = clockStamp;
     }
 
+    const bool noData = !m_fresh.lastGood().any;
+    if (noData != m_drawnNoData) {
+        force = true;
+        m_drawnNoData = noData;
+    }
+    if (noData) {
+        if (force) {
+            drawNoData();
+        }
+        return;
+    }
     if (force || model.isChanged()) {
         weatherText(1);
         // Half size (the decoder only scales by 1/2/4/8): the full-size art runs
@@ -88,6 +99,20 @@ void WeatherWidget::update(bool force) {
     }
 }
 
+// No weather since power-on: say so on the center orb instead of an empty
+// page. Orb 2 stays clear for "No WiFi"; 4 and 5 have nothing to show.
+void WeatherWidget::drawNoData() {
+    for (int orb = 1; orb <= 4; orb++) {
+        m_manager.selectScreen(orb);
+        m_manager.fillScreen(m_backgroundColor);
+    }
+    m_manager.selectScreen(2);
+    m_manager.setFontColor(stale::kAmber, m_backgroundColor);
+    m_manager.drawCenterString("No weather", center, 100, 26);
+    m_manager.setFontColor(m_foregroundColor, m_backgroundColor);
+    m_manager.drawCenterString(nodata::reason(m_time->syncCurrent()), center, 140, 18);
+}
+
 void WeatherWidget::displayClock(int displayIndex) {
     const int clockY = 120;
     const int dayOfWeekY = 190;
@@ -97,6 +122,14 @@ void WeatherWidget::displayClock(int displayIndex) {
     m_manager.fillScreen(m_backgroundColor);
     m_manager.setFontColor(m_foregroundColor);
 
+    if (!m_time->timeValid()) {
+        // No made-up time or date (ClockWidget::drawNoTime)
+        m_manager.setFontColor(stale::kAmber);
+        m_manager.drawCenterString("No time", center, dateY, 22);
+        m_manager.setFontColor(m_foregroundColor);
+        m_manager.drawClockTime("--", "--", center, clockY, 66);
+        return;
+    }
     m_manager.drawCenterString(m_time->getDayAndMonth(), center, dateY, 18);
     const String weekDay = m_time->getWeekday();
     m_manager.drawCenterString(weekDay, center, dayOfWeekY, 22);
@@ -304,6 +337,9 @@ void WeatherWidget::threeDayWeather(int displayIndex) {
 }
 
 int WeatherWidget::getClockStamp() {
+    if (!m_time->timeValid()) {
+        return -1; // redraws once when the time arrives
+    }
     return m_time->getHour() * 60 + m_time->getMinute();
 }
 

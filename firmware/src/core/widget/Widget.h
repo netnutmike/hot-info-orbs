@@ -20,6 +20,9 @@ public:
     // failing and what it shows is old. A page that fetches nothing (the
     // clock) never is.
     virtual bool dataStale() { return false; }
+    // The page's last fetch failed (stale::Tracker::lastFailed). A good time
+    // sync means the internet is back: such a page refreshes then.
+    virtual bool fetchFailed() { return false; }
     // For the info page on the orbs (InfoPagePolicy.h): the kind of data this
     // page fetches, "weather", and when it last got it. nullptr = it has no
     // line there: it fetches nothing, or MQTT, which has its own line.

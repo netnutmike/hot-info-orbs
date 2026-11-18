@@ -1,6 +1,7 @@
 #include "ClockWidget.h"
 
 #include "Settings.h"
+#include "StalePolicy.h" // kAmber
 #include "config_helper.h"
 
 ClockWidget::ClockWidget(ScreenManager &manager) : Widget(manager) {
@@ -29,6 +30,19 @@ void ClockWidget::setup() {
 void ClockWidget::draw(bool force) {
     m_manager.setFont(CLOCK_FONT);
     GlobalTime *time = GlobalTime::getInstance();
+
+    if (m_noTimeChanged) {
+        // Into or out of the no-time face: start from black orbs
+        m_noTimeChanged = false;
+        m_manager.clearAllScreens();
+        force = true;
+    }
+    if (m_noTime) {
+        if (force) {
+            drawNoTime();
+        }
+        return;
+    }
 
     if (m_lastDisplay1Digit != m_display1Digit || force) {
         displayDigit(0, m_lastDisplay1Digit, m_display1Digit, m_color);
@@ -111,6 +125,16 @@ void ClockWidget::update(bool force) {
 
     GlobalTime *time = GlobalTime::getInstance();
 
+    const bool noTime = !time->timeValid();
+    if (noTime != m_noTime) {
+        m_noTime = noTime;
+        m_noTimeChanged = true;
+        force = true; // the digits are worked out afresh when the time arrives
+    }
+    if (m_noTime) {
+        return;
+    }
+
     m_hourSingle = time->getHour();
     m_minuteSingle = time->getMinute();
     m_secondSingle = time->getSecond();
@@ -139,6 +163,28 @@ void ClockWidget::update(bool force) {
 
         m_lastMinuteSingle = m_minuteSingle;
     }
+}
+
+// Every face, Nixie and custom too: their pictures have no dash. The words
+// are amber like "No WiFi" on the data pages (red stays the clock's "Clock
+// only" ring), and the dashes say the same thing without the color.
+void ClockWidget::drawNoTime() {
+    const int digitOrbs[] = {0, 1, 3, 4};
+    for (int orb : digitOrbs) {
+        m_manager.selectScreen(orb);
+        m_manager.fillScreen(TFT_BLACK);
+        m_manager.setFont(CLOCK_FONT);
+        m_manager.setFontColor(m_color, TFT_BLACK);
+        m_manager.drawString("-", SCREEN_SIZE / 2 + CLOCK_OFFSET_X_DIGITS, SCREEN_SIZE / 2, CLOCK_FONT_SIZE, Align::MiddleCenter);
+    }
+    m_manager.selectScreen(2);
+    m_manager.fillScreen(TFT_BLACK);
+    m_manager.setFont(DEFAULT_FONT);
+    m_manager.setFontColor(stale::kAmber, TFT_BLACK);
+    m_manager.drawString("No time", SCREEN_SIZE / 2, SCREEN_SIZE / 2 - 14, 30, Align::MiddleCenter);
+    m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
+    m_manager.drawString("waiting to sync", SCREEN_SIZE / 2, SCREEN_SIZE / 2 + 22, 16, Align::MiddleCenter);
+    m_manager.setFont(CLOCK_FONT);
 }
 
 void ClockWidget::change24hMode() {

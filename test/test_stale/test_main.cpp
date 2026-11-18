@@ -599,6 +599,16 @@ void test_a_switch_from_a_marked_page_to_the_clock_needs_no_extra_repaint() {
     TEST_ASSERT_EQUAL_HEX8(0x1F, p.orbs);
 }
 
+// A good time sync after a failed fetch: the page refreshes at once (2026-11-18)
+void test_a_failed_fetch_is_remembered_until_a_good_one() {
+    stale::Tracker t;
+    TEST_ASSERT_FALSE(t.lastFailed()); // never tried
+    t.attempt(1000, false, 600000);
+    TEST_ASSERT_TRUE(t.lastFailed());
+    t.attempt(2000, true, 600000);
+    TEST_ASSERT_FALSE(t.lastFailed());
+}
+
 int main() {
     UNITY_BEGIN();
     RUN_TEST(test_page_is_fresh_after_a_good_refresh);
@@ -674,5 +684,6 @@ int main() {
     RUN_TEST(test_a_clock_orb_that_was_repainted_gets_its_ring_back);
     RUN_TEST(test_the_clock_ring_comes_off_by_repainting_the_clock);
     RUN_TEST(test_a_switch_from_a_marked_page_to_the_clock_needs_no_extra_repaint);
+    RUN_TEST(test_a_failed_fetch_is_remembered_until_a_good_one);
     return UNITY_END();
 }

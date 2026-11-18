@@ -1,6 +1,7 @@
 #include "OtaUpdater.h"
 #include "DeviceLogStore.h"
 #include "UpdateCheck.h"
+#include "UploadResult.h"
 #include "Utils.h"
 #include "build_id.h"
 #include "config_helper.h"
@@ -9,6 +10,7 @@
 #include <Update.h>
 #include <WebServer.h>
 #include <esp_ota_ops.h>
+#include <functional>
 
 static WebServer s_server(80);
 
@@ -41,11 +43,42 @@ static const char *uploadPage =
     "<p>Newest release: <a href='" UPDATE_CHECK_FILE_URL "'>download firmware.bin</a> &middot; "
     "<a href='" UPDATE_CHECK_NOTES_URL "'>release notes</a></p>"
     "<form method='POST' action='/update' enctype='multipart/form-data'>"
-    "<input type='file' name='firmware' accept='.bin'> "
+    "<input type='file' name='firmware' accept='.bin' required> "
     "<input type='submit' value='Upload'></form>"
     "<p>Choose the <code>firmware.bin</code> you downloaded, or your own build's "
     "<code>.pio/build/&lt;env&gt;/firmware.bin</code>. The orbs restart when it is done.</p>"
     "<p><a href='/settings'>Settings</a></p>";
+
+// POST /update takes multipart form uploads only (#55). The core's own
+// on(uri, method, fn, upload) handler also accepts a raw body (any POST that is
+// not a form, even an empty one) and calls the same upload function for it,
+// which reads server.upload(): a null pointer on that path, so the orbs
+// crashed. Here the upload arrives as an argument and raw bodies are refused,
+// so such a POST reaches the finish step with no bytes: "No file chosen".
+class UpdatePostHandler : public RequestHandler {
+  public:
+    UpdatePostHandler(std::function<void()> finish, std::function<void(HTTPUpload &)> chunk)
+        : m_finish(finish), m_chunk(chunk) {}
+    bool canHandle(HTTPMethod method, String uri) override { return method == HTTP_POST && uri == "/update"; }
+    bool canUpload(String uri) override { return uri == "/update"; }
+    bool canRaw(String uri) override { return false; }
+    bool handle(WebServer &server, HTTPMethod method, String uri) override {
+        if (!canHandle(method, uri)) {
+            return false;
+        }
+        m_finish();
+        return true;
+    }
+    void upload(WebServer &server, String uri, HTTPUpload &upload) override {
+        if (canUpload(uri)) {
+            m_chunk(upload);
+        }
+    }
+
+  private:
+    std::function<void()> m_finish;
+    std::function<void(HTTPUpload &)> m_chunk;
+};
 
 OtaUpdater::OtaUpdater(ScreenManager &manager) : m_manager(manager) {}
 
@@ -123,37 +156,52 @@ void OtaUpdater::setupWebUpdate() {
         s_server.send(200, "text/html", page);
     });
 
-    s_server.on(
-        "/update", HTTP_POST,
+    s_server.addHandler(new UpdatePostHandler(
         // Runs after the upload has finished
         [this]() {
             if (!authorized()) {
                 return;
             }
-            bool ok = !Update.hasError();
-            s_server.send(ok ? 200 : 500, "text/plain", ok ? "Update OK, restarting.\n" : "Update FAILED, old firmware kept.\n");
+            const ota::Outcome o = ota::outcome(m_uploadBytes, Update.hasError());
+            const std::string page = ota::resultPage(o, Update.errorString());
+            const bool ok = o == ota::Outcome::Ok;
+            m_uploadBytes = 0;
+            s_server.send(o == ota::Outcome::Failed ? 500 : 200, "text/html", page.c_str());
+            if (!ota::restartAfter(o)) {
+                // No file: Update.begin() was never called and the screens were never touched
+                Serial.println("OTA upload: no file chosen, nothing done");
+                return;
+            }
             drawStatus(ok ? "Update OK" : "Update failed", ok ? "restarting" : "old firmware kept", ok ? TFT_GREEN : TFT_RED);
             delay(1000);
             DeviceLog::beforeRestart(ok ? "firmware update" : "firmware update failed");
             ESP.restart();
         },
         // Runs once per chunk while the upload streams in
-        [this]() {
+        [this](HTTPUpload &upload) {
 #ifdef OTA_PASSWORD
             if (!s_server.authenticate("admin", OTA_PASSWORD)) {
                 return;
             }
 #endif
-            HTTPUpload &upload = s_server.upload();
             if (upload.status == UPLOAD_FILE_START) {
+                // Nothing starts until bytes arrive: no file chosen (and an empty
+                // file) sends none, and must not take over the screens (#55)
                 Serial.printf("OTA upload: %s\n", upload.filename.c_str());
-                m_updating = true;
-                m_lastPercent = -1;
-                drawStatus("Updating", "do not unplug", TFT_ORANGE);
-                if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH)) {
-                    Update.printError(Serial);
-                }
+                m_uploadBytes = 0;
             } else if (upload.status == UPLOAD_FILE_WRITE) {
+                if (upload.currentSize == 0) {
+                    return;
+                }
+                if (m_uploadBytes == 0) {
+                    m_updating = true;
+                    m_lastPercent = -1;
+                    drawStatus("Updating", "do not unplug", TFT_ORANGE);
+                    if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH)) {
+                        Update.printError(Serial);
+                    }
+                }
+                m_uploadBytes += upload.currentSize;
                 if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
                     Update.printError(Serial);
                 }
@@ -162,16 +210,21 @@ void OtaUpdater::setupWebUpdate() {
                     drawStatus("Updating", String(upload.totalSize / 1024) + " KB", TFT_ORANGE);
                 }
             } else if (upload.status == UPLOAD_FILE_END) {
+                if (m_uploadBytes == 0) {
+                    return; // never began
+                }
                 // true: accept the size as whatever arrived. Only here is the new slot marked bootable.
                 if (!Update.end(true)) {
                     Update.printError(Serial);
                 }
             } else if (upload.status == UPLOAD_FILE_ABORTED) {
-                Update.abort();
+                if (m_uploadBytes > 0) {
+                    Update.abort();
+                }
                 m_updating = false;
                 Serial.println("OTA upload aborted");
             }
-        });
+        }));
 
     s_server.begin();
     MDNS.addService("http", "tcp", 80);

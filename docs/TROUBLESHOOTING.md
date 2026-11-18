@@ -119,7 +119,7 @@ Problems with a
 
 | What you see | What it means, and what to do |
 |---|---|
-| The orbs show **Update failed, old firmware kept** | Nothing changed; the orbs keep running the old version. Check that you chose `firmware.bin` (not the combo file, which is for USB) and upload again. |
+| The orbs show **Update failed, old firmware kept** | Nothing changed; the orbs keep running the old version. The browser page gives the reason. Check that you chose `firmware.bin` (not the combo file, which is for USB) and upload again. |
 | The page still shows the old version after an update | Look too soon and the old version is still answering: the orbs take several seconds to restart. Wait until the orbs show a page again, reload, and read the first line. If it still shows the old version, the new one could not get back on WiFi after its restart and was undone: check the WiFi, then upload again. |
 | The settings page says **Could not check for a newer version** | The phone or computer you are reading on asks GitHub for the newest version, and got no answer: it has no internet, something on it blocks the request, or your network has asked more than 60 times in the last hour. The orbs are fine. The **download firmware.bin** link on the update page still gets the newest file. |
 | No line about a newer version under the version | Scripts are turned off in the browser. Use the **download firmware.bin** link on the update page, or the one in the [README](../README.md#updating-later-over-wifi-no-cable). |

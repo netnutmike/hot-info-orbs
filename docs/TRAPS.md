@@ -924,3 +924,27 @@ second. `TimeSyncWatch` logs "no time sync yet" (120 s after start) and "no
 time sync for N min" (35 min), each once, then the recovery. Rejected keeping
 NTPClient with a back-off: every retry would still block 1 s, or 8 s with DNS
 down, so the freeze only gets rarer.
+
+**Tested on hardware 2026-11-18 (da306cd), same router test:** I blocked the
+orb's internet and DNS first, then flashed it, so it booted with no way to sync.
+- **No stalls while blocked.** 67 web requests averaged 0.31 s (max 0.88 s); the
+  old build held each pass 8.7 s in the same state. Scott watched the clock.
+- **Log:** "no time sync yet, 120 s after start", once, at 2:00 of uptime.
+- **Clock wrong until the first sync:** it showed 2:26 at about 14:40. Where
+  that time came from is not established. The log has no "clock set" line, so
+  the system clock was never valid in that boot.
+- **A restart keeps the system clock: still unverified** (the da306cd commit
+  message asserts it). The old firmware never set the system clock, so this
+  restart had nothing to keep. Test it on the next restart after a sync.
+- **Recovery was slow:** the blocks came off at 14:39:36, but the first sync
+  ("time sync ok, first one 394 s after start") came at 14:43:11, 3.5 min
+  later. Stocks came back on their own timer at 14:43:04. Cause not
+  established. lwIP SNTP backs its retries off from 15 s to 150 s
+  (`SNTP_RETRY_TIMEOUT_EXP`, max 10 × `SNTP_RECV_TIMEOUT`), which accounts for
+  at most 150 s. Stocks recovering 7 s earlier hints the path itself came back
+  late. The debug build recovered 11 s after the same unblock, but it retried
+  on every pass. Weather came back at 14:48:09 on its own ~10 min retry
+  ("ok again after 639 s"), so a dark weather page for up to 10 min after
+  the internet returns is that timer, not this fix.
+- **Separate from #52:** one 6.1 s stall at 14:42:53, during the stocks
+  fetch. Data fetches still run on the loop.

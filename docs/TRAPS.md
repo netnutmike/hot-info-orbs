@@ -968,6 +968,16 @@ sync since start that is not overdue. The clock face still keys on a valid
 time. **Power loss: not tested yet.**
 
 On ac96aa5 with the internet blocked (Scott, 15:05): the time was right, and
-the weather and stock pages said "no internet". Still to run: an unplug test
-(expect the "No time" face), then unblock and time the recovery (expect a
-sync within ~15 s).
+the weather and stock pages said "no internet".
+
+**Router test on ac96aa5, PASSED (2026-11-18):**
+- **Unplugged while blocked:** the log said "power on" with no "clock set", so
+  a power cut loses the clock. Scott saw the "No time" face, and "no internet"
+  on weather and stocks. MQTT went on working, because the broker is on the
+  LAN: no MQTT lines in the log.
+- **Unblocked at 15:07:28:**
+  - first sync at 15:07:39, 11 s later (da306cd took 3.5 min);
+  - weather, on screen, refreshed at 15:07:40 (da306cd: 10 min);
+  - stocks refreshed at 15:08:21, the first time its page came up.
+- **Web response after boot:** 0.32 s mean. The one slow request (2.5 s) was
+  the weather fetch at 15:07:39, which still runs on the loop.

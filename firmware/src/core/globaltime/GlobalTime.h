@@ -5,7 +5,6 @@
 #include "config_helper.h"
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-#include <NTPClient.h>
 #include <TimeLib.h>
 
 // Define locales
@@ -34,7 +33,10 @@ class GlobalTime {
 public:
     static GlobalTime *getInstance();
 
-    void updateTime();
+    void updateTime(); // reads the system clock; never waits on the network
+    // Background SNTP syncs since start, and the uptime (s) of the last one
+    uint32_t syncCount() const;
+    uint32_t lastSyncUpSeconds() const;
     void getHourAndMinute(int &hour, int &minute);
     int getHour();
     int getHour24();
@@ -74,11 +76,7 @@ private:
     String m_weekday;
     int m_timeZoneOffset = 0; // recomputed every second, so DST changes on time
 
-    WiFiUDP m_udp;
-    NTPClient *m_timeClient{nullptr};
-
-    unsigned long m_oneSecond = 1000;
-    unsigned long m_updateTimer = 0;
+    time_t m_lastUtc{-1}; // the second the fields were built for
 
     bool m_format24hour{Settings::get().h24};
 

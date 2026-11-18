@@ -3,26 +3,39 @@
 
 #include "config_helper.h"
 #include <TimeLib.h>
+#include <esp_sntp.h>
+
+#include "TimeSyncWatch.h" // kSyncIntervalS
 
 GlobalTime *GlobalTime::m_instance = nullptr;
 
+namespace {
+// Written by the SNTP callback, which runs in the network task, and read by
+// the loop. 32-bit stores are single instructions on the ESP32.
+volatile uint32_t s_syncs = 0;
+volatile uint32_t s_lastSyncMs = 0;
+
+void onSync(struct timeval *) {
+    s_lastSyncMs = millis();
+    s_syncs = s_syncs + 1;
+}
+} // namespace
+
 GlobalTime::GlobalTime() {
-    m_timeClient = new NTPClient(m_udp);
-    m_timeClient->begin();
-    m_timeClient->setPoolServerName(NTP_SERVER);
     // The zone rule is applied once: the settings page restarts the orb on save.
-    // NTP stays at offset 0 (UTC); the C library turns UTC into local time from
-    // the rule, daylight saving included, with no web service and no key.
+    // The C library turns UTC into local time from the rule, daylight saving
+    // included, with no web service and no key.
     const std::string &zone = Settings::get().tz;
     if (tzdb::find(zone) == nullptr) {
         Serial.printf("Time zone \"%s\" is not in the table (TimeZones.h); showing UTC\n", zone.c_str());
     }
-    setenv("TZ", tzdb::ruleFor(zone), 1);
-    tzset();
-}
-
-GlobalTime::~GlobalTime() {
-    delete m_timeClient;
+    // The ESP32's own SNTP client syncs in the background and sets the system
+    // clock, which runs on its crystal in between. Nothing here waits on the
+    // network: the blocking NTPClient this replaces held the loop a second or
+    // more on every failed try, which froze the clock's colon (issue #52).
+    sntp_set_time_sync_notification_cb(onSync);
+    sntp_set_sync_interval(devlog::kSyncIntervalS * 1000UL);
+    configTzTime(tzdb::ruleFor(zone), NTP_SERVER); // sets TZ, starts SNTP
 }
 
 GlobalTime *GlobalTime::getInstance() {
@@ -33,14 +46,15 @@ GlobalTime *GlobalTime::getInstance() {
 }
 
 void GlobalTime::updateTime() {
-    if (millis() - m_updateTimer > m_oneSecond) {
-        m_timeClient->update();
-        const time_t utc = m_timeClient->getEpochTime();
+    // Every call reads the system clock and rebuilds the fields when the
+    // second changes, so no second is skipped however long a pass takes.
+    const time_t utc = time(nullptr);
+    if (utc != m_lastUtc) {
+        m_lastUtc = utc;
         m_timeZoneOffset = tzdb::offsetAt(utc);
         // Local time kept as an epoch: the widgets read it through TimeLib's
         // hour()/day(), which do no zone math of their own.
         m_unixEpoch = utc + m_timeZoneOffset;
-        m_updateTimer = millis();
         m_minute = minute(m_unixEpoch);
         if (m_format24hour) {
             m_hour = hour(m_unixEpoch);
@@ -57,6 +71,14 @@ void GlobalTime::updateTime() {
         m_weekday = LOC_WEEKDAY[(weekday(m_unixEpoch)) -1];
         m_time = String(m_hour) + ":" + (m_minute < 10 ? "0" + String(m_minute) : String(m_minute));
     }
+}
+
+uint32_t GlobalTime::syncCount() const {
+    return s_syncs;
+}
+
+uint32_t GlobalTime::lastSyncUpSeconds() const {
+    return s_lastSyncMs / 1000;
 }
 
 void GlobalTime::getHourAndMinute(int &hour, int &minute) {

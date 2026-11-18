@@ -6,6 +6,7 @@
 #include "ScreenManager.h"
 #include "Settings.h"
 #include "SettingsPage.h"
+#include "TimeSyncWatch.h"
 #include "Utils.h"
 #include "WidgetSet.h"
 #include "clockwidget/ClockWidget.h"
@@ -39,6 +40,7 @@ Button buttonOK(BUTTON_OK);
 Button buttonRight(BUTTON_RIGHT);
 
 GlobalTime *globalTime; // Initialize the global time
+devlog::TimeSyncWatch s_timeSync; // logs a missing or overdue time sync (issue #52)
 
 String connectingString{""};
 
@@ -433,6 +435,13 @@ void loop() {
         wifiWidget->rejoinIfDown();
         globalTime->updateTime();
         DeviceLog::clock(globalTime->getUnixEpoch());
+        {
+            const std::string news =
+                s_timeSync.step(millis() / 1000, globalTime->syncCount(), globalTime->lastSyncUpSeconds());
+            if (!news.empty()) {
+                DeviceLog::note("%s", news.c_str());
+            }
+        }
 
         checkButtons();
 

@@ -444,7 +444,7 @@ void loop() {
                 DeviceLog::note("%s", news.c_str());
             }
         }
-        if (s_syncKick.step(millis(), globalTime->timeValid(), wifiWidget->linkUp())) {
+        if (s_syncKick.step(millis(), globalTime->syncCurrent(), wifiWidget->linkUp())) {
             globalTime->kickSync();
         }
         if (globalTime->syncCount() != s_syncsSeen) {

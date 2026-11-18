@@ -85,6 +85,10 @@ bool GlobalTime::timeValid() const {
     return devlog::timeValid(time(nullptr));
 }
 
+bool GlobalTime::syncCurrent() const {
+    return devlog::syncCurrent(millis() / 1000, s_syncs, s_lastSyncMs / 1000);
+}
+
 void GlobalTime::kickSync() {
     sntp_restart();
 }

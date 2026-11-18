@@ -110,7 +110,7 @@ void WeatherWidget::drawNoData() {
     m_manager.setFontColor(stale::kAmber, m_backgroundColor);
     m_manager.drawCenterString("No weather", center, 100, 26);
     m_manager.setFontColor(m_foregroundColor, m_backgroundColor);
-    m_manager.drawCenterString(nodata::reason(m_time->timeValid()), center, 140, 18);
+    m_manager.drawCenterString(nodata::reason(m_time->syncCurrent()), center, 140, 18);
 }
 
 void WeatherWidget::displayClock(int displayIndex) {

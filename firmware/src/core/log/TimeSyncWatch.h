@@ -21,24 +21,30 @@ inline bool timeValid(int64_t utc) {
     return utc > 1700000000;
 }
 
-// While there is no real time, ask SNTP again every kKickMs, and at once when
-// WiFi comes back. lwIP's own retry backs off from 15 s to 150 s, so a boot
+// A sync since start that is not overdue: the internet was there lately.
+// Not the same as timeValid(): a restart keeps the clock (rig, 2026-11-18),
+// so a valid time after a restart says nothing about the internet.
+inline bool syncCurrent(uint32_t upS, uint32_t syncs, uint32_t lastSyncUpS) {
+    return syncs > 0 && upS - lastSyncUpS < kSyncOverdueS;
+}
+
+// While there is no current sync (syncCurrent), ask SNTP again every kKickMs,
+// and at once when WiFi comes back. lwIP's own retry backs off from 15 s to 150 s, so a boot
 // with no internet took 3.5 min to show the time once it returned (rig,
 // 2026-11-18). A kick (sntp_restart) only starts a request: nothing waits.
-// Once the time is real, no kicks: the clock keeps time on its crystal, and
-// the 15 min sync takes over.
+// Once a sync is current, no kicks: the 15 min sync takes over.
 constexpr uint32_t kKickMs = 15000;
 class SyncKick {
 public:
-    // Every loop pass. true = restart SNTP now.
-    bool step(uint32_t nowMs, bool valid, bool linkUp) {
+    // Every loop pass. synced: syncCurrent(). true = restart SNTP now.
+    bool step(uint32_t nowMs, bool synced, bool linkUp) {
         if (!m_started) {
             m_started = true; // SNTP was started at boot: the interval runs from here
             m_last = nowMs;
         }
         const bool back = linkUp && !m_up;
         m_up = linkUp;
-        if (valid || !linkUp) {
+        if (synced || !linkUp) {
             return false;
         }
         if (back || nowMs - m_last >= kKickMs) { // unsigned: right across the millis() wrap

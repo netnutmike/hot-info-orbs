@@ -13,6 +13,7 @@ using devlog::TimeSyncWatch;
 using devlog::kKickMs;
 using devlog::SyncKick;
 using devlog::timeValid;
+using devlog::syncCurrent;
 
 void test_a_first_sync_on_time_is_not_news() {
     TimeSyncWatch w;
@@ -72,13 +73,13 @@ void test_a_clock_never_synced_is_not_valid() {
     TEST_ASSERT_TRUE(timeValid(1795000000)); // November 2026
 }
 
-void test_no_kick_while_the_time_is_valid() {
+void test_no_kick_while_the_sync_is_current() {
     SyncKick k;
     k.step(0, true, true);
     TEST_ASSERT_FALSE(k.step(kKickMs * 10, true, true));
 }
 
-void test_no_time_kicks_every_interval_not_every_pass() {
+void test_no_current_sync_kicks_every_interval_not_every_pass() {
     SyncKick k;
     TEST_ASSERT_FALSE(k.step(1000, false, true)); // start: SNTP was just started
     TEST_ASSERT_FALSE(k.step(1000 + kKickMs - 1, false, true));
@@ -93,7 +94,7 @@ void test_no_kick_while_wifi_is_down() {
     TEST_ASSERT_FALSE(k.step(kKickMs * 3, false, false));
 }
 
-void test_wifi_back_without_time_kicks_at_once() {
+void test_wifi_back_without_a_current_sync_kicks_at_once() {
     SyncKick k;
     k.step(0, false, true);
     k.step(1000, false, false);
@@ -101,16 +102,28 @@ void test_wifi_back_without_time_kicks_at_once() {
     TEST_ASSERT_FALSE(k.step(2000 + kKickMs - 1, false, true)); // the interval starts again there
 }
 
-void test_wifi_back_with_valid_time_does_not_kick() {
+void test_wifi_back_with_a_current_sync_does_not_kick() {
     SyncKick k;
     k.step(0, true, true);
     k.step(1000, true, false);
     TEST_ASSERT_FALSE(k.step(2000, true, true));
 }
 
-void test_an_empty_page_blames_the_internet_only_without_a_time_sync() {
+void test_an_empty_page_blames_the_internet_only_without_a_current_sync() {
     TEST_ASSERT_EQUAL_STRING("no internet", nodata::reason(false));
     TEST_ASSERT_EQUAL_STRING("will retry", nodata::reason(true));
+}
+
+// A restart keeps the clock (rig, 2026-11-18), so a valid time does not mean
+// the internet is up. These key on a recent sync instead.
+void test_no_sync_since_start_is_not_current_even_with_a_valid_clock() {
+    TEST_ASSERT_FALSE(syncCurrent(60, 0, 0));
+}
+
+void test_a_sync_is_current_until_it_is_overdue() {
+    TEST_ASSERT_TRUE(syncCurrent(100, 1, 50));
+    TEST_ASSERT_TRUE(syncCurrent(50 + kSyncOverdueS - 1, 1, 50));
+    TEST_ASSERT_FALSE(syncCurrent(50 + kSyncOverdueS, 1, 50));
 }
 
 int main() {
@@ -123,11 +136,13 @@ int main() {
     RUN_TEST(test_the_sync_after_an_overdue_one_says_how_long_it_was_out);
     RUN_TEST(test_overdue_again_after_recovering_is_news_again);
     RUN_TEST(test_a_clock_never_synced_is_not_valid);
-    RUN_TEST(test_no_kick_while_the_time_is_valid);
-    RUN_TEST(test_no_time_kicks_every_interval_not_every_pass);
+    RUN_TEST(test_no_kick_while_the_sync_is_current);
+    RUN_TEST(test_no_current_sync_kicks_every_interval_not_every_pass);
     RUN_TEST(test_no_kick_while_wifi_is_down);
-    RUN_TEST(test_wifi_back_without_time_kicks_at_once);
-    RUN_TEST(test_wifi_back_with_valid_time_does_not_kick);
-    RUN_TEST(test_an_empty_page_blames_the_internet_only_without_a_time_sync);
+    RUN_TEST(test_wifi_back_without_a_current_sync_kicks_at_once);
+    RUN_TEST(test_wifi_back_with_a_current_sync_does_not_kick);
+    RUN_TEST(test_an_empty_page_blames_the_internet_only_without_a_current_sync);
+    RUN_TEST(test_no_sync_since_start_is_not_current_even_with_a_valid_clock);
+    RUN_TEST(test_a_sync_is_current_until_it_is_overdue);
     return UNITY_END();
 }

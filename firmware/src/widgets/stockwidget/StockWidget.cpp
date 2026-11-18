@@ -134,7 +134,7 @@ void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint3
         m_manager.setFontColor(stale::kAmber, TFT_BLACK);
         m_manager.drawString("No price yet", 120, 130, 20, Align::MiddleCenter);
         m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
-        m_manager.drawString(nodata::reason(GlobalTime::getInstance()->timeValid()), 120, 160, 16, Align::MiddleCenter);
+        m_manager.drawString(nodata::reason(GlobalTime::getInstance()->syncCurrent()), 120, 160, 16, Align::MiddleCenter);
         return;
     }
     m_manager.selectScreen(displayIndex);

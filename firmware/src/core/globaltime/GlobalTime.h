@@ -40,6 +40,9 @@ public:
     // false = SNTP has not set the clock since power-on, and the time of day
     // is made up (it counts from 1970). Pages show "No time" instead.
     bool timeValid() const;
+    // A sync since start, not overdue (devlog::syncCurrent): the internet
+    // was there lately
+    bool syncCurrent() const;
     // Ask SNTP again now (SyncKick in TimeSyncWatch.h). Nothing waits on it.
     void kickSync();
     void getHourAndMinute(int &hour, int &minute);

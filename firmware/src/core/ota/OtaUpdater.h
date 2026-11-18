@@ -31,6 +31,7 @@ class OtaUpdater {
     bool m_started = false;
     int m_lastPercent = -1;
     bool m_updating = false;
+    size_t m_uploadBytes = 0; // this browser upload so far; 0 = nothing begun
 };
 
 #endif

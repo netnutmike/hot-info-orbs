@@ -55,7 +55,8 @@ settings and start-up picture.
 2. On a phone or computer on the same WiFi, browse to
    `http://<orbs' address>/update` (the address the orbs show at start-up).
 3. Choose `firmware.bin` and press **Upload**. The orbs restart on their own
-   when it is done, with your WiFi, key and settings kept.
+   when it is done, with your WiFi, key and settings kept. The page waits
+   for them and goes back to the settings by itself, about a minute later.
 
 The orbs' own pages help with steps 1 and 2: the first lines of
 the settings page say when a newer version is out (**⬆ Version … is

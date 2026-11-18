@@ -981,3 +981,22 @@ the weather and stock pages said "no internet".
   - stocks refreshed at 15:08:21, the first time its page came up.
 - **Web response after boot:** 0.32 s mean. The one slow request (2.5 s) was
   the weather fetch at 15:07:39, which still runs on the loop.
+
+## WebServer `on(uri, POST, fn, upload)` crashes on a POST that is not a form (issue #55, 2026-11-18)
+
+- **Measured on the rig (1e08af1):** `curl -X POST http://<orb>/update` with no
+  body crashed the orbs every time (device log: `start: ... crash`). Form
+  uploads, empty ones included, were fine.
+- **Why:** in arduino-esp32 2.x the handler that `on()` builds with an upload
+  function says yes to `canRaw()` for any non-GET method. A POST whose
+  Content-Type is not `multipart/` takes the raw-body path in `Parsing.cpp`
+  and calls that same upload function, which reads `server.upload()`. On the
+  raw path `_currentUpload` is empty, so that is a null read. Every firmware
+  with the web update page has it, 1.8.1 included.
+- **Fix (7f18592):** `/update` POST is its own `RequestHandler` that gets the
+  `HTTPUpload &` as an argument and returns false from `canRaw()`. Checked on
+  the rig: no-file form, empty named file, bare POST and a 4 KB raw body all
+  answer "No file chosen", no crash, no restart.
+- **Rule:** never call `server.upload()` from a function registered with
+  `on(..., upload)`, unless every non-form POST to that address is impossible.
+  Prefer a handler class that is passed the upload.

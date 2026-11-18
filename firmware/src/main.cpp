@@ -3,6 +3,7 @@
 #include "GlobalTime.h"
 #include "InfoPage.h"
 #include "OtaUpdater.h"
+#include "PageLock.h"
 #include "ScreenManager.h"
 #include "Settings.h"
 #include "SettingsPage.h"
@@ -50,6 +51,7 @@ WifiWidget *wifiWidget{nullptr};
 OtaUpdater *otaUpdater{nullptr};
 SettingsPage *settingsPage{nullptr};
 InfoPage *infoPage{nullptr}; // on the orbs: hold the middle button 2 seconds
+pagelock::PageLock s_pageLock; // hold left and right 2 seconds: stay on this page (#58)
 
 int connectionTimer{0};
 const int connectionTimeout{10000};
@@ -330,6 +332,26 @@ void checkButtons() {
         }
         return;
     }
+    // Left and right down together for 2 seconds: lock or unlock the page
+    // (issue #58, PageLock.h). Both buttons' presses in such a hold, the
+    // release included, do nothing else. Works from the info page too, and
+    // closes it, so the note is seen.
+    const pagelock::Step lock = s_pageLock.step(millis(), buttonLeft.heldFor(0), buttonRight.heldFor(0));
+    if (lock.event != pagelock::Event::None) {
+        const bool locked = lock.event == pagelock::Event::Locked;
+        Serial.printf("Left and right held -> page %s\n", locked ? "locked" : "unlocked");
+        DeviceLog::note("page %s by the buttons", locked ? "locked" : "unlocked");
+        if (infoPage->isOpen()) {
+            leaveInfoPage();
+        }
+        widgetSet->setPageLock(locked);
+        m_widgetCycleDelayPrev = millis();
+    }
+    if (lock.swallow) {
+        buttonLeft.getState(); // read and dropped: part of the hold
+        buttonRight.getState();
+        return;
+    }
     // The middle button down for 2 seconds: the info page, from any page, while
     // the finger is still on the button
     if (buttonOK.heldFor(Button::LONG_PRESS_TIME) && infoPage->hold()) {
@@ -453,6 +475,9 @@ void loop() {
         }
 
         checkButtons();
+        if (s_pageLock.noteEnded(millis())) {
+            widgetSet->endLockNote(); // "Locked" / "Unlocked" comes off
+        }
 
         widgetSet->setLinkUp(wifiWidget->linkUp());
         if (!infoPage->isOpen()) {

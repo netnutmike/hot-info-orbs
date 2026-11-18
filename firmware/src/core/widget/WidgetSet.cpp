@@ -127,7 +127,9 @@ bool WidgetSet::followOutage() {
 
 void WidgetSet::rotate() {
     if (!m_clockOnly.active()) {
-        next();
+        if (!m_locked) {
+            next();
+        }
     } else if (m_currentWidget != m_clockPage) {
         m_currentWidget = m_clockPage; // a button had moved off it
         switchWidget();
@@ -146,12 +148,14 @@ void WidgetSet::drawStaleMark() {
     const stale::Mark want = m_clockOnly.mark(m_currentWidget, stale::mark(w->dataStale(), m_wifiOut, pageOrbs != 0));
     const uint8_t dataOrbs = want == stale::Mark::ClockOnly ? (w->clockOnlyOrbs() & 0x1F) : pageOrbs;
     const uint16_t color = stale::ringColor(want);
-    const stale::Paint paint = m_staleOverlay.step(m_screenManager->takeFilled(), want, dataOrbs);
+    const uint8_t filled = m_screenManager->takeFilled();
+    const stale::Paint paint = m_staleOverlay.step(filled, want, dataOrbs);
     if (paint.repaint) {
         m_screenManager->clearAllScreens();
         w->draw(true);
         m_screenManager->takeFilled(); // the overlay already counts these as wiped
     }
+    drawLockMark(paint.repaint ? 0x1F : filled);
     if (!paint.orbs) {
         return;
     }
@@ -179,6 +183,53 @@ void WidgetSet::drawStaleMark() {
             const stale::Plate plate = w->stalePlate();
             m_screenManager->drawPlate("No WiFi", ScreenCenterX, plate.y, plate.w, stale::kPlateH, stale::kPlateRadius, stale::kPlateTextSize, stale::plateColor(want), TFT_BLACK);
         }
+    }
+    m_screenManager->reset();
+}
+
+// Issue #58. The padlock is a shape, not a color (it reads the same to a
+// colorblind eye): a shackle arc over a body with a keyhole, white, at the
+// bottom of the middle orb, inside where a stale ring would go. Like the ring
+// it is drawn again whenever its orb is wiped; a page that redraws only part
+// of that orb can paint over it until the next full draw.
+namespace {
+constexpr int kLockOrb = 2; // the middle orb
+constexpr int kLockX = ScreenCenterX, kLockBodyY = 202;
+constexpr int kLockBodyW = 22, kLockBodyH = 16, kLockShackleR = 8, kLockShackleIn = 5;
+constexpr int kNoteW = 130;
+} // namespace
+
+void WidgetSet::setPageLock(bool locked) {
+    m_locked = locked;
+    m_lockMarkOwed = locked;
+    m_lockNote = locked ? "Locked" : "Unlocked";
+    m_lockNoteOwed = true;
+}
+
+void WidgetSet::endLockNote() {
+    m_lockNote = nullptr;
+    m_clearScreensOnDrawCurrent = true; // the page whole again, padlock and all, no note
+}
+
+void WidgetSet::drawLockMark(uint8_t filled) {
+    const bool wiped = filled & (1u << kLockOrb);
+    const bool mark = m_locked && (m_lockMarkOwed || wiped);
+    const bool note = m_lockNote && (m_lockNoteOwed || wiped);
+    if (!mark && !note) {
+        return;
+    }
+    m_screenManager->selectScreen(kLockOrb);
+    const uint32_t bg = m_screenManager->lastFill(kLockOrb);
+    if (mark) {
+        m_lockMarkOwed = false;
+        m_screenManager->drawArc(kLockX, kLockBodyY, kLockShackleR, kLockShackleIn, 90, 270, TFT_WHITE, bg);
+        m_screenManager->fillRoundRect(kLockX - kLockBodyW / 2, kLockBodyY, kLockBodyW, kLockBodyH, 3, TFT_WHITE);
+        m_screenManager->fillCircle(kLockX, kLockBodyY + 6, 2, bg);
+        m_screenManager->fillRect(kLockX - 1, kLockBodyY + 6, 3, 6, bg);
+    }
+    if (note) {
+        m_lockNoteOwed = false;
+        m_screenManager->drawPlate(m_lockNote, ScreenCenterX, ScreenCenterY - stale::kPlateH / 2, kNoteW, stale::kPlateH, stale::kPlateRadius, stale::kPlateTextSize, TFT_WHITE, TFT_BLACK);
     }
     m_screenManager->reset();
 }

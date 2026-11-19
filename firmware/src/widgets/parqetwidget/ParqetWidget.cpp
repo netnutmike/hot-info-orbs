@@ -84,22 +84,21 @@ void ParqetWidget::update(bool force) {
     }
 }
 
-void ParqetWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_OK && state == BTN_SHORT) {
-        // Force drawing to show the next set of stocks
+// The next set of stocks; after the last set, the next timeframe (issue #60:
+// the timeframe was the half-second press, and the "back to today" hold could
+// never arrive, because a 2 s middle hold is the info page's).
+void ParqetWidget::middleTap() {
+    // draw() moves m_holdingsDisplayFrom on to the next set and back to 0
+    // after the last, so 0 here means the last set (or the only one) is up
+    if (m_holdingsDisplayFrom != 0) {
         draw(true);
-    } else if (buttonId == BUTTON_OK && state == BTN_MEDIUM) {
-        // Change timeframe and force update
-        m_curMode++;
-        if (m_curMode >= PARQET_MODE_COUNT) {
-            m_curMode = 0;
-        }
-        update(true);
-    } else if (buttonId == BUTTON_OK && state == BTN_LONG) {
-        // Reset view to default timeframe and reload
-        m_curMode = 0;
-        update(true);
+        return;
     }
+    m_curMode++;
+    if (m_curMode >= PARQET_MODE_COUNT) {
+        m_curMode = 0;
+    }
+    update(true);
 }
 
 String ParqetWidget::getTimeframe() {

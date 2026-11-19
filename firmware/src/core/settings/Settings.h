@@ -86,6 +86,11 @@ class Settings {
     static bool save(const SettingsValues &v); // writes every key + schema
     static bool factoryReset(); // clears namespace "orbs"
     static bool hasStored(); // true once the page has saved at least once
+    // Issue #60: the clock face picked with the middle button. Takes effect in
+    // get() at once; written to its key alone once the button has been left
+    // alone a few seconds (SaveDelay.h), by tick(), called every loop() pass.
+    static void saveFaceSoon(int face);
+    static void tick();
 
   private:
     static SettingsValues s_values;

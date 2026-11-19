@@ -455,13 +455,13 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     h += "</fieldset>";
 
     h += "<fieldset id='clock'><legend>Clock</legend>";
-    h += "<label for='face'>Clock face at start-up</label><select id='face' name='face'>";
+    h += "<label for='face'>Clock face</label><select id='face' name='face'>";
     for (int f = 0; f <= (int)ClockType::CUSTOM; f++) {
         if (faceCompiledIn(f)) {
             h += option(String(f), faceName(f), f == v.face);
         }
     }
-    h += "</select>" + hint(String("Default: ") + faceName(d.face) + ". A short press on the middle button still changes it until the next restart; a medium press toggles 12/24-hour the same way.") + errorLine(errors, "face");
+    h += "</select>" + hint(String("Default: ") + faceName(d.face) + ". A tap on the middle button on the clock page also changes it, and the orb keeps that choice.") + errorLine(errors, "face");
     h += boolSelect("h24", "Hours", v.h24, d.h24, "12-hour", "24-hour", errors);
     h += boolSelect("ampm", "AM/PM indicator (12-hour, not Nixie)", v.ampm, d.ampm, "Off", "On", errors);
     h += colorField("clkcol", "Digit color", v.clkcol, d.clkcol, errors);

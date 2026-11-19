@@ -187,12 +187,6 @@ void ClockWidget::drawNoTime() {
     m_manager.setFont(CLOCK_FONT);
 }
 
-void ClockWidget::change24hMode() {
-    GlobalTime *time = GlobalTime::getInstance();
-    time->setFormat24Hour(!time->getFormat24Hour());
-    draw(true);
-}
-
 void ClockWidget::changeClockType() {
     switch (m_type) {
     case ClockType::NORMAL:
@@ -217,12 +211,11 @@ void ClockWidget::changeClockType() {
     draw(true);
 }
 
-void ClockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_OK && state == BTN_SHORT) {
-        changeClockType();
-    } else if (buttonId == BUTTON_OK && state == BTN_MEDIUM) {
-        change24hMode();
-    }
+// Next face, kept across a restart (Settings::saveFaceSoon). 12/24 h is on
+// the settings page only since #60: it was the half-second press here.
+void ClockWidget::middleTap() {
+    changeClockType();
+    Settings::saveFaceSoon((int)m_type);
 }
 
 DigitOffset ClockWidget::getOffsetForDigit(const String &digit) {

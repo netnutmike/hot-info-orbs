@@ -23,7 +23,6 @@ public:
     void setEyesRan(bool ran) { m_eyesRan = ran; }
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
 
     bool isConnected() { return m_isConnected; }
@@ -39,6 +38,7 @@ public:
     static String lastOutageNote();
 
 private:
+    void forgetWifiCountdown(bool showConnecting);
     void connectionTimedOut();
     void drawLines(const std::vector<wififail::Line> &lines, int centerY);
     void lookForSavedNetwork();

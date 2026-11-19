@@ -37,9 +37,8 @@ void WeatherWidget::changeMode() {
     threeDayWeather(4);
 }
 
-void WeatherWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_OK && state == BTN_SHORT)
-        changeMode();
+void WeatherWidget::middleTap() {
+    changeMode();
 }
 
 void WeatherWidget::setup() {

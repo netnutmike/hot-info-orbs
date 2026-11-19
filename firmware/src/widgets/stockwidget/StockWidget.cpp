@@ -77,9 +77,8 @@ void StockWidget::changeMode() {
     update(true);
 }
 
-void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_OK && state == BTN_SHORT)
-        changeMode();
+void StockWidget::middleTap() {
+    changeMode();
 }
 
 bool StockWidget::getStockData(StockDataModel &stock) {

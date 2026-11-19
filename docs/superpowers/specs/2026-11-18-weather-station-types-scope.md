@@ -126,7 +126,7 @@ only the station's own keys.
 - [ ] `AmbientSource`, with a host-tested parser.
 - [ ] The settings page: a type picker on each station slot, with the form
       built from the table; old Tempest settings carry over untouched.
-- [ ] On the rig, with Yang's key: a page that shows the station's
+- [x] On the rig, with Yang's key: a page that shows the station's
       temperature plus the forecast; a wrong key shows its error on the
       settings page, as Tempest's does today.
 - [ ] Docs: the user guide (Ambient setup, where to make the two keys);
@@ -145,6 +145,11 @@ only the station's own keys.
 - Status per slot moved from `TempestSource` to `StationStatus.h`, shared by
   both types; a station page that fetched but has no forecast says why in
   a note beside the tick.
+- **On the rig, 2026-11-19 (ed6a991):** an Ambient station with a real key
+  pair shows its temperature plus the Visual Crossing forecast; a key pair
+  that Ambient refuses shows Ambient's own reason beside the tick; a blank
+  MAC on a one-station account uses that station and names it beside the
+  tick.
 
 ## Decisions (2026-11-18)
 

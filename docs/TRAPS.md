@@ -1000,3 +1000,24 @@ the weather and stock pages said "no internet".
 - **Rule:** never call `server.upload()` from a function registered with
   `on(..., upload)`, unless every non-form POST to that address is impossible.
   Prefer a handler class that is passed the upload.
+
+## Parqet is compiled by no build env (2026-11-18)
+
+`ParqetWidget` is built only when `PARQET_PORTFOLIO_ID` is defined, and no
+env in `platformio.ini`, CI included, defines it. A change to it (#60
+rewrote its button handler) passes every `pio run` without being compiled.
+Compile it on purpose:
+
+    PLATFORMIO_BUILD_FLAGS='-DPARQET_PORTFOLIO_ID=\"test\"' pio run -e xiao-esp32s3
+
+then build again without the flag before flashing anything.
+
+## A hold ring on orb 3 shares its band with two other rings (#60, 2026-11-18)
+
+The issue's "ring fills while Middle is held" was not built. Orb 3 is the
+clock's colon orb, and its second ticks are drawn at radius 110-120
+(`ClockWidget.cpp`, `drawSmoothArc`). The stale ring is at 113-120 on data
+orbs (`stale::kRingOuter/kRingInner`). A hold ring there would draw over
+both, and erasing it after a slow tap blanks them too unless the whole page
+redraws, which is a full-screen flicker on every such tap. Settle where it
+goes and how it is erased on the rig before building it.

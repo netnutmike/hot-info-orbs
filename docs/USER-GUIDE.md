@@ -20,7 +20,7 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 - [When WiFi goes down](#when-wifi-goes-down)
 - [Changing the WiFi network](#changing-the-wifi-network)
 - [Running from a phone hotspot](#running-from-a-phone-hotspot)
-- [Weather from your own Tempest stations](#weather-from-your-own-tempest-stations)
+- [Weather from your own station](#weather-from-your-own-station)
 - [Dimming and switching off at night](#dimming-and-switching-off-at-night)
 - [The log](#the-log)
 - [The password](#the-password)
@@ -75,7 +75,8 @@ Each page uses all five orbs.
 | **MQTT** (up to two) | A page of your own: one live value on each orb from an MQTT broker, such as Home Assistant. |
 
 Weather has one page for your town (Visual Crossing) and one for each
-[Tempest station](#weather-from-your-own-tempest-stations) you add. Web Data
+[weather station](#weather-from-your-own-station) you add (Tempest or
+Ambient Weather). Web Data
 and MQTT pages are set up on the settings page under **Advanced**;
 [CUSTOM-PAGES.md](CUSTOM-PAGES.md) has the format and Home Assistant recipes.
 
@@ -193,9 +194,9 @@ Your settings stay through restarts, power cuts and
 
 | Section | What is in it |
 |---|---|
-| **API keys** | Your free [Visual Crossing](https://www.visualcrossing.com/sign-up) weather key, and a Tempest token if you have a station. Once saved, a key shows as stars. Leave the box alone to keep the key, or paste a new one to replace it. |
+| **API keys** | Your free [Visual Crossing](https://www.visualcrossing.com/sign-up) weather key, and your station's keys if you have one (a Tempest token, or Ambient Weather's two keys). Once saved, a key shows as stars. Leave the box alone to keep the key, or paste a new one to replace it. |
 | **Time zone and location** | **Time zone**: pick from the list. Daylight saving is automatic. **Weather location**: your town, such as `Orlando, FL`. The page cannot check the town; a wrong one shows up as an empty weather page. |
-| **Tempest stations** | See [Weather from your own Tempest stations](#weather-from-your-own-tempest-stations). |
+| **Weather stations** | See [Weather from your own station](#weather-from-your-own-station). |
 | **Mounting** | **Upside down** turns the screens over and reverses the order of the orbs, for a set mounted the other way up. The buttons do not move: left is still the button that is on the left when the orbs are the right way up. |
 
 ### Display: what the orbs show
@@ -388,19 +389,46 @@ Pages that read from something on your home network, such as an MQTT broker,
 show no data while the orbs are on the hotspot. Untick them under
 **Rotation > Show** for the day.
 
-## Weather from your own Tempest stations
+## Weather from your own station
 
-If you own a WeatherFlow Tempest station, the orbs can show its weather: one
-weather page per station, up to two. If a Visual Crossing key is also set,
-your town keeps its own page as well. Without that key only the Tempest pages
-show.
+If you own a WeatherFlow Tempest or an Ambient Weather station, the orbs can
+show its weather: one weather page per station, up to two, of either kind.
+If a Visual Crossing key is also set, your town keeps its own page as well.
+Without that key only the station pages show.
+
+Under **Weather stations**, pick each station's **type** first; the page then
+asks for that type's ID.
+
+**Tempest**
 
 1. Get a token: tempestwx.com > Settings > Data Authorizations > Create
    Token. On the settings page, paste it under **API keys > Tempest token**.
-2. Find each station's ID: it is the number in the station's tempestwx.com
-   address. Enter it under **Tempest stations** with a short label, 16
-   characters at most. The label shows in place of the town name.
+2. Find the station's ID: it is the number in the station's tempestwx.com
+   address. Enter it as the **Station ID** with a short label, 16 characters
+   at most. The label shows in place of the town name.
 3. Press **Save and restart**.
+
+**Ambient Weather**
+
+An Ambient station sends its readings but no forecast, so its page takes the
+temperature and the readings (feels like, humidity, wind) from the station,
+and the words, the picture, today's high and low, sunrise and sunset and the
+next three days from **Visual Crossing**, at the station's own location. Set
+the Visual Crossing key as well; without it the page shows the temperature
+only, and the settings page says so.
+
+1. Make two keys on **ambientweather.net** (the `.net` site, not `.com`),
+   on your account page: an **API Key** and an **Application Key**. They are
+   two different kinds; two API Keys do not work. Paste both under
+   **API keys**.
+2. Give the station a short label, 16 characters at most. Leave **Station
+   MAC** blank if the account has one station: the page uses it, and after
+   the first fetch the settings page shows its name and MAC. With several
+   stations on the account, the settings page lists them; copy the MAC of
+   the one you want.
+3. Press **Save and restart**.
+
+To remove an Ambient page, blank both the MAC and the label.
 
 Afterwards each station shows ✔ or ✖ on the settings page for its last
 fetch, how long ago that was, and the error if it failed.

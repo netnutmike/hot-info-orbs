@@ -44,10 +44,11 @@ inline std::string tempestFitLine(std::string s) {
     return s;
 }
 
-// Orb 1's text on a Tempest page, one reading per line, '\n'-separated:
+// The conditions text on a station page, one reading per line, '\n'-separated:
 // "Clear\nFeels like 49\nHumidity 82%\nWind W 4-7 mph". A reading missing
-// from the reply is left out rather than shown as 0.
-inline std::string tempestSummary(const TempestReading &r, const char *windUnit) {
+// from the reply is left out rather than shown as 0. Any reading struct with
+// these fields will do (TempestReading, StationReading in AmbientParse.h).
+template <class R> inline std::string stationSummary(const R &r, const char *windUnit) {
     std::string out = tempestFitLine(r.conditions);
     char buf[40];
     if (!std::isnan(r.feels)) {
@@ -71,6 +72,10 @@ inline std::string tempestSummary(const TempestReading &r, const char *windUnit)
         out += tempestFitLine(buf + 1).insert(0, "\n");
     }
     return out;
+}
+
+inline std::string tempestSummary(const TempestReading &r, const char *windUnit) {
+    return stationSummary(r, windUnit);
 }
 
 // Tempest icon names to the set WeatherWidget::drawWeatherIcon knows

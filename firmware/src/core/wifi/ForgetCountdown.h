@@ -4,12 +4,13 @@
 // Issue #60: holding RIGHT while the orbs power up forgets the saved WiFi.
 // It used to happen at once, on one read of the pin, so a thumb resting on the
 // button while plugging the cable in wiped the network. Now the middle orb
-// counts down "5, 4, 3, 2, 1" and the WiFi is forgotten only if the button is
-// still down at the end; letting go before that keeps it.
+// counts down "3, 2, 1" over 5 seconds and the WiFi is forgotten only if the
+// button is still down at the end; letting go before that keeps it. No
+// Arduino types, so the host tests can build it (test/test_forgetwifi).
 //
-// Five seconds, not three, and on orb 3, not the status orb 4: on the rig
-// (Scott, 2026-11-19) three seconds on orb 4 went by before he found it. No Arduino types, so the
-// host tests can build it (test/test_forgetwifi).
+// On the rig (Scott, 2026-11-19) a 3-second "3, 2, 1" on the status orb 4 went
+// by before he found it. He asked for orb 3, then for three numbers that last
+// 5 seconds, so each number stays up about 1.7 s.
 //
 // REJECTED: moving it to the info page as a confirmed action. Any button
 // closes the info page and does nothing else (InfoPagePolicy.h); a confirm
@@ -23,7 +24,8 @@
 
 namespace forgetwifi {
 
-constexpr uint32_t kCountMs = 5000; // "5, 4, 3, 2, 1"
+constexpr uint32_t kCountMs = 5000; // the whole count
+constexpr int kNumbers = 3; // "3, 2, 1", each shown for kCountMs / kNumbers
 constexpr uint32_t kLetGoMs = 50; // longer than the 35 ms button debounce
 
 enum class State {
@@ -49,13 +51,14 @@ class Countdown {
         return nowMs - m_upSince >= kLetGoMs ? State::Kept : State::Counting;
     }
 
-    // The number on the orb: 5, 4, 3, 2, 1, then 0 at the end
-    int secondsLeft(uint32_t nowMs) const {
+    // The number on the orb: 3, then 2, then 1, then 0 at the end. Rounded
+    // up, so the 3 shows from the first moment and the 1 until the end.
+    int numberLeft(uint32_t nowMs) const {
         const uint32_t gone = nowMs - m_start;
         if (gone >= kCountMs) {
             return 0;
         }
-        return static_cast<int>((kCountMs - gone + 999) / 1000);
+        return static_cast<int>(((kCountMs - gone) * kNumbers + kCountMs - 1) / kCountMs);
     }
 
   private:

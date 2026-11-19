@@ -354,7 +354,7 @@ The orbs remember **one** WiFi network. To move them to another:
 
 1. Unplug the orbs.
 2. Hold the **right** button and plug them back in. The middle orb (orb 3)
-   shows `Keep holding to forget WiFi` and counts down 5, 4, 3, 2, 1. Keep
+   shows `Keep holding to forget WiFi` and counts down 3, 2, 1 over 5 seconds. Keep
    holding until it shows `WiFi forgotten`, then let go. If you let go during
    the count, it shows `WiFi kept` and nothing changes, so a thumb resting on
    the button while you plug in can't wipe the network by accident. Only the

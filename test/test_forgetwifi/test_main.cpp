@@ -59,24 +59,24 @@ void test_let_go_right_at_the_end_keeps() {
     TEST_ASSERT_TRUE(c.step(kCountMs + kLetGoMs, false) == State::Kept);
 }
 
-void test_the_count_shows_5_to_1() {
+// Three numbers over 5 s: each about 1.7 s on the orb
+void test_the_count_shows_3_2_1_over_5_seconds() {
     TEST_ASSERT_EQUAL_UINT32(5000, kCountMs);
     Countdown c(500);
-    TEST_ASSERT_EQUAL(5, c.secondsLeft(500));
-    TEST_ASSERT_EQUAL(5, c.secondsLeft(500 + 999));
-    TEST_ASSERT_EQUAL(4, c.secondsLeft(500 + 1000));
-    TEST_ASSERT_EQUAL(3, c.secondsLeft(500 + 2000));
-    TEST_ASSERT_EQUAL(2, c.secondsLeft(500 + 3000));
-    TEST_ASSERT_EQUAL(1, c.secondsLeft(500 + 4000));
-    TEST_ASSERT_EQUAL(1, c.secondsLeft(500 + 4999));
-    TEST_ASSERT_EQUAL(0, c.secondsLeft(500 + 5000));
+    TEST_ASSERT_EQUAL(3, c.numberLeft(500));
+    TEST_ASSERT_EQUAL(3, c.numberLeft(500 + 1666));
+    TEST_ASSERT_EQUAL(2, c.numberLeft(500 + 1667));
+    TEST_ASSERT_EQUAL(2, c.numberLeft(500 + 3333));
+    TEST_ASSERT_EQUAL(1, c.numberLeft(500 + 3334));
+    TEST_ASSERT_EQUAL(1, c.numberLeft(500 + 4999));
+    TEST_ASSERT_EQUAL(0, c.numberLeft(500 + 5000));
 }
 
 void test_holds_across_the_counter_wrapping() {
     const uint32_t start = 0xFFFFF800u; // about 2 s before the wrap
     Countdown c(start);
     TEST_ASSERT_TRUE(c.step(start + 4000, true) == State::Counting); // past the wrap
-    TEST_ASSERT_EQUAL(1, c.secondsLeft(start + 4000));
+    TEST_ASSERT_EQUAL(1, c.numberLeft(start + 4000));
     TEST_ASSERT_TRUE(c.step(start + kCountMs, true) == State::Forget);
 }
 
@@ -87,7 +87,7 @@ int main(int, char **) {
     RUN_TEST(test_bounce_does_not_cancel);
     RUN_TEST(test_up_at_the_end_waits_to_see);
     RUN_TEST(test_let_go_right_at_the_end_keeps);
-    RUN_TEST(test_the_count_shows_5_to_1);
+    RUN_TEST(test_the_count_shows_3_2_1_over_5_seconds);
     RUN_TEST(test_holds_across_the_counter_wrapping);
     return UNITY_END();
 }

@@ -93,7 +93,7 @@ void WifiWidget::forgetWifiCountdown() {
     while (state == forgetwifi::State::Counting) {
         const uint32_t now = millis();
         state = countdown.step(now, digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL);
-        const int left = countdown.secondsLeft(now);
+        const int left = countdown.numberLeft(now);
         if (state == forgetwifi::State::Counting && left != shown && left > 0) {
             shown = left;
             m_manager.fillRect(0, numberTop, ScreenWidth, 70, TFT_BLACK);
@@ -186,7 +186,7 @@ bool WifiWidget::begin(bool showConnecting) {
     wifimgr.setMenu(wm_menu);
 
     // Right held at power-up: forget the saved WiFi (stored by the ESP WiFi
-    // library), but only after a "5, 4, 3, 2, 1" the hand can still let go
+    // library), but only after a "3, 2, 1" (5 s) the hand can still let go
     // during (ForgetCountdown.h, issue #60)
     bool countedDown = false;
     if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {

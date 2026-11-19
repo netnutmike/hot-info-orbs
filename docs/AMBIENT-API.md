@@ -1,8 +1,14 @@
 # Ambient Weather Network API (issue #51)
 
-**From the published docs, 2026-11-18; not yet measured against a real
-station.** Replace this line with the measurements (reply size, timing, TLS
-from the XIAO) once a key pair has been tried on the rig.
+**From the published docs, 2026-11-18; the reply measured from a laptop
+2026-11-19** against one real station (a club member's, with their keys).
+Not yet measured: timing and TLS from the XIAO itself.
+
+**Measured 2026-11-19 (one station on the account):** HTTP 200 in 0.28 s,
+**1,563 bytes**; `lastData` has 30 fields; `info` carries `name` (the
+station's Weather Underground ID, `K…-aws`), `location` and `coords`. The
+firmware's parser (`AmbientParse.h`) read it correctly in both US and metric
+units, and found the station's coordinates.
 
 Source: the API blueprint in `github.com/ambient-weather/api-docs`
 (`apiary.apib`). The docs site `ambientweather.docs.apiary.io` failed to load
@@ -45,7 +51,11 @@ settings page, not just the code.
 
 The owner also sent the station's Weather Underground ID
 (`K…-aws`), not its MAC: owners know their station by that ID or its name,
-not by MAC.
+not by MAC. The MAC is in the `/devices` reply itself (`macAddress`), so a
+working key pair is enough to find it.
+
+The second pair (a real Application Key from the same account, 2026-11-19)
+worked at once: no waiting for the key to be activated.
 
 ## Fields the firmware reads (`AmbientParse.h`)
 

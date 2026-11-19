@@ -240,6 +240,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
         <li>Sunrise and sunset times above the weather icon, and a small drawing of tonight's moon below it. Times come from the weather source; the moon phase is worked out on the orb, because Tempest does not supply one.</li>
         <li>In 12-hour mode the clock on the weather page shows <span class="num">9:05</span>, centered, not <span class="num">09:05</span>.<span class="was">Was: a leading zero, and the time sat right of center.</span></li>
         <li>The Tempest token is pasted on the settings page, so the ready-made release file works with a station too. Every build carries the Tempest code (about 20 KB); without a token it stays idle.</li>
+        <li>Ambient Weather Network stations too: each station slot has a type, Tempest or Ambient Weather. An Ambient page shows the station's own temperature, feels-like, humidity and wind, with the conditions and forecast from Visual Crossing at the station's location. Leave the station's MAC blank and an account with one station uses it; with several, the settings page lists them by name and MAC. Existing Tempest settings carry over untouched.</li>
       </ul>
     </div>
     <div class="group">
@@ -272,7 +273,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <div class="group">
       <h3>Quality</h3>
       <ul>
-        <li>Unit tests run on a laptop and in CI for settings validation, weather parsing, the sun and moon, and custom pages: 342 tests, including WiFi roaming and recovery, MQTT text fitting, the device log and the info page. The newer-version check runs in the browser and has its own 28 cases.<span class="was">Was: none.</span></li>
+        <li>Unit tests run on a laptop and in CI for settings validation, weather parsing, the sun and moon, and custom pages: 404 tests, including WiFi roaming and recovery, MQTT text fitting, the device log, the info page, the page lock, the buttons and Ambient stations. The newer-version check runs in the browser and has its own 28 cases.<span class="was">Was: none.</span></li>
         <li>The linter reports problems and no longer commits changes back, so the repository only moves when a person moves it.</li>
         <li>An upstream bug is fixed: an uninitialized loop counter in the page rotation.</li>
         <li>A written setup guide goes from an empty laptop to a running orb, and a traps file records every mistake that cost time once.<span class="was">Was: Brett's assembly video and README.</span></li>
@@ -325,7 +326,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       <dl>
         <dt>Module</dt><dd>Seeed XIAO ESP32-S3 (plain), on headers or soldered flat on its castellations</dd>
         <dt>Flash</dt><dd><span class="num">8 MB</span>; laid out as two 3.75 MB firmware slots so updates are safe</dd>
-        <dt>Headroom</dt><dd>Firmware fills <span class="num">49.5%</span> of a slot (release 1.8.2, built 18 Nov 2026). The stop line is <span class="num">92%</span>.</dd>
+        <dt>Headroom</dt><dd>Firmware fills <span class="num">50.1%</span> of a slot (release 1.8.3, built 19 Nov 2026). The stop line is <span class="num">92%</span>.</dd>
         <dt>PSRAM</dt><dd><span class="num">8 MB</span> octal; the board definition enables it, not yet measured on hardware</dd>
         <dt>Carrier</dt><dd><span class="num">hardware/hot-info-orbs-xiao-46mm</span>, rev 2.5: the v1.1 board reworked for the XIAO, displays 46 mm apart</dd>
         <dt>Pins</dt><dd>11 GPIO used: 8 for the displays (5 chip selects plus data, clock and DC; reset is an RC circuit) and 3 for the buttons; the busy light is the XIAO's own LED</dd>
@@ -357,7 +358,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   </div>
   <div class="widgets">
     <div class="w"><h3>Clock</h3><p>Seven-segment or Nixie, 12 or 24 hour, with custom colors and shadow. Your own JPG digits with a build of your own.</p></div>
-    <div class="w"><h3>Weather</h3><p>Current conditions, today's high and low, a 3-day forecast, and sunrise, sunset and the moon. From Visual Crossing, or your own Tempest station.</p></div>
+    <div class="w"><h3>Weather</h3><p>Current conditions, today's high and low, a 3-day forecast, and sunrise, sunset and the moon. From Visual Crossing, or your own Tempest or Ambient Weather station.</p></div>
     <div class="w"><h3>Stocks</h3><p>Up to five tickers, one per orb: stocks, forex or crypto, from Twelve Data, through a shared key built into the software.</p></div>
     <div class="w"><h3>Custom pages</h3><p>Your own page in the rotation, set up on the settings page: a JSON file from any web address, or one live value per orb from MQTT (Home Assistant), on up to two pages of five. Long values wrap to fit. No rebuild.</p></div>
   </div>
@@ -403,7 +404,9 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       <h3>Controls</h3>
       <dl>
         <dt>Buttons</dt><dd>3: left, middle, right</dd>
-        <dt>Presses</dt><dd>Short, medium (<span class="num">0.5 s</span>), long (<span class="num">2 s</span>)</dd>
+        <dt>Presses</dt><dd>Tap, or hold <span class="num">2 s</span>; one job per button. Left and right tap to change page; middle tap does the page's own thing (next clock face, next weather or stocks mode, refresh now), middle hold opens the info page.</dd>
+        <dt>Page lock</dt><dd>Hold left and right together <span class="num">2 s</span> to stop the rotation on the page shown; the same hold unlocks. A small padlock shows while locked; a restart clears it.</dd>
+        <dt>Forget WiFi</dt><dd>Hold right while plugging in: orb 3 counts 3, 2, 1 over <span class="num">5 s</span>, and the WiFi is forgotten only if the button is still down at the end. Other settings stay.</dd>
         <dt>Mounting</dt><dd>Works upside down: the settings page turns the screens over and reverses their order. The buttons keep their places.</dd>
       </dl>
     </div>
@@ -440,7 +443,7 @@ a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 <footer>
   <p><b>Credit:</b> Info Orbs is Brett Turner's project, and the firmware started as his and its contributors'. Buy <a href="https://brett.tech/collections/electronics-projects/products/info-orbs-full-dev-kit">his dev kit</a> if you want the original.</p>
-  <p>Source, setup guide and build notes: <a href="https://github.com/scottdube/hot-info-orbs">github.com/scottdube/hot-info-orbs</a>. Status as of 18 November 2026, firmware 1.8.2.</p>
+  <p>Source, setup guide and build notes: <a href="https://github.com/scottdube/hot-info-orbs">github.com/scottdube/hot-info-orbs</a>. Status as of 19 November 2026, firmware 1.8.3.</p>
 </footer>
 
 </div>

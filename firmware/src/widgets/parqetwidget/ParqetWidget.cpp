@@ -84,21 +84,11 @@ void ParqetWidget::update(bool force) {
     }
 }
 
-// The next set of stocks; after the last set, the next timeframe (issue #60:
-// the timeframe was the half-second press, and the "back to today" hold could
-// never arrive, because a 2 s middle hold is the info page's).
+// The next set of stocks: the old short press. Parqet is unused (Scott, #60),
+// so it gets no new behavior. The half-second press (next timeframe) went with
+// BTN_MEDIUM, and the unreachable long-press branch is deleted.
 void ParqetWidget::middleTap() {
-    // draw() moves m_holdingsDisplayFrom on to the next set and back to 0
-    // after the last, so 0 here means the last set (or the only one) is up
-    if (m_holdingsDisplayFrom != 0) {
-        draw(true);
-        return;
-    }
-    m_curMode++;
-    if (m_curMode >= PARQET_MODE_COUNT) {
-        m_curMode = 0;
-    }
-    update(true);
+    draw(true);
 }
 
 String ParqetWidget::getTimeframe() {

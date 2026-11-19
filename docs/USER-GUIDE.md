@@ -39,7 +39,7 @@ within 2 seconds, quick or slow. A hold is 2 seconds or more.
 | **Right** | next page | nothing |
 | **Middle** | the page's action: see the table below | the [info page](#the-info-page) |
 | **Left and right together** | | lock the orbs on this page; the same again unlocks: see [Locking a page](#locking-a-page) |
-| **Right** while plugging in power | | forget the WiFi network, after a 3-second countdown: see [Changing the WiFi network](#changing-the-wifi-network) |
+| **Right** while plugging in power | | forget the WiFi network: see [Changing the WiFi network](#changing-the-wifi-network) |
 
 The buttons keep their places when the orbs are set to **Upside down**: on an
 upside-down set, "left" and "right" here are the buttons that are on the left
@@ -100,8 +100,8 @@ same again to unlock: the middle orb shows **Unlocked** and the padlock goes.
   locked page comes back after it.
 - A restart clears the lock.
 - **Don't hold both buttons while plugging the orbs in.** Holding right at
-  power-up starts the countdown to forget the WiFi network (let go to keep
-  it). A hold carried over from power-up never locks.
+  power-up forgets the WiFi network. A hold carried over from power-up never
+  locks.
 
 **How often the data refreshes.** Weather every 10 minutes and stocks every
 15 minutes, **while their page is on screen**. A page that is not on screen
@@ -352,13 +352,10 @@ they never restart under you while you are typing a password.
 The orbs remember **one** WiFi network. To move them to another:
 
 1. Unplug the orbs.
-2. Hold the **right** button and plug them back in. Orb 4 shows
-   `Keep holding to forget WiFi` and counts down 3, 2, 1. Keep holding until
-   it shows `WiFi forgotten`, then let go. If you let go during the count,
-   it shows `WiFi kept` and nothing changes, so a thumb resting on the button
-   while you plug in can't wipe the network by accident. On a set mounted
-   upside down, this is the button on the left as you look at it: the buttons
-   do not move with the **Upside down** setting.
+2. Hold the **right** button and plug them back in. Let go when orb 4 shows
+   `Wifi Settings reset`. On a set mounted upside down, this is the button on
+   the left as you look at it: the buttons do not move with the **Upside
+   down** setting.
 3. The orbs start their own setup network. Orb 5 shows its name:
    `Info-Orbs_` and two characters, such as `Info-Orbs_84`. Yours will have
    its own two characters.

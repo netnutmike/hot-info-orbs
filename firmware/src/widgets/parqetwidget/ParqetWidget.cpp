@@ -84,22 +84,11 @@ void ParqetWidget::update(bool force) {
     }
 }
 
-void ParqetWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_OK && state == BTN_SHORT) {
-        // Force drawing to show the next set of stocks
-        draw(true);
-    } else if (buttonId == BUTTON_OK && state == BTN_MEDIUM) {
-        // Change timeframe and force update
-        m_curMode++;
-        if (m_curMode >= PARQET_MODE_COUNT) {
-            m_curMode = 0;
-        }
-        update(true);
-    } else if (buttonId == BUTTON_OK && state == BTN_LONG) {
-        // Reset view to default timeframe and reload
-        m_curMode = 0;
-        update(true);
-    }
+// The next set of stocks: the old short press. Parqet is unused (Scott, #60),
+// so it gets no new behavior. The half-second press (next timeframe) went with
+// BTN_MEDIUM, and the unreachable long-press branch is deleted.
+void ParqetWidget::middleTap() {
+    draw(true);
 }
 
 String ParqetWidget::getTimeframe() {

@@ -81,7 +81,7 @@ public:
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void buttonPressed(uint8_t buttonId, ButtonState state) override;
+    void middleTap() override;
     String getName() override;
     uint8_t dataOrbs() override { return 0; } // keeps time without WiFi: no data to mark
     // The red ring and "No WiFi" of "Clock only when WiFi is out". The
@@ -91,7 +91,6 @@ public:
     void setClockOnly(bool on) override { m_ringed = on; }
 
 private:
-    void change24hMode();
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color, bool shadowing);
     void displayDigit(int displayIndex, const String &lastDigit, const String &digit, uint32_t color);
     void displaySeconds(int displayIndex, int seconds, int color);

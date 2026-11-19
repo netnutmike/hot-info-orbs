@@ -30,14 +30,16 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 
 ## The three buttons
 
-| Button | Press | What it does |
+Every press is a **tap** or a **hold**. A tap is any press you let go of
+within 2 seconds, quick or slow. A hold is 2 seconds or more.
+
+| Button | Tap | Hold 2 seconds |
 |---|---|---|
-| **Left** | short | previous page |
-| **Right** | short | next page |
-| **Middle** | short, or about half a second | depends on the page showing: see the table below |
-| **Middle** | hold 2 seconds | the [info page](#the-info-page) |
-| **Left and right together** | hold 2 seconds | lock the orbs on this page; the same again unlocks: see [Locking a page](#locking-a-page) |
-| **Right** | hold while plugging in power | forget the WiFi network: see [Changing the WiFi network](#changing-the-wifi-network) |
+| **Left** | previous page | nothing |
+| **Right** | next page | nothing |
+| **Middle** | the page's action: see the table below | the [info page](#the-info-page) |
+| **Left and right together** | | lock the orbs on this page; the same again unlocks: see [Locking a page](#locking-a-page) |
+| **Right** while plugging in power | | forget the WiFi network, after a 5-second countdown on the middle orb: see [Changing the WiFi network](#changing-the-wifi-network) |
 
 The buttons keep their places when the orbs are set to **Upside down**: on an
 upside-down set, "left" and "right" here are the buttons that are on the left
@@ -46,18 +48,19 @@ and right when the orbs are the right way up.
 Left and right move only between the pages ticked under **Rotation > Show** on
 the settings page.
 
-The middle button on each page:
+A tap on the middle button on each page:
 
-| Page | Short press | Half-second press |
-|---|---|---|
-| Clock | next clock face | switch 12-hour / 24-hour |
-| Weather | orb 5 switches between the three-day highs and lows | |
-| Stocks | fetch the prices now | |
-| MQTT | draw the page again | |
-| Web Data | | |
+| Page | Middle tap |
+|---|---|
+| Clock | next clock face |
+| Weather | orb 5 switches between the three-day highs and lows |
+| Stocks | fetch the prices now |
+| MQTT | draw the page again (MQTT values arrive by themselves, so there is nothing to fetch) |
+| Web Data | fetch the data now |
 
-A clock face or 12/24-hour choice made with the button lasts until the orbs
-next restart. To keep it, set it on the settings page.
+The orbs keep a clock face picked with the button through a restart. They
+save it a few seconds after your last tap, so the settings page shows the
+same face. 12-hour or 24-hour is set on the settings page only.
 
 **During screens-off hours** the first press of any button only wakes the
 screens for a minute. Press again to do something.
@@ -98,8 +101,8 @@ same again to unlock: the middle orb shows **Unlocked** and the padlock goes.
   locked page comes back after it.
 - A restart clears the lock.
 - **Don't hold both buttons while plugging the orbs in.** Holding right at
-  power-up forgets the WiFi network. A hold carried over from power-up never
-  locks.
+  power-up starts the countdown to forget the WiFi network (let go to keep
+  it). A hold carried over from power-up never locks.
 
 **How often the data refreshes.** Weather every 10 minutes and stocks every
 15 minutes, **while their page is on screen**. A page that is not on screen
@@ -204,7 +207,7 @@ Your settings stay through restarts, power cuts and
 | Section | What is in it |
 |---|---|
 | **Rotation** | **Seconds per page**: 0 stays on one page; 5 to 3600 moves to the next page after that many seconds. **Show**: tick the pages you want. Tick one to keep it on screen, or several to rotate through them. **Clock only when WiFi is out**: Off keeps the page up with its marks; On switches to the clock while WiFi is down. See [the marks](#what-the-amber-and-red-marks-mean). |
-| **Clock** | The clock face at start-up, 12-hour or 24-hour, the AM/PM mark, the digit color and the color of the unlit segments. |
+| **Clock** | The clock face (a middle tap on the clock page changes it too), 12-hour or 24-hour, the AM/PM mark, the digit color and the color of the unlit segments. |
 | **Weather** | °F and mph, or °C and km/h. Light or dark screens. |
 | **Stocks** | One to five tickers, with commas between them, one per orb. Crypto is written `BTC/USD`. To pick an exchange, add the country: `APC&country=Germany`. |
 | **Dim times**, **Screens-off times** | See [Dimming and switching off at night](#dimming-and-switching-off-at-night). |
@@ -350,10 +353,15 @@ they never restart under you while you are typing a password.
 The orbs remember **one** WiFi network. To move them to another:
 
 1. Unplug the orbs.
-2. Hold the **right** button and plug them back in. Let go when orb 4 shows
-   `Wifi Settings reset`. On a set mounted upside down, this is the button on
-   the left as you look at it: the buttons do not move with the **Upside
-   down** setting.
+2. Hold the **right** button and plug them back in. The middle orb (orb 3)
+   shows `Keep holding to forget WiFi` and counts down 3, 2, 1 over 5 seconds. Keep
+   holding until it shows `WiFi forgotten`, then let go. If you let go during
+   the count, it shows `WiFi kept` and nothing changes, so a thumb resting on
+   the button while you plug in can't wipe the network by accident. Only the
+   WiFi network and its password are forgotten: every setting on the settings
+   page stays as it was. On a set mounted
+   upside down, this is the button on the left as you look at it: the buttons
+   do not move with the **Upside down** setting.
 3. The orbs start their own setup network. Orb 5 shows its name:
    `Info-Orbs_` and two characters, such as `Info-Orbs_84`. Yours will have
    its own two characters.

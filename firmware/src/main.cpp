@@ -204,7 +204,11 @@ void setup() {
     infoPage = new InfoPage(*sm, *widgetSet);
     // Every splash screen is drawn before the eyes start: from here until
     // BootEyes::finish the eye task is the only thing drawing
-    wifiWidget->begin(!eyesWanted);
+    // The forget-WiFi countdown (#60) draws on orb 3 and leaves it blank:
+    // without the eyes the boot picture goes back; with them the nose does
+    if (wifiWidget->begin(!eyesWanted) && !eyesWanted) {
+        drawBootPicture();
+    }
     bool eyesRan = false;
 #ifdef BOOT_EYES
     if (eyesWanted) {
@@ -372,7 +376,7 @@ void checkButtons() {
     // The hold that opened it being let go is not a press (Ignored).
     if (infoPage->isOpen()) {
         const ButtonState middleState = buttonOK.getState();
-        bool closed = middleState != BTN_NOTHING && infoPage->press(true, middleState == BTN_LONG) == infopage::Press::Closed;
+        bool closed = middleState != BTN_NOTHING && infoPage->press(true, middleState == BTN_HOLD) == infopage::Press::Closed;
         bool side = buttonLeft.getState() != BTN_NOTHING;
         side = buttonRight.getState() != BTN_NOTHING || side;
         if (!closed && side && infoPage->isOpen()) {
@@ -384,46 +388,39 @@ void checkButtons() {
         }
         return;
     }
-    // Reset cycle timer whenever a button is pressed
-    if (buttonLeft.pressedShort()) {
-        // Left short press cycles widgets backward
-        Serial.println("Left button short pressed -> switch to prev Widget");
+    // One job per button and gesture (issue #60, PressPolicy.h). A tap is any
+    // release under 2 s; a left or right hold does nothing on its own. Every
+    // button is read on every pass and each press it holds is acted on, so
+    // presses made during a slow pass (a data fetch) are not dropped. A handled
+    // press restarts the rotation timer.
+    const ButtonState leftState = buttonLeft.getState();
+    const ButtonState middleState = buttonOK.getState();
+    const ButtonState rightState = buttonRight.getState();
+    if (leftState == BTN_TAP) {
+        Serial.println("Left tap -> previous page");
         m_widgetCycleDelayPrev = millis();
         widgetSet->prev();
-    } else if (buttonRight.pressedShort()) {
-        // Right short press cycles widgets forward
-        Serial.println("Right button short pressed -> switch to next Widget");
+    }
+    if (rightState == BTN_TAP) {
+        Serial.println("Right tap -> next page");
         m_widgetCycleDelayPrev = millis();
         widgetSet->next();
-    } else {
-        ButtonState leftState = buttonLeft.getState();
-        ButtonState middleState = buttonOK.getState();
-        ButtonState rightState = buttonRight.getState();
-
-        // Everying else that is not BTN_NOTHING will be forwarded to the current widget
-        if (leftState != BTN_NOTHING) {
-            Serial.printf("Left button pressed, state=%d\n", leftState);
-            m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_LEFT, leftState);
-        } else if (middleState != BTN_NOTHING) {
-            Serial.printf("Middle button pressed, state=%d\n", middleState);
-            m_widgetCycleDelayPrev = millis();
-            // A 2 second hold is the info page's (opened above while it was
-            // still down, or here if the loop was busy then). The page on show
-            // does not get that hold.
-            if (infoPage->press(true, middleState == BTN_LONG) == infopage::Press::PassOn) {
-                widgetSet->buttonPressed(BUTTON_OK, middleState);
-            }
-        } else if (rightState != BTN_NOTHING) {
-            Serial.printf("Right button pressed, state=%d\n", rightState);
-            m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_RIGHT, rightState);
+    }
+    if (middleState != BTN_NOTHING) {
+        m_widgetCycleDelayPrev = millis();
+        // A 2 second hold is the info page's (opened above while it was still
+        // down, or here if the loop was busy then). The page on show only
+        // gets taps.
+        if (infoPage->press(true, middleState == BTN_HOLD) == infopage::Press::PassOn) {
+            Serial.println("Middle tap -> the page's action");
+            widgetSet->middleTap();
         }
     }
 }
 
 void loop() {
     DeviceLog::tick(); // writes the events waiting; first, so every path below gets it
+    Settings::tick(); // a clock face picked with the middle button, once the taps stop (#60)
     if (wifiWidget->isConnected() == false) {
         wifiWidget->update();
         {

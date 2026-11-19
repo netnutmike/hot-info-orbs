@@ -1,7 +1,6 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#include "Button.h"
 #include "ScreenManager.h"
 #include "StalePolicy.h"
 #include "config_helper.h"
@@ -13,7 +12,11 @@ public:
     virtual void setup() = 0;
     virtual void update(bool force = false) = 0;
     virtual void draw(bool force = false) = 0;
-    virtual void buttonPressed(uint8_t buttonId, ButtonState state) = 0;
+    // A tap on the middle button (issue #60): the page's one action, and it
+    // always shows something (a refresh, if the page has one view). Left and
+    // right only change the page, and the middle hold is the info page, so
+    // pages get nothing else. Default: nothing (the WiFi status page).
+    virtual void middleTap() {}
     virtual String getName() = 0;
     virtual String showLabel() { return getName(); } // its Show tick box; the saved key stays getName()
     // Issue #32 (StalePolicy.h). true = this page's refreshes have been

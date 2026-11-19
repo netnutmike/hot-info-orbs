@@ -42,7 +42,7 @@ public:
     // on that orb until endLockNote(), which repaints the page without it.
     void setPageLock(bool locked);
     void endLockNote();
-    void buttonPressed(uint8_t buttonId, ButtonState state);
+    void middleTap();
     void showLoading();
     // true = the boot eyes are still on orbs 2 and 4: the start-up "Loading"
     // lines all go on orb 5 instead of orbs 4 and 5

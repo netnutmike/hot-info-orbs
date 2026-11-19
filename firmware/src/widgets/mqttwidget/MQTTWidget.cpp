@@ -386,7 +386,8 @@ String MQTTWidget::showLabel() {
     return mqttShowLabel(m_page, m_name.c_str()).c_str();
 }
 
-void MQTTWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_OK && state == BTN_SHORT)
-        changeMode();
+// MQTT values are pushed by the broker, so there is nothing to fetch: the tap
+// draws the page again
+void MQTTWidget::middleTap() {
+    changeMode();
 }

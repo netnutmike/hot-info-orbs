@@ -53,7 +53,10 @@ WebDataWidget::~WebDataWidget() {
 void WebDataWidget::setup() {
 }
 
-void WebDataWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
+// Fetch now (issue #60: the middle tap always does something visible; this
+// page used to ignore it)
+void WebDataWidget::middleTap() {
+    update(true);
 }
 
 void WebDataWidget::draw(bool force) {

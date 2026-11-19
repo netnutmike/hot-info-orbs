@@ -2,21 +2,18 @@
 #define BUTTON_H
 #include <Arduino.h>
 
+// A finished press: a tap (let go under 2 s) or a hold (PressPolicy.h, #60)
 enum ButtonState {
     BTN_NOTHING,
-    BTN_SHORT,
-    BTN_MEDIUM,
-    BTN_LONG
+    BTN_TAP,
+    BTN_HOLD
 };
 
 class Button {
 public:
     Button(uint8_t pin);
     void begin();
-    bool pressedShort();
-    bool pressedMedium();
-    bool pressedLong();
-    ButtonState getState();
+    ButtonState getState(); // the press let go since the last read, if any; reading it takes it
     // Down right now, and for at least this long. The others only speak once
     // the button is let go.
     bool heldFor(unsigned long ms);
@@ -34,11 +31,6 @@ public:
     const static unsigned long DEBOUNCE_TIME = BUTTON_DEBOUNCE_TIME;
 #else
     const static unsigned long DEBOUNCE_TIME = 35;
-#endif
-#ifdef BUTTON_MEDIUM_PRESS_TIME
-    const static unsigned long MEDIUM_PRESS_TIME = BUTTON_MEDIUM_PRESS_TIME;
-#else
-    const static unsigned long MEDIUM_PRESS_TIME = 500;
 #endif
 #ifdef BUTTON_LONG_PRESS_TIME
     const static unsigned long LONG_PRESS_TIME = BUTTON_LONG_PRESS_TIME;

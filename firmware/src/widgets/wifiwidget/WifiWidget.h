@@ -14,7 +14,9 @@ public:
     void setup() override;
     // setup() is begin(true) + connect() + showPortal() on failure. main.cpp
     // calls the parts itself so the boot eyes can run during connect().
-    void begin(bool showConnecting);
+    // True if the forget-WiFi countdown ran: it drew on orb 3 and left it
+    // blank, so the caller puts the boot picture back (main.cpp)
+    bool begin(bool showConnecting);
     void drawConnecting();
     bool connect();
     // What went wrong goes on orbs 4 and 5. eyesShown: BootEyes left crossed
@@ -23,7 +25,6 @@ public:
     void setEyesRan(bool ran) { m_eyesRan = ran; }
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void buttonPressed(uint8_t buttonId, ButtonState state) override;
     String getName() override;
 
     bool isConnected() { return m_isConnected; }
@@ -39,6 +40,7 @@ public:
     static String lastOutageNote();
 
 private:
+    void forgetWifiCountdown();
     void connectionTimedOut();
     void drawLines(const std::vector<wififail::Line> &lines, int centerY);
     void lookForSavedNetwork();

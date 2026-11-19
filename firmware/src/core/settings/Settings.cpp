@@ -1,5 +1,6 @@
 #include "Settings.h"
 
+#include "SaveDelay.h"
 #include "SettingsValidation.h"
 #include "Utils.h"
 #include "clockwidget/ClockWidget.h"
@@ -246,6 +247,9 @@ void Settings::load() {
                 v.mq2u[i] = p.getString(k, v.mq2u[i].c_str()).c_str();
             }
         }
+        // The middle button writes the face alone (saveFaceSoon), maybe on an
+        // orb whose page was never saved, so it is read without "schema" too
+        v.face = p.getInt("face", v.face);
         p.end();
     }
     s_values = v;
@@ -343,4 +347,24 @@ bool Settings::factoryReset() {
 
 bool Settings::hasStored() {
     return s_stored;
+}
+
+// --- the clock face from the middle button (issue #60) ---
+
+static savedelay::SaveDelay s_faceSave;
+
+void Settings::saveFaceSoon(int face) {
+    s_values.face = face; // the settings page shows it from now on
+    s_faceSave.changed(millis());
+}
+
+void Settings::tick() {
+    if (!s_faceSave.due(millis())) {
+        return;
+    }
+    Preferences p;
+    bool ok = p.begin(NS, false);
+    ok = ok && p.putInt("face", s_values.face) > 0;
+    p.end();
+    Serial.printf("Settings: clock face %d %s\n", s_values.face, ok ? "saved" : "NOT saved");
 }

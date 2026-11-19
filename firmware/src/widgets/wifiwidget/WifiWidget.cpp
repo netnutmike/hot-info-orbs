@@ -1,6 +1,7 @@
 #include "WifiWidget.h"
 #include "Button.h" // Widget.h no longer brings it (#60)
 #include "DeviceLogStore.h"
+#include "ForgetCountdown.h"
 #include "RoamPolicy.h"
 #include "StalePolicy.h"
 #include "Utils.h"
@@ -77,6 +78,46 @@ void WifiWidget::drawConnecting() {
     m_manager.drawCenterString("Connecting", ScreenCenterX, ScreenCenterY - lineHeight, fontSize);
 }
 
+// Before the boot eyes start, so this is the only thing drawing on orb 4
+void WifiWidget::forgetWifiCountdown(bool showConnecting) {
+    m_manager.selectScreen(statusScreenIndex);
+    m_manager.clearScreen();
+    m_manager.drawCenterString("Keep holding", ScreenCenterX, ScreenCenterY - 50, fontSize);
+    m_manager.drawCenterString("to forget WiFi", ScreenCenterX, ScreenCenterY - 22, fontSize);
+    const int numberTop = ScreenCenterY + 5; // the number below, 48 high, centered at +40
+    forgetwifi::Countdown countdown(millis());
+    forgetwifi::State state = forgetwifi::State::Counting;
+    int shown = -1;
+    while (state == forgetwifi::State::Counting) {
+        const uint32_t now = millis();
+        state = countdown.step(now, digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL);
+        const int left = countdown.secondsLeft(now);
+        if (state == forgetwifi::State::Counting && left != shown && left > 0) {
+            shown = left;
+            m_manager.fillRect(0, numberTop, ScreenWidth, 70, TFT_BLACK);
+            m_manager.drawCenterString(String(left), ScreenCenterX, ScreenCenterY + 40, 48);
+        }
+        delay(10);
+    }
+    m_manager.fillRect(0, ScreenCenterY - 70, ScreenWidth, 150, TFT_BLACK);
+    if (state == forgetwifi::State::Forget) {
+        wifimgr.resetSettings();
+        Serial.println("Right held through the countdown -> WiFi forgotten");
+        DeviceLog::note("wifi forgotten: right button held at power-up");
+        m_manager.drawCenterString("WiFi forgotten", ScreenCenterX, ScreenCenterY, fontSize);
+        delay(messageDelay);
+    } else {
+        Serial.println("Right let go during the countdown -> WiFi kept");
+        m_manager.drawCenterString("WiFi kept", ScreenCenterX, ScreenCenterY, fontSize);
+        delay(1500);
+    }
+    if (showConnecting) {
+        drawConnecting(); // what begin() put there before the countdown
+    } else {
+        m_manager.clearScreen(); // the boot eyes draw here next
+    }
+}
+
 void WifiWidget::begin(bool showConnecting) {
     m_manager.setFont(DEFAULT_FONT);
     m_manager.setFontColor(TFT_WHITE);
@@ -146,13 +187,11 @@ void WifiWidget::begin(bool showConnecting) {
     wifimgr.setShowInfoErase(false);
     wifimgr.setMenu(wm_menu);
 
-    // Hold right button when connecting to power to reset wifi settings
-    // these are stored by the ESP WiFi library
+    // Right held at power-up: forget the saved WiFi (stored by the ESP WiFi
+    // library), but only after a "3, 2, 1" the hand can still let go during
+    // (ForgetCountdown.h, issue #60)
     if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {
-        wifimgr.resetSettings();
-        m_manager.selectScreen(statusScreenIndex);
-        m_manager.drawCenterString("Wifi Settings reset", ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
-        delay(messageDelay);
+        forgetWifiCountdown(showConnecting);
     }
 
     // Set WiFiManager to non-blocking so status and info can be displayed

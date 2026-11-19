@@ -38,6 +38,7 @@ public:
     static String lastOutageNote();
 
 private:
+    void forgetWifiCountdown(bool showConnecting);
     void connectionTimedOut();
     void drawLines(const std::vector<wififail::Line> &lines, int centerY);
     void lookForSavedNetwork();

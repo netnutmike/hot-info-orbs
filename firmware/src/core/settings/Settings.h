@@ -36,6 +36,13 @@ struct SettingsValues {
     std::string tlbl1; // its label on the page, "" when unused
     uint32_t tstn2;
     std::string tlbl2;
+    // Station type per slot (issue #51), index into stations::kTypes; 0 =
+    // Tempest, so a slot saved before types reads as Tempest. An Ambient slot
+    // is picked by MAC ("AA:BB:CC:DD:EE:FF", "" = unused); its label is tlblN.
+    int sttype1;
+    int sttype2;
+    std::string stmac1;
+    std::string stmac2;
     std::string hidden; // widget names left out of the rotation, '\n'-separated; "" = show all
     bool wificlock; // WiFi out: all five orbs go to the clock (stale::ClockOnly). Off = the page stays, marked
     // Custom pages (docs/superpowers/specs/2026-10-17-custom-pages-design.md).
@@ -69,6 +76,8 @@ struct SettingsValues {
     // release build (env:release), so a downloaded .bin gets its keys here
     std::string wxkey; // Visual Crossing
     std::string tsttok; // Tempest (WeatherFlow) token, "" = no Tempest pages
+    std::string awapp; // Ambient Weather Application Key
+    std::string awkey; // Ambient Weather API Key; both needed for Ambient pages
 };
 
 // Night-dim level. The page sets hours only; the level stays a build choice.

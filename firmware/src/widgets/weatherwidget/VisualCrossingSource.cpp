@@ -16,16 +16,19 @@
 // Built from Settings (location and units are on the settings page). The
 // location is url-encoded: "The Villages, FL" has spaces and a comma, and upstream
 // issue #337 reports spaces failing.
-VisualCrossingSource::VisualCrossingSource() {
+VisualCrossingSource::VisualCrossingSource() : VisualCrossingSource(String(Settings::get().wxloc.c_str())) {}
+
+VisualCrossingSource::VisualCrossingSource(const String &location) {
     const SettingsValues &s = Settings::get();
     m_url = String("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/") +
-            sv::urlEncode(s.wxloc).c_str() + "/next3days?key=" + s.wxkey.c_str() +
+            sv::urlEncode(location.c_str()).c_str() + "/next3days?key=" + s.wxkey.c_str() +
             "&unitGroup=" + (s.wxmetric ? "metric" : "us") +
             "&include=days,current&iconSet=icons1&lang=" + LOC_LANG;
 }
 
 bool VisualCrossingSource::fetch(WeatherDataModel &model) {
     if (Settings::get().wxkey.empty()) {
+        m_error = "no Visual Crossing key";
         return false; // no key yet: the request would only be refused
     }
     HTTPClient http;
@@ -43,6 +46,7 @@ bool VisualCrossingSource::fetch(WeatherDataModel &model) {
             model.setCurrentText(doc["days"][0]["description"].as<String>());
 
             model.setCurrentIcon(doc["currentConditions"]["icon"].as<String>());
+            m_conditions = doc["currentConditions"]["conditions"] | "";
             model.setTodayHigh(doc["days"][0]["tempmax"].as<float>());
             model.setTodayLow(doc["days"][0]["tempmin"].as<float>());
             model.setSunTimes(doc["days"][0]["sunriseEpoch"] | (int64_t)0, doc["days"][0]["sunsetEpoch"] | (int64_t)0);
@@ -67,12 +71,14 @@ bool VisualCrossingSource::fetch(WeatherDataModel &model) {
                 Serial.print(F("Deserialization failed"));
                 break;
             }
+            m_error = String("JSON: ") + error.c_str();
 
             return false;
         }
     } else {
         // Handle HTTP request error
         Serial.printf("HTTP request failed, error: %s\n", http.errorToString(httpCode).c_str());
+        m_error = http.errorToString(httpCode);
         http.end();
         return false;
     }

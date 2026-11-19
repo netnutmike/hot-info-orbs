@@ -110,8 +110,11 @@ only the station's own keys.
    XIAO with the client the existing sources use.
 5. **Units:** Ambient sends °F (`tempf`); the page's units setting must
    apply to every type, so each parser converts to one unit inside.
-6. **An Ambient account with several stations:** pick by MAC, with blank
-   meaning the first.
+6. **An Ambient account with several stations:** pick by MAC. *(Changed in
+   the build, 2026-11-18: the MAC is required, not "blank = first". A
+   slot is used when its own type's ID is set, the same rule as Tempest's
+   station ID, so a blank field always means "no page". "First" would also
+   change silently when the owner adds a station.)*
 
 ## Done when (first step: Ambient only)
 
@@ -127,6 +130,18 @@ only the station's own keys.
       `docs/AMBIENT-API.md` beside `TEMPEST-API.md`.
 - [ ] Ecowitt, WeatherLink and WU each become a follow-up issue against this
       model, opened only when someone with that station wants it.
+
+## As built (step 1, 2026-11-18)
+
+- The type table is `StationTypes.h`: names and help text per type, used by
+  the settings page. Construction stays an `if` per type in `main.cpp`
+  (two types do not need a factory table yet).
+- No separate `ForecastSource` interface yet: `StationPage` calls
+  `VisualCrossingSource` with the station's "lat,lon". It becomes an
+  interface when a second forecast service (Open-Meteo) arrives.
+- Status per slot moved from `TempestSource` to `StationStatus.h`, shared by
+  both types; a station page that fetched but has no forecast says why in
+  a note beside the tick.
 
 ## Decisions (2026-11-18)
 

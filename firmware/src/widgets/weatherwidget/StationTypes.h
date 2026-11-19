@@ -47,9 +47,11 @@ inline const TypeInfo &info(Type t) {
 }
 
 // A slot has a page when the ID for its own type is set. The other type's ID
-// is kept (switching back restores it) but does not count.
-inline bool slotUsed(Type t, uint32_t tempestId, const std::string &mac) {
-    return t == Type::Ambient ? !mac.empty() : tempestId != 0;
+// is kept (switching back restores it) but does not count. Ambient's MAC may
+// be blank (the account's only station), so there the label counts too:
+// blank MAC and blank label = no page.
+inline bool slotUsed(Type t, uint32_t tempestId, const std::string &mac, const std::string &label) {
+    return t == Type::Ambient ? !mac.empty() || !label.empty() : tempestId != 0;
 }
 
 } // namespace stations

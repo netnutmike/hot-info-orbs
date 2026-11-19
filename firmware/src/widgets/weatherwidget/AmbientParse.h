@@ -16,6 +16,7 @@
 // What a station gives for "now". NAN = the station sent no such reading.
 struct StationReading {
     std::string name; // the station's own name on the service, "" if none
+    std::string mac; // as the service sends it; with a blank MAC setting, the one it used
     std::string conditions; // filled from the forecast service, not the station
     float temp = NAN;
     float feels = NAN;
@@ -77,10 +78,26 @@ inline bool ambientParse(JsonDocument &doc, const std::string &mac, bool metric,
         return false;
     }
     JsonObject dev;
-    for (JsonObject d : all) {
-        if (ambientSameMac(d["macAddress"], mac)) {
-            dev = d;
-            break;
+    if (mac.empty()) {
+        // Blank: the account's only station. With several, name them so the
+        // owner can copy the right MAC from the settings page.
+        if (all.size() > 1) {
+            err = "this Ambient account has " + std::to_string(all.size()) + " stations:";
+            const char *sep = " ";
+            for (JsonObject d : all) {
+                err += sep + std::string(d["info"]["name"] | "(no name)") + " " + std::string(d["macAddress"] | "?");
+                sep = ", ";
+            }
+            err += ". Enter the MAC of the one for this page";
+            return false;
+        }
+        dev = all[0];
+    } else {
+        for (JsonObject d : all) {
+            if (ambientSameMac(d["macAddress"], mac)) {
+                dev = d;
+                break;
+            }
         }
     }
     if (dev.isNull()) {
@@ -96,6 +113,7 @@ inline bool ambientParse(JsonDocument &doc, const std::string &mac, bool metric,
     auto speed = [metric](float mph) { return std::isnan(mph) || !metric ? mph : mph * 1.609344f; };
     StationReading r;
     r.name = dev["info"]["name"] | "";
+    r.mac = dev["macAddress"] | "";
     r.temp = temp(last["tempf"].as<float>());
     r.feels = temp(last["feelsLike"] | NAN);
     r.humidity = last["humidity"] | NAN;

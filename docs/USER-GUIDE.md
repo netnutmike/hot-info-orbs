@@ -417,13 +417,18 @@ next three days from **Visual Crossing**, at the station's own location. Set
 the Visual Crossing key as well; without it the page shows the temperature
 only, and the settings page says so.
 
-1. Make two keys on **ambientweather.net** (the `.net` site, not `.com`):
-   Account > API Keys. Create an **API Key**, and further down the same page
-   an **Application Key**. Paste both under **API keys**.
-2. Find the station's MAC: ambientweather.net > Devices, written like
-   `00:0E:C6:AB:12:34`. Enter it as the **Station MAC** with a short label.
-   An account with several stations has one MAC for each.
+1. Make two keys on **ambientweather.net** (the `.net` site, not `.com`),
+   on your account page: an **API Key** and an **Application Key**. They are
+   two different kinds; two API Keys do not work. Paste both under
+   **API keys**.
+2. Give the station a short label, 16 characters at most. Leave **Station
+   MAC** blank if the account has one station: the page uses it, and after
+   the first fetch the settings page shows its name and MAC. With several
+   stations on the account, the settings page lists them; copy the MAC of
+   the one you want.
 3. Press **Save and restart**.
+
+To remove an Ambient page, blank both the MAC and the label.
 
 Afterwards each station shows ✔ or ✖ on the settings page for its last
 fetch, how long ago that was, and the error if it failed.

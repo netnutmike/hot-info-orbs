@@ -110,11 +110,14 @@ only the station's own keys.
    XIAO with the client the existing sources use.
 5. **Units:** Ambient sends °F (`tempf`); the page's units setting must
    apply to every type, so each parser converts to one unit inside.
-6. **An Ambient account with several stations:** pick by MAC. *(Changed in
-   the build, 2026-11-18: the MAC is required, not "blank = first". A
-   slot is used when its own type's ID is set, the same rule as Tempest's
-   station ID, so a blank field always means "no page". "First" would also
-   change silently when the owner adds a station.)*
+6. **An Ambient account with several stations:** pick by MAC. **Blank MAC
+   = the account's only station** (Scott, 2026-11-19). With several, the
+   settings page lists them by name and MAC instead of picking the first,
+   so adding a station never changes the page silently. The first build
+   made the MAC required; on the rig that left a blank MAC with no page
+   and no warning, twice, because the owner knew the station by its
+   Weather Underground ID, not its MAC. An Ambient slot is used when its
+   MAC or its label is set.
 
 ## Done when (first step: Ambient only)
 

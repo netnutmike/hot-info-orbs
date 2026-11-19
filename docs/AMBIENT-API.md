@@ -78,6 +78,7 @@ firmware sees one unit per setting, as with Tempest.
 | wrong or missing key | `HTTP 401: check both Ambient keys` |
 | over the rate limit | `HTTP 429: too many requests to Ambient, it tries again later` |
 | MAC not on the account | `station … is not on this Ambient account` |
+| MAC blank, several stations | `this Ambient account has N stations: name MAC, …` (so the owner can copy one) |
 | account has no stations | `no stations on this Ambient account` |
 | no outdoor temperature in `lastData` | `no outdoor temperature from this station` |
 

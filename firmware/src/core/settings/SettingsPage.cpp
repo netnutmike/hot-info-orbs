@@ -145,6 +145,9 @@ static String stationStatusLine(int slot) {
     String when = mins == 0 ? String("under a minute ago") : mins < 120 ? String(mins) + " min ago" : String(mins / 60) + " h ago";
     String line = String(st.ok ? "&#10004; " : "&#10006; ") + "Last fetch " + when + ", took " + String(st.ms / 1000.0, 1) +
                   " s, free heap " + String(st.freeHeap / 1024) + " KB";
+    if (st.ok && st.station.length()) {
+        line += ", station " + esc(st.station.c_str());
+    }
     if (!st.ok) {
         line += " &mdash; " + esc(st.error.c_str());
     } else if (st.note.length()) {
@@ -178,10 +181,12 @@ static String stationRow(int slot, int type, uint32_t id, const std::string &mac
     const stations::TypeInfo &am = stations::info(stations::Type::Ambient);
     h += "<div id='" + macKey + "-row'><label for='" + macKey + "'>Station " + n + " " + am.idLabel + "</label><input type='text' id='" +
          macKey + "' name='" + macKey + "' value='" + esc(mac) + "' autocomplete='off'>";
-    h += hint(String(am.idHint) + " Blank = no page.") + errorLine(errors, macKey.c_str()) + "</div>";
+    h += hint(String(am.idHint) + " Blank = the account's only station (with several, this page names them). "
+              "Blank MAC and blank label = no page.") +
+         errorLine(errors, macKey.c_str()) + "</div>";
     const String label = "Station " + n + " label (16 characters)";
     h += textField(lblKey.c_str(), label.c_str(), lbl, defLbl, "", errors);
-    if (stations::slotUsed(t, id, mac)) {
+    if (stations::slotUsed(t, id, mac, lbl)) {
         if (!keysSet) {
             h += "<div class='err'>&#10006; No page for this station: paste " + String(stations::info(t).keysHint) +
                  " under <a href='#keys'>API keys</a> above.</div>";
@@ -404,8 +409,8 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     // Weather works with either source: a Visual Crossing key, or a Tempest
     // token plus a station (with both, both get pages)
     const stations::Type st1 = stations::typeFrom(stored.sttype1), st2 = stations::typeFrom(stored.sttype2);
-    const bool used1 = stations::slotUsed(st1, stored.tstn1, stored.stmac1);
-    const bool used2 = stations::slotUsed(st2, stored.tstn2, stored.stmac2);
+    const bool used1 = stations::slotUsed(st1, stored.tstn1, stored.stmac1, stored.tlbl1);
+    const bool used2 = stations::slotUsed(st2, stored.tstn2, stored.stmac2, stored.tlbl2);
     const bool tempestKeys = !stored.tsttok.empty();
     const bool ambientKeys = !stored.awapp.empty() && !stored.awkey.empty();
     auto keysFor = [&](stations::Type t) { return t == stations::Type::Ambient ? ambientKeys : tempestKeys; };
@@ -803,9 +808,10 @@ void SettingsPage::handlePost() {
     if (has("stmac2") && !sv::parseMac(argStr(s, "stmac2"), v.stmac2, err)) {
         errors["stmac2"] = err;
     }
-    // The label is required when the slot is used by its own type's ID
-    const bool used1 = stations::slotUsed(stations::typeFrom(v.sttype1), v.tstn1, v.stmac1);
-    const bool used2 = stations::slotUsed(stations::typeFrom(v.sttype2), v.tstn2, v.stmac2);
+    // The label is required when the slot's own ID is set. Not the label
+    // itself: for Ambient with a blank MAC the label alone makes the page
+    const bool used1 = stations::slotUsed(stations::typeFrom(v.sttype1), v.tstn1, v.stmac1, "");
+    const bool used2 = stations::slotUsed(stations::typeFrom(v.sttype2), v.tstn2, v.stmac2, "");
     if (has("tlbl1") && !sv::parseStationLabel(argStr(s, "tlbl1"), used1 ? 1 : 0, v.tlbl1, err)) {
         errors["tlbl1"] = err;
     }

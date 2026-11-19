@@ -14,6 +14,7 @@ bool StationPage::fetch(WeatherDataModel &model) {
     StationReading r;
     st.ok = m_station->read(r, st);
     if (st.ok) {
+        st.station = (r.name + " " + r.mac).c_str();
         if (s.wxkey.empty()) {
             st.note = "No forecast: paste a Visual Crossing key under API keys";
         } else {

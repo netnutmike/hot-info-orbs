@@ -48,6 +48,36 @@ void test_a_mac_not_on_the_account_is_an_error() {
     TEST_ASSERT_EQUAL_STRING("station 00:00:00:00:00:99 is not on this Ambient account", err.c_str());
 }
 
+// A blank MAC (Scott, 2026-11-19): an owner knows the station by name or
+// its WU ID, not its MAC. With one station on the account, that one; with
+// several, the error names them so the owner can copy the right MAC.
+void test_blank_mac_uses_the_only_station() {
+    JsonDocument doc;
+    deserializeJson(doc, R"([{"macAddress":"00:0E:C6:00:00:01","info":{"name":"KXXTEST1-aws"},"lastData":{"tempf":69.1}}])");
+    StationReading r;
+    std::string err;
+    TEST_ASSERT_TRUE(ambientParse(doc, "", false, r, err));
+    TEST_ASSERT_EQUAL_STRING("KXXTEST1-aws", r.name.c_str());
+    TEST_ASSERT_EQUAL_STRING("00:0E:C6:00:00:01", r.mac.c_str());
+    TEST_ASSERT_EQUAL_FLOAT(69.1, r.temp);
+}
+
+void test_blank_mac_with_several_stations_names_them() {
+    StationReading r;
+    std::string err;
+    TEST_ASSERT_FALSE(parseFixture("", false, r, err));
+    TEST_ASSERT_EQUAL_STRING("this Ambient account has 2 stations: Back Yard 00:11:22:33:44:55, Dock AA:BB:CC:DD:EE:01. "
+                             "Enter the MAC of the one for this page",
+                             err.c_str());
+}
+
+void test_the_reading_carries_the_mac_as_sent() {
+    StationReading r;
+    std::string err;
+    TEST_ASSERT_TRUE(parseFixture("aa:bb:cc:dd:ee:01", false, r, err));
+    TEST_ASSERT_EQUAL_STRING("AA:BB:CC:DD:EE:01", r.mac.c_str());
+}
+
 void test_an_empty_account_is_an_error() {
     JsonDocument doc;
     deserializeJson(doc, "[]");
@@ -205,10 +235,17 @@ void test_every_type_names_its_id_field() {
 // A slot is used by the ID of the type it is set to; the other type's ID,
 // left over from before a switch, does not count
 void test_slot_used_follows_its_type(void) {
-    TEST_ASSERT_TRUE(stations::slotUsed(stations::Type::Tempest, 12345, ""));
-    TEST_ASSERT_FALSE(stations::slotUsed(stations::Type::Tempest, 0, "AA:BB:CC:DD:EE:01"));
-    TEST_ASSERT_TRUE(stations::slotUsed(stations::Type::Ambient, 0, "AA:BB:CC:DD:EE:01"));
-    TEST_ASSERT_FALSE(stations::slotUsed(stations::Type::Ambient, 12345, ""));
+    TEST_ASSERT_TRUE(stations::slotUsed(stations::Type::Tempest, 12345, "", ""));
+    TEST_ASSERT_FALSE(stations::slotUsed(stations::Type::Tempest, 0, "AA:BB:CC:DD:EE:01", "Dock"));
+    TEST_ASSERT_TRUE(stations::slotUsed(stations::Type::Ambient, 0, "AA:BB:CC:DD:EE:01", ""));
+    TEST_ASSERT_FALSE(stations::slotUsed(stations::Type::Ambient, 12345, "", ""));
+}
+
+// Ambient with a blank MAC: the label says the owner wants a page (it uses
+// the account's only station); blank MAC and blank label = no page
+void test_ambient_slot_with_a_label_and_no_mac_is_used(void) {
+    TEST_ASSERT_TRUE(stations::slotUsed(stations::Type::Ambient, 0, "", "Home"));
+    TEST_ASSERT_FALSE(stations::slotUsed(stations::Type::Ambient, 0, "", ""));
 }
 
 // A refused request carries the reason in its body; that, not just the code,
@@ -244,6 +281,10 @@ int main(int, char **) {
     RUN_TEST(test_type_from_an_unknown_index_is_tempest);
     RUN_TEST(test_every_type_names_its_id_field);
     RUN_TEST(test_slot_used_follows_its_type);
+    RUN_TEST(test_ambient_slot_with_a_label_and_no_mac_is_used);
+    RUN_TEST(test_blank_mac_uses_the_only_station);
+    RUN_TEST(test_blank_mac_with_several_stations_names_them);
+    RUN_TEST(test_the_reading_carries_the_mac_as_sent);
     RUN_TEST(test_error_body_text);
     return UNITY_END();
 }

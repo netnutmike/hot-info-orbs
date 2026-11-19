@@ -257,7 +257,7 @@ void setup() {
     const SettingsValues &wx = Settings::get();
     auto addStation = [&](int slot, int type, uint32_t id, const std::string &mac, const std::string &label) {
         const stations::Type t = stations::typeFrom(type);
-        if (!stations::slotUsed(t, id, mac)) {
+        if (!stations::slotUsed(t, id, mac, label)) {
             return;
         }
         if (t == stations::Type::Tempest && !wx.tsttok.empty()) {

@@ -15,7 +15,8 @@ struct StationStatus {
                      // start-up fetch runs before the clock has synced
     uint32_t freeHeap = 0; // just after the fetch
     String error; // when !ok
-    String note; // when ok but part of the page is missing (the forecast)
+    String note;
+    String station; // which station answered, "name MAC", when the type can pick one // when ok but part of the page is missing (the forecast)
 };
 
 constexpr int kStationSlots = 2;

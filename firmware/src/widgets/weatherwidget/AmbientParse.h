@@ -111,3 +111,13 @@ inline bool ambientParse(JsonDocument &doc, const std::string &mac, bool metric,
     out = r;
     return true;
 }
+
+// The reason in a refused request's body, {"error":"..."}; "" when there is
+// none (docs/AMBIENT-API.md: two API keys are refused with a clear one)
+inline std::string ambientErrorText(const std::string &body) {
+    JsonDocument doc;
+    if (deserializeJson(doc, body) || !doc["error"].is<const char *>()) {
+        return "";
+    }
+    return doc["error"].as<const char *>();
+}

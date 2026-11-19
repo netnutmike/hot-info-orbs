@@ -30,12 +30,21 @@ bool AmbientSource::read(StationReading &r, StationStatus &st) {
         } else {
             ok = true;
         }
-    } else if (st.code == 401) {
-        st.error = "HTTP 401: check both Ambient keys";
-    } else if (st.code == 429) {
-        st.error = "HTTP 429: too many requests to Ambient, it tries again later";
+    } else if (st.code > 0) {
+        // Ambient says why in the body, e.g. two API keys and no Application Key
+        const std::string why = ambientErrorText(http.getString().c_str());
+        if (st.code == 401) {
+            st.error = "HTTP 401: check both Ambient keys";
+        } else if (st.code == 429) {
+            st.error = "HTTP 429: too many requests to Ambient, it tries again later";
+        } else {
+            st.error = String("HTTP ") + st.code;
+        }
+        if (!why.empty()) {
+            st.error += String(" (Ambient says: ") + why.c_str() + ")";
+        }
     } else {
-        st.error = st.code > 0 ? String("HTTP ") + st.code : http.errorToString(st.code);
+        st.error = http.errorToString(st.code);
     }
     http.end();
     return ok;

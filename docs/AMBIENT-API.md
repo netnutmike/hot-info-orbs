@@ -29,6 +29,24 @@ station's coordinates are a home address. They go in each orb's own settings.
 - **Rate limit:** 1 request/s per API key, 3/s per Application Key; HTTP 429
   when over. A page fetches every 10 minutes while it is on screen.
 
+## Measured 2026-11-19: two API keys are not a pair
+
+The first test keys from a station owner were **two API Keys** (both made on
+the account page as "API Key"). Ambient refused them either way round with
+HTTP 401 and a body that names the problem:
+
+`{"error":"You are using an apiKey as your applicationKey. Please contact support@ambientweather.com to get an applicationKey"}`
+
+So the server can tell the two kinds apart, and an owner needs one of each.
+Where an owner gets an Application Key today is **not confirmed**: the
+blueprint says the account page; this error text and some third-party docs
+say Ambient support. The firmware shows the body's `error` text on the
+settings page, not just the code.
+
+The owner also sent the station's Weather Underground ID
+(`K…-aws`), not its MAC: owners know their station by that ID or its name,
+not by MAC.
+
 ## Fields the firmware reads (`AmbientParse.h`)
 
 | Field | Unit | Use |

@@ -211,6 +211,15 @@ void test_slot_used_follows_its_type(void) {
     TEST_ASSERT_FALSE(stations::slotUsed(stations::Type::Ambient, 12345, ""));
 }
 
+// A refused request carries the reason in its body; that, not just the code,
+// goes on the settings page (measured reply, 2026-11-19)
+void test_error_body_text(void) {
+    TEST_ASSERT_EQUAL_STRING("You are using an apiKey as your applicationKey. Please contact support@ambientweather.com to get an applicationKey",
+                             ambientErrorText("{\"error\":\"You are using an apiKey as your applicationKey. Please contact support@ambientweather.com to get an applicationKey\"}").c_str());
+    TEST_ASSERT_EQUAL_STRING("", ambientErrorText("<html>Bad gateway</html>").c_str());
+    TEST_ASSERT_EQUAL_STRING("", ambientErrorText("{\"other\":1}").c_str());
+}
+
 int main(int, char **) {
     UNITY_BEGIN();
     RUN_TEST(test_the_station_with_that_mac);
@@ -235,5 +244,6 @@ int main(int, char **) {
     RUN_TEST(test_type_from_an_unknown_index_is_tempest);
     RUN_TEST(test_every_type_names_its_id_field);
     RUN_TEST(test_slot_used_follows_its_type);
+    RUN_TEST(test_error_body_text);
     return UNITY_END();
 }

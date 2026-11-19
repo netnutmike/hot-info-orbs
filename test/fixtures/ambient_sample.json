@@ -1,0 +1,19 @@
+[
+  {
+    "macAddress": "00:11:22:33:44:55",
+    "info": {"name": "Back Yard", "location": "Home"},
+    "lastData": {
+      "dateutc": 1515436500000, "winddir": 58, "windspeedmph": 0.9, "windgustmph": 4,
+      "tempf": 66.9, "humidity": 30, "baromrelin": 30.05, "tempinf": 74.1, "humidityin": 30,
+      "dailyrainin": 0, "feelsLike": 66.9, "dewPoint": 34.45
+    }
+  },
+  {
+    "macAddress": "AA:BB:CC:DD:EE:01",
+    "info": {"name": "Dock", "coords": {"coords": {"lat": 40.5, "lon": -105.25}}},
+    "lastData": {
+      "dateutc": 1515436500000, "winddir": 270, "windspeedmph": 0, "windgustmph": 0,
+      "tempf": 32, "humidity": 81.6, "feelsLike": 28.4
+    }
+  }
+]

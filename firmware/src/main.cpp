@@ -14,6 +14,8 @@
 #include "config_helper.h"
 #include "icons.h"
 #include "mqttwidget/MQTTWidget.h"
+#include "weatherwidget/AmbientSource.h"
+#include "weatherwidget/StationTypes.h"
 #include "weatherwidget/TempestSource.h"
 #include "weatherwidget/VisualCrossingSource.h"
 #include "weatherwidget/WeatherWidget.h"
@@ -245,22 +247,30 @@ void setup() {
         widgetSet->add(new StockWidget(*sm));
     }
 #endif
-    bool tempestPages = false;
-    // One weather page per Tempest station, plus Visual Crossing for the
-    // location whenever a VC key is set (a third place, e.g. a town away from
-    // the stations). With Tempest pages and no VC key, VC is left out: it
-    // would only show a key error. A station without a token would fail every
-    // fetch with 401, so it gets no page (the settings page says why).
+    bool stationPages = false;
+    // One weather page per station (Tempest or Ambient, issue #51), plus
+    // Visual Crossing for the location whenever a VC key is set (a third
+    // place, e.g. a town away from the stations). With station pages and no VC
+    // key, VC is left out: it would only show a key error. A station without
+    // its account keys would fail every fetch with 401, so it gets no page
+    // (the settings page says why).
     const SettingsValues &wx = Settings::get();
-    if (!wx.tsttok.empty() && wx.tstn1) {
-        widgetSet->add(new WeatherWidget(*sm, new TempestSource(0, wx.tstn1, wx.tlbl1)));
-        tempestPages = true;
-    }
-    if (!wx.tsttok.empty() && wx.tstn2) {
-        widgetSet->add(new WeatherWidget(*sm, new TempestSource(1, wx.tstn2, wx.tlbl2)));
-        tempestPages = true;
-    }
-    if (!tempestPages || !wx.wxkey.empty()) {
+    auto addStation = [&](int slot, int type, uint32_t id, const std::string &mac, const std::string &label) {
+        const stations::Type t = stations::typeFrom(type);
+        if (!stations::slotUsed(t, id, mac, label)) {
+            return;
+        }
+        if (t == stations::Type::Tempest && !wx.tsttok.empty()) {
+            widgetSet->add(new WeatherWidget(*sm, new TempestSource(slot, id, label)));
+            stationPages = true;
+        } else if (t == stations::Type::Ambient && !wx.awapp.empty() && !wx.awkey.empty()) {
+            widgetSet->add(new WeatherWidget(*sm, new StationPage(slot, new AmbientSource(mac), label)));
+            stationPages = true;
+        }
+    };
+    addStation(0, wx.sttype1, wx.tstn1, wx.stmac1, wx.tlbl1);
+    addStation(1, wx.sttype2, wx.tstn2, wx.stmac2, wx.tlbl2);
+    if (!stationPages || !wx.wxkey.empty()) {
         widgetSet->add(new WeatherWidget(*sm, new VisualCrossingSource()));
     }
     // Custom pages: set up on /settings, registered only when configured.

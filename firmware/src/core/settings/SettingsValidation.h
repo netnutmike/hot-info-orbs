@@ -244,6 +244,40 @@ inline bool parseStationId(const std::string &in, uint32_t &out, std::string &er
     return true;
 }
 
+// Ambient Weather station MAC (issue #51): blank = unused, otherwise 12 hex
+// digits with ':' or '-' or nothing between them, kept as AA:BB:CC:DD:EE:FF
+// (the form the Ambient API sends)
+inline bool parseMac(const std::string &in, std::string &out, std::string &err) {
+    std::string hex;
+    for (char c : trim(in)) {
+        if (c == ':' || c == '-') {
+            continue;
+        }
+        if (!isxdigit((unsigned char)c)) {
+            hex.clear();
+            hex.push_back('!');
+            break;
+        }
+        hex.push_back((char)toupper((unsigned char)c));
+    }
+    if (trim(in).empty()) {
+        out = "";
+        return true;
+    }
+    if (hex.size() != 12) {
+        err = "A MAC is 12 hex digits, like 00:0E:C6:AB:12:34 (shown on ambientweather.net under Devices)";
+        return false;
+    }
+    out.clear();
+    for (int i = 0; i < 12; i += 2) {
+        if (i) {
+            out += ':';
+        }
+        out += hex.substr(i, 2);
+    }
+    return true;
+}
+
 // Label shown on the orb in place of the town name: 1..16 characters (orb 1
 // shrinks the text to fit, "Salt Lake City" is 14), and
 // only required when the station is in use
@@ -566,6 +600,16 @@ inline std::string tempestTokenHint(const std::string &v, const std::string &sto
                           : "Optional: only for owners of a Tempest weather station.";
     }
     return apiKeyHint(v, stored, "Tempest");
+}
+
+// The Ambient keys (Application Key and API Key) work the same way: optional
+// until an Ambient station is set (issue #51)
+inline std::string ambientKeyHint(const std::string &v, const std::string &stored, bool stationSet) {
+    if (v == stored && stored.empty()) {
+        return stationSet ? "&#9888; No key yet. The Ambient pages stay off until both keys are pasted here."
+                          : "Optional: only for owners of an Ambient Weather station.";
+    }
+    return apiKeyHint(v, stored, "Ambient");
 }
 
 // Write-only: the page never shows the stored password. Blank keeps it,

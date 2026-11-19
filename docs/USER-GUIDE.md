@@ -39,7 +39,7 @@ within 2 seconds, quick or slow. A hold is 2 seconds or more.
 | **Right** | next page | nothing |
 | **Middle** | the page's action: see the table below | the [info page](#the-info-page) |
 | **Left and right together** | | lock the orbs on this page; the same again unlocks: see [Locking a page](#locking-a-page) |
-| **Right** while plugging in power | | forget the WiFi network, after a 3-second countdown: see [Changing the WiFi network](#changing-the-wifi-network) |
+| **Right** while plugging in power | | forget the WiFi network, after a 5-second countdown on the middle orb: see [Changing the WiFi network](#changing-the-wifi-network) |
 
 The buttons keep their places when the orbs are set to **Upside down**: on an
 upside-down set, "left" and "right" here are the buttons that are on the left
@@ -353,11 +353,13 @@ they never restart under you while you are typing a password.
 The orbs remember **one** WiFi network. To move them to another:
 
 1. Unplug the orbs.
-2. Hold the **right** button and plug them back in. Orb 4 shows
-   `Keep holding to forget WiFi` and counts down 3, 2, 1. Keep holding until
-   it shows `WiFi forgotten`, then let go. If you let go during the count,
-   it shows `WiFi kept` and nothing changes, so a thumb resting on the button
-   while you plug in can't wipe the network by accident. On a set mounted
+2. Hold the **right** button and plug them back in. The middle orb (orb 3)
+   shows `Keep holding to forget WiFi` and counts down 5, 4, 3, 2, 1. Keep
+   holding until it shows `WiFi forgotten`, then let go. If you let go during
+   the count, it shows `WiFi kept` and nothing changes, so a thumb resting on
+   the button while you plug in can't wipe the network by accident. Only the
+   WiFi network and its password are forgotten: every setting on the settings
+   page stays as it was. On a set mounted
    upside down, this is the button on the left as you look at it: the buttons
    do not move with the **Upside down** setting.
 3. The orbs start their own setup network. Orb 5 shows its name:

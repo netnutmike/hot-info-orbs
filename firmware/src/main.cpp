@@ -204,7 +204,11 @@ void setup() {
     infoPage = new InfoPage(*sm, *widgetSet);
     // Every splash screen is drawn before the eyes start: from here until
     // BootEyes::finish the eye task is the only thing drawing
-    wifiWidget->begin(!eyesWanted);
+    // The forget-WiFi countdown (#60) draws on orb 3 and leaves it blank:
+    // without the eyes the boot picture goes back; with them the nose does
+    if (wifiWidget->begin(!eyesWanted) && !eyesWanted) {
+        drawBootPicture();
+    }
     bool eyesRan = false;
 #ifdef BOOT_EYES
     if (eyesWanted) {

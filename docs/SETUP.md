@@ -181,7 +181,7 @@ at a time.
 This is stored on the device, not in your files. You do not reflash to change
 WiFi later: hold the **right** button while plugging in power (the button on the right
 when the orbs are the right way up; **Upside down** does not move the
-buttons). Orb 4 counts down 3, 2, 1; keep holding until it shows `WiFi forgotten`, and the orbs forget the network and open the setup network again. Letting go during the count keeps the network.
+buttons). The middle orb (orb 3) counts down 5, 4, 3, 2, 1; keep holding until it shows `WiFi forgotten`, and the orbs forget the network and open the setup network again. Letting go during the count keeps the network.
 The orbs remember only one network at a time.
 
 If the orbs cannot join, orbs 4 and 5 say why. The user guide covers

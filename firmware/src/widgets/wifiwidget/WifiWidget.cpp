@@ -13,6 +13,7 @@
 
 const int lineHeight = 40;
 const int statusScreenIndex = 3;
+const int countdownScreenIndex = 2; // orb 3, the middle: easiest to find (#60)
 const int fontSize = 19;
 const int messageDelay = 5000;
 const int maxLineWidth = 200; // clears the round edge on every line the portal screens use
@@ -78,9 +79,10 @@ void WifiWidget::drawConnecting() {
     m_manager.drawCenterString("Connecting", ScreenCenterX, ScreenCenterY - lineHeight, fontSize);
 }
 
-// Before the boot eyes start, so this is the only thing drawing on orb 4
-void WifiWidget::forgetWifiCountdown(bool showConnecting) {
-    m_manager.selectScreen(statusScreenIndex);
+// On orb 3, the middle, before the boot eyes start, so nothing else draws
+// there meanwhile. Orb 4 keeps its "Connecting".
+void WifiWidget::forgetWifiCountdown() {
+    m_manager.selectScreen(countdownScreenIndex);
     m_manager.clearScreen();
     m_manager.drawCenterString("Keep holding", ScreenCenterX, ScreenCenterY - 50, fontSize);
     m_manager.drawCenterString("to forget WiFi", ScreenCenterX, ScreenCenterY - 22, fontSize);
@@ -111,14 +113,10 @@ void WifiWidget::forgetWifiCountdown(bool showConnecting) {
         m_manager.drawCenterString("WiFi kept", ScreenCenterX, ScreenCenterY, fontSize);
         delay(1500);
     }
-    if (showConnecting) {
-        drawConnecting(); // what begin() put there before the countdown
-    } else {
-        m_manager.clearScreen(); // the boot eyes draw here next
-    }
+    m_manager.clearScreen(); // the boot picture or the eyes' nose goes here next
 }
 
-void WifiWidget::begin(bool showConnecting) {
+bool WifiWidget::begin(bool showConnecting) {
     m_manager.setFont(DEFAULT_FONT);
     m_manager.setFontColor(TFT_WHITE);
     if (showConnecting) {
@@ -188,10 +186,12 @@ void WifiWidget::begin(bool showConnecting) {
     wifimgr.setMenu(wm_menu);
 
     // Right held at power-up: forget the saved WiFi (stored by the ESP WiFi
-    // library), but only after a "3, 2, 1" the hand can still let go during
-    // (ForgetCountdown.h, issue #60)
+    // library), but only after a "5, 4, 3, 2, 1" the hand can still let go
+    // during (ForgetCountdown.h, issue #60)
+    bool countedDown = false;
     if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {
-        forgetWifiCountdown(showConnecting);
+        forgetWifiCountdown();
+        countedDown = true;
     }
 
     // Set WiFiManager to non-blocking so status and info can be displayed
@@ -212,6 +212,7 @@ void WifiWidget::begin(bool showConnecting) {
     // portal runs, so fewer, shorter attempts lose nothing.
     wifimgr.setConnectTimeout(15); // seconds per attempt
     wifimgr.setConnectRetries(3);
+    return countedDown;
 }
 
 bool WifiWidget::connect() {

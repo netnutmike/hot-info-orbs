@@ -4,17 +4,17 @@
 #include "TempestParse.h"
 #include <HTTPClient.h>
 
-TempestStatus TempestSource::s_status[TempestSource::SLOTS];
+static StationStatus s_status[kStationSlots];
+
+StationStatus &stationStatus(int slot) {
+    return s_status[slot];
+}
 
 TempestSource::TempestSource(int slot, uint32_t stationId, const std::string &label)
     : m_slot(slot), m_station(stationId), m_label(label.c_str()) {}
 
-const TempestStatus &TempestSource::status(int slot) {
-    return s_status[slot];
-}
-
 bool TempestSource::fetch(WeatherDataModel &model) {
-    TempestStatus st;
+    StationStatus st;
     st.attempted = true;
     uint32_t start = millis();
     bool metric = Settings::get().wxmetric;
@@ -45,7 +45,7 @@ bool TempestSource::fetch(WeatherDataModel &model) {
     st.ms = millis() - start;
     st.at = millis();
     st.freeHeap = ESP.getFreeHeap();
-    s_status[m_slot] = st;
+    stationStatus(m_slot) = st;
     if (!st.ok) {
         Serial.printf("Tempest %s: %s\n", m_label.c_str(), st.error.c_str());
         return false; // the model keeps the previous data

@@ -3,15 +3,19 @@
 #include "GlobalTime.h"
 #include "InfoPage.h"
 #include "OtaUpdater.h"
+#include "PageLock.h"
 #include "ScreenManager.h"
 #include "Settings.h"
 #include "SettingsPage.h"
+#include "TimeSyncWatch.h"
 #include "Utils.h"
 #include "WidgetSet.h"
 #include "clockwidget/ClockWidget.h"
 #include "config_helper.h"
 #include "icons.h"
 #include "mqttwidget/MQTTWidget.h"
+#include "weatherwidget/AmbientSource.h"
+#include "weatherwidget/StationTypes.h"
 #include "weatherwidget/TempestSource.h"
 #include "weatherwidget/VisualCrossingSource.h"
 #include "weatherwidget/WeatherWidget.h"
@@ -39,6 +43,9 @@ Button buttonOK(BUTTON_OK);
 Button buttonRight(BUTTON_RIGHT);
 
 GlobalTime *globalTime; // Initialize the global time
+devlog::TimeSyncWatch s_timeSync; // logs a missing or overdue time sync (issue #52)
+devlog::SyncKick s_syncKick; // asks again every 15 s while there is no real time
+uint32_t s_syncsSeen = 0; // time syncs the pages have been told about
 
 String connectingString{""};
 
@@ -46,6 +53,7 @@ WifiWidget *wifiWidget{nullptr};
 OtaUpdater *otaUpdater{nullptr};
 SettingsPage *settingsPage{nullptr};
 InfoPage *infoPage{nullptr}; // on the orbs: hold the middle button 2 seconds
+pagelock::PageLock s_pageLock; // hold left and right 2 seconds: stay on this page (#58)
 
 int connectionTimer{0};
 const int connectionTimeout{10000};
@@ -196,7 +204,11 @@ void setup() {
     infoPage = new InfoPage(*sm, *widgetSet);
     // Every splash screen is drawn before the eyes start: from here until
     // BootEyes::finish the eye task is the only thing drawing
-    wifiWidget->begin(!eyesWanted);
+    // The forget-WiFi countdown (#60) draws on orb 3 and leaves it blank:
+    // without the eyes the boot picture goes back; with them the nose does
+    if (wifiWidget->begin(!eyesWanted) && !eyesWanted) {
+        drawBootPicture();
+    }
     bool eyesRan = false;
 #ifdef BOOT_EYES
     if (eyesWanted) {
@@ -239,22 +251,30 @@ void setup() {
         widgetSet->add(new StockWidget(*sm));
     }
 #endif
-    bool tempestPages = false;
-    // One weather page per Tempest station, plus Visual Crossing for the
-    // location whenever a VC key is set (a third place, e.g. a town away from
-    // the stations). With Tempest pages and no VC key, VC is left out: it
-    // would only show a key error. A station without a token would fail every
-    // fetch with 401, so it gets no page (the settings page says why).
+    bool stationPages = false;
+    // One weather page per station (Tempest or Ambient, issue #51), plus
+    // Visual Crossing for the location whenever a VC key is set (a third
+    // place, e.g. a town away from the stations). With station pages and no VC
+    // key, VC is left out: it would only show a key error. A station without
+    // its account keys would fail every fetch with 401, so it gets no page
+    // (the settings page says why).
     const SettingsValues &wx = Settings::get();
-    if (!wx.tsttok.empty() && wx.tstn1) {
-        widgetSet->add(new WeatherWidget(*sm, new TempestSource(0, wx.tstn1, wx.tlbl1)));
-        tempestPages = true;
-    }
-    if (!wx.tsttok.empty() && wx.tstn2) {
-        widgetSet->add(new WeatherWidget(*sm, new TempestSource(1, wx.tstn2, wx.tlbl2)));
-        tempestPages = true;
-    }
-    if (!tempestPages || !wx.wxkey.empty()) {
+    auto addStation = [&](int slot, int type, uint32_t id, const std::string &mac, const std::string &label) {
+        const stations::Type t = stations::typeFrom(type);
+        if (!stations::slotUsed(t, id, mac, label)) {
+            return;
+        }
+        if (t == stations::Type::Tempest && !wx.tsttok.empty()) {
+            widgetSet->add(new WeatherWidget(*sm, new TempestSource(slot, id, label)));
+            stationPages = true;
+        } else if (t == stations::Type::Ambient && !wx.awapp.empty() && !wx.awkey.empty()) {
+            widgetSet->add(new WeatherWidget(*sm, new StationPage(slot, new AmbientSource(mac), label)));
+            stationPages = true;
+        }
+    };
+    addStation(0, wx.sttype1, wx.tstn1, wx.stmac1, wx.tlbl1);
+    addStation(1, wx.sttype2, wx.tstn2, wx.stmac2, wx.tlbl2);
+    if (!stationPages || !wx.wxkey.empty()) {
         widgetSet->add(new WeatherWidget(*sm, new VisualCrossingSource()));
     }
     // Custom pages: set up on /settings, registered only when configured.
@@ -326,6 +346,26 @@ void checkButtons() {
         }
         return;
     }
+    // Left and right down together for 2 seconds: lock or unlock the page
+    // (issue #58, PageLock.h). Both buttons' presses in such a hold, the
+    // release included, do nothing else. Works from the info page too, and
+    // closes it, so the note is seen.
+    const pagelock::Step lock = s_pageLock.step(millis(), buttonLeft.heldFor(0), buttonRight.heldFor(0));
+    if (lock.event != pagelock::Event::None) {
+        const bool locked = lock.event == pagelock::Event::Locked;
+        Serial.printf("Left and right held -> page %s\n", locked ? "locked" : "unlocked");
+        DeviceLog::note("page %s by the buttons", locked ? "locked" : "unlocked");
+        if (infoPage->isOpen()) {
+            leaveInfoPage();
+        }
+        widgetSet->setPageLock(locked);
+        m_widgetCycleDelayPrev = millis();
+    }
+    if (lock.swallow) {
+        buttonLeft.getState(); // read and dropped: part of the hold
+        buttonRight.getState();
+        return;
+    }
     // The middle button down for 2 seconds: the info page, from any page, while
     // the finger is still on the button
     if (buttonOK.heldFor(Button::LONG_PRESS_TIME) && infoPage->hold()) {
@@ -336,7 +376,7 @@ void checkButtons() {
     // The hold that opened it being let go is not a press (Ignored).
     if (infoPage->isOpen()) {
         const ButtonState middleState = buttonOK.getState();
-        bool closed = middleState != BTN_NOTHING && infoPage->press(true, middleState == BTN_LONG) == infopage::Press::Closed;
+        bool closed = middleState != BTN_NOTHING && infoPage->press(true, middleState == BTN_HOLD) == infopage::Press::Closed;
         bool side = buttonLeft.getState() != BTN_NOTHING;
         side = buttonRight.getState() != BTN_NOTHING || side;
         if (!closed && side && infoPage->isOpen()) {
@@ -348,46 +388,39 @@ void checkButtons() {
         }
         return;
     }
-    // Reset cycle timer whenever a button is pressed
-    if (buttonLeft.pressedShort()) {
-        // Left short press cycles widgets backward
-        Serial.println("Left button short pressed -> switch to prev Widget");
+    // One job per button and gesture (issue #60, PressPolicy.h). A tap is any
+    // release under 2 s; a left or right hold does nothing on its own. Every
+    // button is read on every pass and each press it holds is acted on, so
+    // presses made during a slow pass (a data fetch) are not dropped. A handled
+    // press restarts the rotation timer.
+    const ButtonState leftState = buttonLeft.getState();
+    const ButtonState middleState = buttonOK.getState();
+    const ButtonState rightState = buttonRight.getState();
+    if (leftState == BTN_TAP) {
+        Serial.println("Left tap -> previous page");
         m_widgetCycleDelayPrev = millis();
         widgetSet->prev();
-    } else if (buttonRight.pressedShort()) {
-        // Right short press cycles widgets forward
-        Serial.println("Right button short pressed -> switch to next Widget");
+    }
+    if (rightState == BTN_TAP) {
+        Serial.println("Right tap -> next page");
         m_widgetCycleDelayPrev = millis();
         widgetSet->next();
-    } else {
-        ButtonState leftState = buttonLeft.getState();
-        ButtonState middleState = buttonOK.getState();
-        ButtonState rightState = buttonRight.getState();
-
-        // Everying else that is not BTN_NOTHING will be forwarded to the current widget
-        if (leftState != BTN_NOTHING) {
-            Serial.printf("Left button pressed, state=%d\n", leftState);
-            m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_LEFT, leftState);
-        } else if (middleState != BTN_NOTHING) {
-            Serial.printf("Middle button pressed, state=%d\n", middleState);
-            m_widgetCycleDelayPrev = millis();
-            // A 2 second hold is the info page's (opened above while it was
-            // still down, or here if the loop was busy then). The page on show
-            // does not get that hold.
-            if (infoPage->press(true, middleState == BTN_LONG) == infopage::Press::PassOn) {
-                widgetSet->buttonPressed(BUTTON_OK, middleState);
-            }
-        } else if (rightState != BTN_NOTHING) {
-            Serial.printf("Right button pressed, state=%d\n", rightState);
-            m_widgetCycleDelayPrev = millis();
-            widgetSet->buttonPressed(BUTTON_RIGHT, rightState);
+    }
+    if (middleState != BTN_NOTHING) {
+        m_widgetCycleDelayPrev = millis();
+        // A 2 second hold is the info page's (opened above while it was still
+        // down, or here if the loop was busy then). The page on show only
+        // gets taps.
+        if (infoPage->press(true, middleState == BTN_HOLD) == infopage::Press::PassOn) {
+            Serial.println("Middle tap -> the page's action");
+            widgetSet->middleTap();
         }
     }
 }
 
 void loop() {
     DeviceLog::tick(); // writes the events waiting; first, so every path below gets it
+    Settings::tick(); // a clock face picked with the middle button, once the taps stop (#60)
     if (wifiWidget->isConnected() == false) {
         wifiWidget->update();
         {
@@ -433,8 +466,25 @@ void loop() {
         wifiWidget->rejoinIfDown();
         globalTime->updateTime();
         DeviceLog::clock(globalTime->getUnixEpoch());
+        {
+            const std::string news =
+                s_timeSync.step(millis() / 1000, globalTime->syncCount(), globalTime->lastSyncUpSeconds());
+            if (!news.empty()) {
+                DeviceLog::note("%s", news.c_str());
+            }
+        }
+        if (s_syncKick.step(millis(), globalTime->syncCurrent(), wifiWidget->linkUp())) {
+            globalTime->kickSync();
+        }
+        if (globalTime->syncCount() != s_syncsSeen) {
+            s_syncsSeen = globalTime->syncCount();
+            widgetSet->timeSynced(); // the internet is up: failed pages refresh now
+        }
 
         checkButtons();
+        if (s_pageLock.noteEnded(millis())) {
+            widgetSet->endLockNote(); // "Locked" / "Unlocked" comes off
+        }
 
         widgetSet->setLinkUp(wifiWidget->linkUp());
         if (!infoPage->isOpen()) {
@@ -445,7 +495,7 @@ void loop() {
                 feed->service(); // values current when a page comes up
             }
         }
-        widgetSet->updateBrightnessByTime(globalTime->getHour24() * 60 + globalTime->getMinute());
+        widgetSet->updateBrightnessByTime(globalTime->timeValid() ? globalTime->getHour24() * 60 + globalTime->getMinute() : -1);
         if (infoPage->isOpen()) {
             // The info page has the orbs: the rotation waits. It closes on any
             // button (checkButtons), after a minute, or when the panels go off.

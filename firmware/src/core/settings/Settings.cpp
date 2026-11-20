@@ -1,5 +1,6 @@
 #include "Settings.h"
 
+#include "SaveDelay.h"
 #include "SettingsValidation.h"
 #include "Utils.h"
 #include "clockwidget/ClockWidget.h"
@@ -89,6 +90,8 @@ SettingsValues Settings::defaults() {
 #else
     d.tlbl2 = "";
 #endif
+    d.sttype1 = d.sttype2 = 0;
+    d.stmac1 = d.stmac2 = "";
     d.hidden = "";
     d.wificlock = false;
     // Custom pages: the old build-time defines are now defaults, so a build
@@ -148,6 +151,7 @@ SettingsValues Settings::defaults() {
 #else
     d.tsttok = "";
 #endif
+    d.awapp = d.awkey = ""; // no build-time default: page only
     return d;
 }
 
@@ -190,6 +194,11 @@ void Settings::load() {
             v.tlbl1 = p.getString("tlbl1", v.tlbl1.c_str()).c_str();
             v.tstn2 = p.getUInt("tstn2", v.tstn2);
             v.tlbl2 = p.getString("tlbl2", v.tlbl2.c_str()).c_str();
+            // Station types: added 2026-11-18 (issue #51); absent = Tempest
+            v.sttype1 = p.getInt("sttype1", v.sttype1);
+            v.sttype2 = p.getInt("sttype2", v.sttype2);
+            v.stmac1 = p.getString("stmac1", v.stmac1.c_str()).c_str();
+            v.stmac2 = p.getString("stmac2", v.stmac2.c_str()).c_str();
             v.hidden = p.getString("hidden", v.hidden.c_str()).c_str();
             v.wificlock = p.getBool("wificlock", v.wificlock); // added 2026-11-14; absent = default
             // Custom pages: added after schema 1 without a bump, like tstn1
@@ -210,6 +219,8 @@ void Settings::load() {
             // that saved before this firmware keeps its secrets.h keys
             v.wxkey = p.getString("wxkey", v.wxkey.c_str()).c_str();
             v.tsttok = p.getString("tsttok", v.tsttok.c_str()).c_str();
+            v.awapp = p.getString("awapp", v.awapp.c_str()).c_str();
+            v.awkey = p.getString("awkey", v.awkey.c_str()).c_str();
             for (int i = 0; i < 5; i++) {
                 char k[8];
                 snprintf(k, sizeof(k), "mqt%d", i + 1);
@@ -236,6 +247,9 @@ void Settings::load() {
                 v.mq2u[i] = p.getString(k, v.mq2u[i].c_str()).c_str();
             }
         }
+        // The middle button writes the face alone (saveFaceSoon), maybe on an
+        // orb whose page was never saved, so it is read without "schema" too
+        v.face = p.getInt("face", v.face);
         p.end();
     }
     s_values = v;
@@ -291,7 +305,9 @@ bool Settings::save(const SettingsValues &v) {
          putStr("mqhost", v.mqhost) && p.putInt("mqport", v.mqport) && putStr("mquser", v.mquser) &&
          putStr("mqpass", v.mqpass) && putStr("mqsetup", v.mqsetup) && p.putBool("mqfit", v.mqfit) == 1 &&
          p.putBool("mq2fit", v.mq2fit) == 1 && p.putInt("mqsize", v.mqsize) && p.putInt("mq2size", v.mq2size) &&
-         putStr("wxkey", v.wxkey) && putStr("tsttok", v.tsttok);
+         putStr("wxkey", v.wxkey) && putStr("tsttok", v.tsttok) && putStr("awapp", v.awapp) && putStr("awkey", v.awkey) &&
+         p.putInt("sttype1", v.sttype1) && p.putInt("sttype2", v.sttype2) && putStr("stmac1", v.stmac1) &&
+         putStr("stmac2", v.stmac2);
     for (int i = 0; ok && i < 5; i++) {
         char k[8];
         snprintf(k, sizeof(k), "mqt%d", i + 1);
@@ -331,4 +347,24 @@ bool Settings::factoryReset() {
 
 bool Settings::hasStored() {
     return s_stored;
+}
+
+// --- the clock face from the middle button (issue #60) ---
+
+static savedelay::SaveDelay s_faceSave;
+
+void Settings::saveFaceSoon(int face) {
+    s_values.face = face; // the settings page shows it from now on
+    s_faceSave.changed(millis());
+}
+
+void Settings::tick() {
+    if (!s_faceSave.due(millis())) {
+        return;
+    }
+    Preferences p;
+    bool ok = p.begin(NS, false);
+    ok = ok && p.putInt("face", s_values.face) > 0;
+    p.end();
+    Serial.printf("Settings: clock face %d %s\n", s_values.face, ok ? "saved" : "NOT saved");
 }

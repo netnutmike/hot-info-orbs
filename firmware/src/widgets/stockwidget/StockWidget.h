@@ -18,9 +18,10 @@ public:
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void buttonPressed(uint8_t buttonId, ButtonState state) override;
+    void middleTap() override;
     String getName() override;
     bool dataStale() override { return m_fresh.stale(); }
+    bool fetchFailed() override { return m_fresh.lastFailed(); }
     const char *dataKind() override { return "stocks"; }
     stale::LastGood lastGood() override { return m_fresh.lastGood(); }
     uint8_t dataOrbs() override { return (uint8_t)((1u << m_stockCount) - 1); } // one orb per ticker

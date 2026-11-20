@@ -20,7 +20,7 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 - [When WiFi goes down](#when-wifi-goes-down)
 - [Changing the WiFi network](#changing-the-wifi-network)
 - [Running from a phone hotspot](#running-from-a-phone-hotspot)
-- [Weather from your own Tempest stations](#weather-from-your-own-tempest-stations)
+- [Weather from your own station](#weather-from-your-own-station)
 - [Dimming and switching off at night](#dimming-and-switching-off-at-night)
 - [The log](#the-log)
 - [The password](#the-password)
@@ -30,13 +30,16 @@ In this guide the five displays are **orb 1 to orb 5, left to right**, and
 
 ## The three buttons
 
-| Button | Press | What it does |
+Every press is a **tap** or a **hold**. A tap is any press you let go of
+within 2 seconds, quick or slow. A hold is 2 seconds or more.
+
+| Button | Tap | Hold 2 seconds |
 |---|---|---|
-| **Left** | short | previous page |
-| **Right** | short | next page |
-| **Middle** | short, or about half a second | depends on the page showing: see the table below |
-| **Middle** | hold 2 seconds | the [info page](#the-info-page) |
-| **Right** | hold while plugging in power | forget the WiFi network: see [Changing the WiFi network](#changing-the-wifi-network) |
+| **Left** | previous page | nothing |
+| **Right** | next page | nothing |
+| **Middle** | the page's action: see the table below | the [info page](#the-info-page) |
+| **Left and right together** | | lock the orbs on this page; the same again unlocks: see [Locking a page](#locking-a-page) |
+| **Right** while plugging in power | | forget the WiFi network, after a 5-second countdown on the middle orb: see [Changing the WiFi network](#changing-the-wifi-network) |
 
 The buttons keep their places when the orbs are set to **Upside down**: on an
 upside-down set, "left" and "right" here are the buttons that are on the left
@@ -45,18 +48,19 @@ and right when the orbs are the right way up.
 Left and right move only between the pages ticked under **Rotation > Show** on
 the settings page.
 
-The middle button on each page:
+A tap on the middle button on each page:
 
-| Page | Short press | Half-second press |
-|---|---|---|
-| Clock | next clock face | switch 12-hour / 24-hour |
-| Weather | orb 5 switches between the three-day highs and lows | |
-| Stocks | fetch the prices now | |
-| MQTT | draw the page again | |
-| Web Data | | |
+| Page | Middle tap |
+|---|---|
+| Clock | next clock face |
+| Weather | orb 5 switches between the three-day highs and lows |
+| Stocks | fetch the prices now |
+| MQTT | draw the page again (MQTT values arrive by themselves, so there is nothing to fetch) |
+| Web Data | fetch the data now |
 
-A clock face or 12/24-hour choice made with the button lasts until the orbs
-next restart. To keep it, set it on the settings page.
+The orbs keep a clock face picked with the button through a restart. They
+save it a few seconds after your last tap, so the settings page shows the
+same face. 12-hour or 24-hour is set on the settings page only.
 
 **During screens-off hours** the first press of any button only wakes the
 screens for a minute. Press again to do something.
@@ -74,13 +78,31 @@ Each page uses all five orbs.
 | **MQTT** (up to two) | A page of your own: one live value on each orb from an MQTT broker, such as Home Assistant. |
 
 Weather has one page for your town (Visual Crossing) and one for each
-[Tempest station](#weather-from-your-own-tempest-stations) you add. Web Data
+[weather station](#weather-from-your-own-station) you add (Tempest or
+Ambient Weather). Web Data
 and MQTT pages are set up on the settings page under **Advanced**;
 [CUSTOM-PAGES.md](CUSTOM-PAGES.md) has the format and Home Assistant recipes.
 
 **Staying on one page, or rotating.** New orbs stay on one page until you
 press a button. To rotate by themselves, set **Rotation > Seconds per page**
 on the settings page.
+
+### Locking a page
+
+**Hold left and right together for 2 seconds** to keep the orbs on the page
+they show: the rotation stops. The middle orb shows **Locked** for a moment,
+and a small padlock stays at the bottom of it while the lock is on. Do the
+same again to unlock: the middle orb shows **Unlocked** and the padlock goes.
+
+- Letting go of the two buttons does nothing else: it does not change the page.
+- Left and right still change pages while locked, and the lock stays on the
+  page you move to.
+- **Clock only when WiFi is out** still takes over during an outage; the
+  locked page comes back after it.
+- A restart clears the lock.
+- **Don't hold both buttons while plugging the orbs in.** Holding right at
+  power-up starts the countdown to forget the WiFi network (let go to keep
+  it). A hold carried over from power-up never locks.
 
 **How often the data refreshes.** Weather every 10 minutes and stocks every
 15 minutes, **while their page is on screen**. A page that is not on screen
@@ -175,9 +197,9 @@ Your settings stay through restarts, power cuts and
 
 | Section | What is in it |
 |---|---|
-| **API keys** | Your free [Visual Crossing](https://www.visualcrossing.com/sign-up) weather key, and a Tempest token if you have a station. Once saved, a key shows as stars. Leave the box alone to keep the key, or paste a new one to replace it. |
+| **API keys** | Your free [Visual Crossing](https://www.visualcrossing.com/sign-up) weather key, and your station's keys if you have one (a Tempest token, or Ambient Weather's two keys). Once saved, a key shows as stars. Leave the box alone to keep the key, or paste a new one to replace it. |
 | **Time zone and location** | **Time zone**: pick from the list. Daylight saving is automatic. **Weather location**: your town, such as `Orlando, FL`. The page cannot check the town; a wrong one shows up as an empty weather page. |
-| **Tempest stations** | See [Weather from your own Tempest stations](#weather-from-your-own-tempest-stations). |
+| **Weather stations** | See [Weather from your own station](#weather-from-your-own-station). |
 | **Mounting** | **Upside down** turns the screens over and reverses the order of the orbs, for a set mounted the other way up. The buttons do not move: left is still the button that is on the left when the orbs are the right way up. |
 
 ### Display: what the orbs show
@@ -185,7 +207,7 @@ Your settings stay through restarts, power cuts and
 | Section | What is in it |
 |---|---|
 | **Rotation** | **Seconds per page**: 0 stays on one page; 5 to 3600 moves to the next page after that many seconds. **Show**: tick the pages you want. Tick one to keep it on screen, or several to rotate through them. **Clock only when WiFi is out**: Off keeps the page up with its marks; On switches to the clock while WiFi is down. See [the marks](#what-the-amber-and-red-marks-mean). |
-| **Clock** | The clock face at start-up, 12-hour or 24-hour, the AM/PM mark, the digit color and the color of the unlit segments. |
+| **Clock** | The clock face (a middle tap on the clock page changes it too), 12-hour or 24-hour, the AM/PM mark, the digit color and the color of the unlit segments. |
 | **Weather** | °F and mph, or °C and km/h. Light or dark screens. |
 | **Stocks** | One to five tickers, with commas between them, one per orb. Crypto is written `BTC/USD`. To pick an exchange, add the country: `APC&country=Germany`. |
 | **Dim times**, **Screens-off times** | See [Dimming and switching off at night](#dimming-and-switching-off-at-night). |
@@ -331,10 +353,15 @@ they never restart under you while you are typing a password.
 The orbs remember **one** WiFi network. To move them to another:
 
 1. Unplug the orbs.
-2. Hold the **right** button and plug them back in. Let go when orb 4 shows
-   `Wifi Settings reset`. On a set mounted upside down, this is the button on
-   the left as you look at it: the buttons do not move with the **Upside
-   down** setting.
+2. Hold the **right** button and plug them back in. The middle orb (orb 3)
+   shows `Keep holding to forget WiFi` and counts down 3, 2, 1 over 5 seconds. Keep
+   holding until it shows `WiFi forgotten`, then let go. If you let go during
+   the count, it shows `WiFi kept` and nothing changes, so a thumb resting on
+   the button while you plug in can't wipe the network by accident. Only the
+   WiFi network and its password are forgotten: every setting on the settings
+   page stays as it was. On a set mounted
+   upside down, this is the button on the left as you look at it: the buttons
+   do not move with the **Upside down** setting.
 3. The orbs start their own setup network. Orb 5 shows its name:
    `Info-Orbs_` and two characters, such as `Info-Orbs_84`. Yours will have
    its own two characters.
@@ -370,19 +397,46 @@ Pages that read from something on your home network, such as an MQTT broker,
 show no data while the orbs are on the hotspot. Untick them under
 **Rotation > Show** for the day.
 
-## Weather from your own Tempest stations
+## Weather from your own station
 
-If you own a WeatherFlow Tempest station, the orbs can show its weather: one
-weather page per station, up to two. If a Visual Crossing key is also set,
-your town keeps its own page as well. Without that key only the Tempest pages
-show.
+If you own a WeatherFlow Tempest or an Ambient Weather station, the orbs can
+show its weather: one weather page per station, up to two, of either kind.
+If a Visual Crossing key is also set, your town keeps its own page as well.
+Without that key only the station pages show.
+
+Under **Weather stations**, pick each station's **type** first; the page then
+asks for that type's ID.
+
+**Tempest**
 
 1. Get a token: tempestwx.com > Settings > Data Authorizations > Create
    Token. On the settings page, paste it under **API keys > Tempest token**.
-2. Find each station's ID: it is the number in the station's tempestwx.com
-   address. Enter it under **Tempest stations** with a short label, 16
-   characters at most. The label shows in place of the town name.
+2. Find the station's ID: it is the number in the station's tempestwx.com
+   address. Enter it as the **Station ID** with a short label, 16 characters
+   at most. The label shows in place of the town name.
 3. Press **Save and restart**.
+
+**Ambient Weather**
+
+An Ambient station sends its readings but no forecast, so its page takes the
+temperature and the readings (feels like, humidity, wind) from the station,
+and the words, the picture, today's high and low, sunrise and sunset and the
+next three days from **Visual Crossing**, at the station's own location. Set
+the Visual Crossing key as well; without it the page shows the temperature
+only, and the settings page says so.
+
+1. Make two keys on **ambientweather.net** (the `.net` site, not `.com`),
+   on your account page: an **API Key** and an **Application Key**. They are
+   two different kinds; two API Keys do not work. Paste both under
+   **API keys**.
+2. Give the station a short label, 16 characters at most. Leave **Station
+   MAC** blank if the account has one station: the page uses it, and after
+   the first fetch the settings page shows its name and MAC. With several
+   stations on the account, the settings page lists them; copy the MAC of
+   the one you want.
+3. Press **Save and restart**.
+
+To remove an Ambient page, blank both the MAC and the label.
 
 Afterwards each station shows ✔ or ✖ on the settings page for its last
 fetch, how long ago that was, and the error if it failed.

@@ -1,6 +1,8 @@
 #include "StockWidget.h"
 #include "DeviceLogStore.h"
 
+#include "GlobalTime.h"
+#include "NoData.h"
 #include "Settings.h"
 #include "config_helper.h"
 #include <ArduinoJson.h>
@@ -75,9 +77,8 @@ void StockWidget::changeMode() {
     update(true);
 }
 
-void StockWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
-    if (buttonId == BUTTON_OK && state == BTN_SHORT)
-        changeMode();
+void StockWidget::middleTap() {
+    changeMode();
 }
 
 bool StockWidget::getStockData(StockDataModel &stock) {
@@ -124,7 +125,15 @@ bool StockWidget::getStockData(StockDataModel &stock) {
 void StockWidget::displayStock(int8_t displayIndex, StockDataModel &stock, uint32_t backgroundColor, uint32_t textColor) {
     Serial.println("displayStock - " + stock.getSymbol() + " ~ " + stock.getCurrentPrice());
     if (stock.getCurrentPrice() == 0.0) {
-        // There isn't any data to display yet
+        // No price for it since power-on: say so, not a dark orb
+        m_manager.selectScreen(displayIndex);
+        m_manager.fillScreen(TFT_BLACK);
+        m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
+        m_manager.drawString(stock.getSymbol(), 120, 85, 29, Align::MiddleCenter);
+        m_manager.setFontColor(stale::kAmber, TFT_BLACK);
+        m_manager.drawString("No price yet", 120, 130, 20, Align::MiddleCenter);
+        m_manager.setFontColor(TFT_WHITE, TFT_BLACK);
+        m_manager.drawString(nodata::reason(GlobalTime::getInstance()->syncCurrent()), 120, 160, 16, Align::MiddleCenter);
         return;
     }
     m_manager.selectScreen(displayIndex);

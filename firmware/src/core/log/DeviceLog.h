@@ -91,7 +91,7 @@ inline bool needsRotate(size_t fileSize, size_t addSize, size_t cap = kFileCap) 
     return fileSize > 0 && fileSize + addSize > cap;
 }
 
-// False until the first time sync: the clock library counts up from zero
+// False until the first time sync: the system clock counts up from zero
 // until then, plus or minus the time zone. Any date after 2023 is a real one.
 inline bool clockSet(int64_t localEpoch) {
     return localEpoch > 1700000000;

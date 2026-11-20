@@ -28,10 +28,11 @@ public:
     void setup() override;
     void update(bool force = false) override;
     void draw(bool force = false) override;
-    void buttonPressed(uint8_t buttonId, ButtonState state) override;
+    void middleTap() override;
     String getName() override;
     static const WebDataStatus &status();
     bool dataStale() override { return m_fresh.stale(); }
+    bool fetchFailed() override { return m_fresh.lastFailed(); }
     const char *dataKind() override { return "web data"; }
     stale::LastGood lastGood() override { return m_fresh.lastGood(); }
 

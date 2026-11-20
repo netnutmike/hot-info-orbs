@@ -877,3 +877,147 @@ overwriting, and nothing is killed. Test a binary with `"$f" --version; echo $?`
 **Not established:** whether it recurs on the next launch, now that the file
 exists again and will be overwritten in place. Check for new
 `nrfutil-*.ips` files before trusting the launcher.
+
+## A failing time sync freezes the clock colon and stalls the buttons (issue #52, 2026-11-18)
+
+Reproduced on the rig (XIAO, debug build e7e799c) by blocking only the orb's
+traffic at the router, WiFi left up. The time pages were rotating as usual.
+
+- **Internet blocked, DNS still answering (14:15:27):** the log showed
+  `time sync failed (1021 ms), retrying every pass` at 14:16:07, and Scott saw
+  the colon freeze at 2:16: stuck off, then stuck on at 2:17. HTTP latency to
+  the orb rose from 0.33 s mean to 0.68 s, with a 1.9 s max.
+- **DNS to the gateway blocked as well, so a real outage (14:17:41):** passes
+  of 8.7 s, of which the time sync took 8.0 s (DNS lookup timeout plus the 1 s
+  wait). HTTP requests timed out at 6 s. Scott: "it freezes and also seems to
+  prevent the buttons from working normally."
+- **Unblocked at 14:19:37:** `time sync ok again after 71 failures in 220 s,
+  121613 ms blocked`, logged at 14:19:48. The orb spent 2 of those 3.7 minutes
+  waiting on the time sync.
+
+**Why the colon freezes even when no pass takes 2 s:**
+- `GlobalTime::updateTime()` refreshes every time field, the seconds
+  included, only inside its once-a-second gate, and that same gate calls
+  `NTPClient::update()`.
+- arduino-libraries/NTPClient 3.2.1 does not record a failed attempt, so it
+  tries again on every gate. Each try costs at least 1 s: 101 × `delay(10)`,
+  plus the DNS lookup `beginPacket()` does every time.
+- So the seconds advance about every 2 s, in steps of 2. The colon (lit on
+  even seconds, `ClockWidget.cpp:58`) sticks on one parity and flips when a
+  step drifts to 1 or 3.
+- The buttons are caught by interrupts but acted on once per pass, so a
+  press waits for the pass to end.
+
+**The debug build's slow-loop watch missed stage 1.** It counts *consecutive*
+passes over 1 s, but only the pass carrying the sync is slow, and the
+gate-skipping passes between are fast. The sync-failure line is the one that
+names the cause. Stage 2 tripped the watch only because its passes were long.
+
+**Not yet established:** what makes Yang's and the rig's syncs fail in normal
+running (a time server or DNS hiccup of about 30 s fits the reported
+duration).
+
+**Fixed on `fix/52-sntp`:** NTPClient is gone. The ESP32's own SNTP syncs in
+the background (`configTzTime`, every 15 min), and `updateTime()` reads the
+system clock on every call, so a failed sync can't hold the loop or skip a
+second. `TimeSyncWatch` logs "no time sync yet" (120 s after start) and "no
+time sync for N min" (35 min), each once, then the recovery. Rejected keeping
+NTPClient with a back-off: every retry would still block 1 s, or 8 s with DNS
+down, so the freeze only gets rarer.
+
+**Tested on hardware 2026-11-18 (da306cd), same router test:** I blocked the
+orb's internet and DNS first, then flashed it, so it booted with no way to sync.
+- **No stalls while blocked.** 67 web requests averaged 0.31 s (max 0.88 s); the
+  old build held each pass 8.7 s in the same state. Scott watched the clock.
+- **Log:** "no time sync yet, 120 s after start", once, at 2:00 of uptime.
+- **Clock wrong until the first sync:** it showed 2:26 at about 14:40. Where
+  that time came from is not established. The log has no "clock set" line, so
+  the system clock was never valid in that boot.
+- **A restart keeps the system clock: still unverified** (the da306cd commit
+  message asserts it). The old firmware never set the system clock, so this
+  restart had nothing to keep. Test it on the next restart after a sync.
+- **Recovery was slow:** the blocks came off at 14:39:36, but the first sync
+  ("time sync ok, first one 394 s after start") came at 14:43:11, 3.5 min
+  later. Stocks came back on their own timer at 14:43:04. Cause not
+  established. lwIP SNTP backs its retries off from 15 s to 150 s
+  (`SNTP_RETRY_TIMEOUT_EXP`, max 10 × `SNTP_RECV_TIMEOUT`), which accounts for
+  at most 150 s. Stocks recovering 7 s earlier hints the path itself came back
+  late. The debug build recovered 11 s after the same unblock, but it retried
+  on every pass. Weather came back at 14:48:09 on its own ~10 min retry
+  ("ok again after 639 s"), so a dark weather page for up to 10 min after
+  the internet returns is that timer, not this fix.
+- **Separate from #52:** one 6.1 s stall at 14:42:53, during the stocks
+  fetch. Data fetches still run on the loop.
+
+**Not done at da306cd (Scott, 2026-11-18):** the freeze was gone, but with no
+internet the orb still showed a made-up time as if real, took minutes to
+correct it, and left weather dark. 5f85db5 and ac96aa5 fix that:
+- "No time" face (dashes on every clock face) until SNTP sets the clock.
+- `SyncKick`: `sntp_restart()` every 15 s, and at once on WiFi back, while
+  there is no current sync.
+- Every good sync gives each page whose last fetch failed a refresh.
+- Empty weather and stock pages say so, with "no internet" when there is no
+  current sync.
+
+**A software restart keeps the system clock: measured 2026-11-18.** I flashed
+5f85db5 over a synced clock with the internet blocked. The log was dated from
+the start, and no sync was possible. That broke the first cut, which keyed the
+15 s retry and "no internet" on a valid clock: after a restart the clock was
+valid, so neither ran. Since ac96aa5 they key on `syncCurrent()`, meaning a
+sync since start that is not overdue. The clock face still keys on a valid
+time. **Power loss: not tested yet.**
+
+On ac96aa5 with the internet blocked (Scott, 15:05): the time was right, and
+the weather and stock pages said "no internet".
+
+**Router test on ac96aa5, PASSED (2026-11-18):**
+- **Unplugged while blocked:** the log said "power on" with no "clock set", so
+  a power cut loses the clock. Scott saw the "No time" face, and "no internet"
+  on weather and stocks. MQTT went on working, because the broker is on the
+  LAN: no MQTT lines in the log.
+- **Unblocked at 15:07:28:**
+  - first sync at 15:07:39, 11 s later (da306cd took 3.5 min);
+  - weather, on screen, refreshed at 15:07:40 (da306cd: 10 min);
+  - stocks refreshed at 15:08:21, the first time its page came up.
+- **Web response after boot:** 0.32 s mean. The one slow request (2.5 s) was
+  the weather fetch at 15:07:39, which still runs on the loop.
+
+## WebServer `on(uri, POST, fn, upload)` crashes on a POST that is not a form (issue #55, 2026-11-18)
+
+- **Measured on the rig (1e08af1):** `curl -X POST http://<orb>/update` with no
+  body crashed the orbs every time (device log: `start: ... crash`). Form
+  uploads, empty ones included, were fine.
+- **Why:** in arduino-esp32 2.x the handler that `on()` builds with an upload
+  function says yes to `canRaw()` for any non-GET method. A POST whose
+  Content-Type is not `multipart/` takes the raw-body path in `Parsing.cpp`
+  and calls that same upload function, which reads `server.upload()`. On the
+  raw path `_currentUpload` is empty, so that is a null read. Every firmware
+  with the web update page has it, 1.8.1 included.
+- **Fix (7f18592):** `/update` POST is its own `RequestHandler` that gets the
+  `HTTPUpload &` as an argument and returns false from `canRaw()`. Checked on
+  the rig: no-file form, empty named file, bare POST and a 4 KB raw body all
+  answer "No file chosen", no crash, no restart.
+- **Rule:** never call `server.upload()` from a function registered with
+  `on(..., upload)`, unless every non-form POST to that address is impossible.
+  Prefer a handler class that is passed the upload.
+
+## Parqet is compiled by no build env (2026-11-18)
+
+`ParqetWidget` is built only when `PARQET_PORTFOLIO_ID` is defined, and no
+env in `platformio.ini`, CI included, defines it. A change to it (#60
+rewrote its button handler) passes every `pio run` without being compiled.
+Compile it on purpose:
+
+    PLATFORMIO_BUILD_FLAGS='-DPARQET_PORTFOLIO_ID=\"test\"' pio run -e xiao-esp32s3
+
+then build again without the flag before flashing anything.
+
+## A hold ring on orb 3 shares its band with two other rings (#60, 2026-11-18)
+
+The issue's "ring fills while Middle is held" was not built. Orb 3 is the
+clock's colon orb, and its second ticks are drawn at radius 110-120
+(`ClockWidget.cpp`, `drawSmoothArc`). The stale ring is at 113-120 on data
+orbs (`stale::kRingOuter/kRingInner`). A hold ring there would draw over
+both, and erasing it after a slow tap blanks them too unless the whole page
+redraws, which is a full-screen flicker on every such tap. Settle where it
+goes and how it is erased on the rig before building it.

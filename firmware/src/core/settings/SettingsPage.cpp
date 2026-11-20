@@ -6,7 +6,8 @@
 #include "UpdateCheck.h"
 #include "IrisPalette.h"
 #include "LidPalette.h"
-#include "weatherwidget/TempestSource.h"
+#include "weatherwidget/StationStatus.h"
+#include "weatherwidget/StationTypes.h"
 #include "mqttwidget/MqttFeed.h"
 #include "webdatawidget/WebDataWidget.h"
 #include "wifiwidget/WifiWidget.h"
@@ -77,7 +78,7 @@ static const char *NAV_JS =
 static String contents() {
     String h = "<div class='toc'>";
     h += "<div><b><a href='#setup'>Setup</a></b><a href='#keys'>API keys</a><a href='#place'>Time zone and location</a>"
-         "<a href='#tempest'>Tempest stations</a><a href='#mount'>Mounting</a></div>";
+         "<a href='#stations'>Weather stations</a><a href='#mount'>Mounting</a></div>";
     h += "<div><b><a href='#display'>Display</a></b><a href='#rotation'>Rotation</a><a href='#clock'>Clock</a>"
          "<a href='#weather'>Weather</a>";
 #ifdef STOCK_TICKER_LIST
@@ -135,8 +136,8 @@ static String textField(const char *key, const char *label, const std::string &v
 
 // The last fetch per station. An orb in service has no serial cable, so this is
 // how a failing station is seen without walking over to the orbs.
-static String tempestStatusLine(int slot) {
-    const TempestStatus &st = TempestSource::status(slot);
+static String stationStatusLine(int slot) {
+    const StationStatus &st = stationStatus(slot);
     if (!st.attempted) {
         return hint("&#9888; Not fetched since start-up.");
     }
@@ -144,27 +145,62 @@ static String tempestStatusLine(int slot) {
     String when = mins == 0 ? String("under a minute ago") : mins < 120 ? String(mins) + " min ago" : String(mins / 60) + " h ago";
     String line = String(st.ok ? "&#10004; " : "&#10006; ") + "Last fetch " + when + ", took " + String(st.ms / 1000.0, 1) +
                   " s, free heap " + String(st.freeHeap / 1024) + " KB";
+    if (st.ok && st.station.length()) {
+        line += ", station " + esc(st.station.c_str());
+    }
     if (!st.ok) {
         line += " &mdash; " + esc(st.error.c_str());
+    } else if (st.note.length()) {
+        line += " &mdash; &#9888; " + esc(st.note.c_str());
     }
     return "<div class='" + String(st.ok ? "hint" : "err") + "'>" + line + "</div>";
 }
 
-static String stationRow(int slot, const char *idKey, const char *lblKey, uint32_t id, const std::string &lbl, uint32_t defId,
-                         const std::string &defLbl, bool hasToken, const std::map<std::string, std::string> &errors) {
-    String n = String(slot + 1);
-    String h = "<label for='" + String(idKey) + "'>Station " + n + " ID</label><input type='text' inputmode='numeric' id='" +
-               idKey + "' name='" + idKey + "' value='" + (id ? String(id) : String("")) + "'>";
-    h += hint("Blank = no page. Default: " + (defId ? String(defId) : String("none"))) + errorLine(errors, idKey);
-    String label = "Station " + n + " label (16 characters)";
-    h += textField(lblKey, label.c_str(), lbl, defLbl, "", errors);
-    if (id && !hasToken) {
-        h += "<div class='err'>&#10006; No page for this station: paste a Tempest token under <a href='#keys'>API keys</a> above.</div>";
-    } else if (id) {
-        h += tempestStatusLine(slot);
+static String option(const String &value, const String &text, bool selected);
+
+// One station slot: its type, then the ID field for each type (the script
+// below shows only the picked type's; without script both show, and only the
+// picked one counts), then the label and the last fetch.
+static String stationRow(int slot, int type, uint32_t id, const std::string &mac, const std::string &lbl, uint32_t defId,
+                         const std::string &defLbl, bool keysSet, const std::map<std::string, std::string> &errors) {
+    const String n = String(slot + 1);
+    const String typeKey = "sttype" + n, idKey = "tstn" + n, macKey = "stmac" + n, lblKey = "tlbl" + n;
+    const stations::Type t = stations::typeFrom(type);
+    String h = "<label for='" + typeKey + "'>Station " + n + " type</label><select id='" + typeKey + "' name='" + typeKey +
+               "' class='sttype' data-slot='" + n + "'>";
+    for (int i = 0; i < stations::kTypeCount; i++) {
+        h += option(String(i).c_str(), stations::kTypes[i].name, i == static_cast<int>(t));
+    }
+    h += "</select>";
+    const stations::TypeInfo &tp = stations::info(stations::Type::Tempest);
+    h += "<div id='" + idKey + "-row'><label for='" + idKey + "'>Station " + n + " " + tp.idLabel +
+         "</label><input type='text' inputmode='numeric' id='" + idKey + "' name='" + idKey + "' value='" +
+         (id ? String(id) : String("")) + "'>";
+    h += hint(String(tp.idHint) + " Blank = no page. Default: " + (defId ? String(defId) : String("none"))) +
+         errorLine(errors, idKey.c_str()) + "</div>";
+    const stations::TypeInfo &am = stations::info(stations::Type::Ambient);
+    h += "<div id='" + macKey + "-row'><label for='" + macKey + "'>Station " + n + " " + am.idLabel + "</label><input type='text' id='" +
+         macKey + "' name='" + macKey + "' value='" + esc(mac) + "' autocomplete='off'>";
+    h += hint(String(am.idHint) + " Blank = the account's only station (with several, this page names them). "
+              "Blank MAC and blank label = no page.") +
+         errorLine(errors, macKey.c_str()) + "</div>";
+    const String label = "Station " + n + " label (16 characters)";
+    h += textField(lblKey.c_str(), label.c_str(), lbl, defLbl, "", errors);
+    if (stations::slotUsed(t, id, mac, lbl)) {
+        if (!keysSet) {
+            h += "<div class='err'>&#10006; No page for this station: paste " + String(stations::info(t).keysHint) +
+                 " under <a href='#keys'>API keys</a> above.</div>";
+        } else {
+            h += stationStatusLine(slot);
+        }
     }
     return h;
 }
+
+// Shows each slot's ID field for its picked type
+static const char *STATION_JS = "<script>(()=>{const f=s=>{const a=s.value==='1',n=s.dataset.slot;"
+                                "document.getElementById('tstn'+n+'-row').hidden=a;document.getElementById('stmac'+n+'-row').hidden=!a;};"
+                                "document.querySelectorAll('select.sttype').forEach(s=>{f(s);s.addEventListener('change',()=>f(s));});})();</script>";
 
 static String ago(uint32_t at) {
     uint32_t mins = (millis() - at) / 60000;
@@ -372,8 +408,16 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     h += banner;
     // Weather works with either source: a Visual Crossing key, or a Tempest
     // token plus a station (with both, both get pages)
-    const bool tempestReady = !stored.tsttok.empty() && (stored.tstn1 || stored.tstn2);
-    if (stored.wxkey.empty() && !tempestReady) {
+    const stations::Type st1 = stations::typeFrom(stored.sttype1), st2 = stations::typeFrom(stored.sttype2);
+    const bool used1 = stations::slotUsed(st1, stored.tstn1, stored.stmac1, stored.tlbl1);
+    const bool used2 = stations::slotUsed(st2, stored.tstn2, stored.stmac2, stored.tlbl2);
+    const bool tempestKeys = !stored.tsttok.empty();
+    const bool ambientKeys = !stored.awapp.empty() && !stored.awkey.empty();
+    auto keysFor = [&](stations::Type t) { return t == stations::Type::Ambient ? ambientKeys : tempestKeys; };
+    const bool tempestSet = (used1 && st1 == stations::Type::Tempest) || (used2 && st2 == stations::Type::Tempest);
+    const bool ambientSet = (used1 && st1 == stations::Type::Ambient) || (used2 && st2 == stations::Type::Ambient);
+    const bool stationReady = (used1 && keysFor(st1)) || (used2 && keysFor(st2));
+    if (stored.wxkey.empty() && !stationReady) {
         h += "<div class='banner err'>&#9888; Start here: paste your free weather API key in <a href='#keys'>API keys</a>, "
              "pick your time zone under <a href='#place'>Time zone and location</a>, then press <b>Save and restart</b>.</div>";
     }
@@ -393,7 +437,15 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     h += "<label for='tsttok'>Tempest token (your own weather station) &mdash; tempestwx.com &gt; Settings &gt; Data Authorizations &gt; Create Token</label>"
          "<input type='password' id='tsttok' name='tsttok' value='' placeholder='" +
          String(sv::secretPlaceholder(stored.tsttok)) + "' autocomplete='off'>";
-    h += hint(sv::tempestTokenHint(v.tsttok, stored.tsttok, stored.tstn1 || stored.tstn2).c_str()) + errorLine(errors, "tsttok");
+    h += hint(sv::tempestTokenHint(v.tsttok, stored.tsttok, tempestSet).c_str()) + errorLine(errors, "tsttok");
+    h += "<label for='awapp'>Ambient Weather Application Key (your own station) &mdash; ambientweather.net &gt; Account &gt; API Keys</label>"
+         "<input type='password' id='awapp' name='awapp' value='' placeholder='" +
+         String(sv::secretPlaceholder(stored.awapp)) + "' autocomplete='off'>";
+    h += hint(sv::ambientKeyHint(v.awapp, stored.awapp, ambientSet).c_str()) + errorLine(errors, "awapp");
+    h += "<label for='awkey'>Ambient Weather API Key &mdash; same page, Create API Key</label>"
+         "<input type='password' id='awkey' name='awkey' value='' placeholder='" +
+         String(sv::secretPlaceholder(stored.awkey)) + "' autocomplete='off'>";
+    h += hint(sv::ambientKeyHint(v.awkey, stored.awkey, ambientSet).c_str()) + errorLine(errors, "awkey");
     h += "</fieldset>";
 
     h += "<fieldset id='place'><legend>Time zone and location</legend>";
@@ -420,14 +472,15 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     h += textField("wxloc", "Weather location", v.wxloc, d.wxloc, ". Not checked until the orb fetches the weather.", errors);
     h += "</fieldset>";
 
-    h += "<fieldset id='tempest'><legend>Tempest stations</legend>";
-    h += hint("Only if you have a Tempest weather station: its ID is the number in its tempestwx.com address. "
-              "Each station gets its own weather page. The location above keeps its page too while a Visual Crossing key is set. "
+    h += "<fieldset id='stations'><legend>Weather stations</legend>";
+    h += hint("Only if you have your own weather station (Tempest or Ambient Weather). Each station gets its own weather page. "
+              "An Ambient station sends only its readings, so its page takes the words, picture, highs and days from Visual Crossing "
+              "at the station's location: it needs the Visual Crossing key too. "
+              "The location above keeps its page too while a Visual Crossing key is set. "
               "Units follow <a href='#weather'>Weather</a> under Display.");
-    const bool hasToken = !stored.tsttok.empty();
-    h += stationRow(0, "tstn1", "tlbl1", v.tstn1, v.tlbl1, d.tstn1, d.tlbl1, hasToken, errors);
-    h += stationRow(1, "tstn2", "tlbl2", v.tstn2, v.tlbl2, d.tstn2, d.tlbl2, hasToken, errors);
-    h += "</fieldset>";
+    h += stationRow(0, v.sttype1, v.tstn1, v.stmac1, v.tlbl1, d.tstn1, d.tlbl1, keysFor(stations::typeFrom(v.sttype1)), errors);
+    h += stationRow(1, v.sttype2, v.tstn2, v.stmac2, v.tlbl2, d.tstn2, d.tlbl2, keysFor(stations::typeFrom(v.sttype2)), errors);
+    h += "</fieldset>" + String(STATION_JS);
 
     h += "<fieldset id='mount'><legend>Mounting</legend>";
     h += boolSelect("invert", "Orbs", v.invert, d.invert, "Right way up", "Upside down", errors);
@@ -455,13 +508,13 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     h += "</fieldset>";
 
     h += "<fieldset id='clock'><legend>Clock</legend>";
-    h += "<label for='face'>Clock face at start-up</label><select id='face' name='face'>";
+    h += "<label for='face'>Clock face</label><select id='face' name='face'>";
     for (int f = 0; f <= (int)ClockType::CUSTOM; f++) {
         if (faceCompiledIn(f)) {
             h += option(String(f), faceName(f), f == v.face);
         }
     }
-    h += "</select>" + hint(String("Default: ") + faceName(d.face) + ". A short press on the middle button still changes it until the next restart; a medium press toggles 12/24-hour the same way.") + errorLine(errors, "face");
+    h += "</select>" + hint(String("Default: ") + faceName(d.face) + ". A tap on the middle button on the clock page also changes it, and the orb keeps that choice.") + errorLine(errors, "face");
     h += boolSelect("h24", "Hours", v.h24, d.h24, "12-hour", "24-hour", errors);
     h += boolSelect("ampm", "AM/PM indicator (12-hour, not Nixie)", v.ampm, d.ampm, "Off", "On", errors);
     h += colorField("clkcol", "Digit color", v.clkcol, d.clkcol, errors);
@@ -664,6 +717,15 @@ void SettingsPage::handlePost() {
             errors["tsttok"] = err;
         }
     }
+    for (const char *k : {"awapp", "awkey"}) {
+        if (has(k)) {
+            std::string &field = std::string(k) == "awapp" ? v.awapp : v.awkey;
+            const std::string stored = field;
+            if (!sv::parseApiKey(argStr(s, k), stored, field, err)) {
+                errors[k] = err;
+            }
+        }
+    }
     if (has("wxloc") && !sv::normalizeText(argStr(s, "wxloc"), 64, v.wxloc, err)) {
         errors["wxloc"] = err;
     }
@@ -734,10 +796,26 @@ void SettingsPage::handlePost() {
     if (has("tstn2") && !sv::parseStationId(argStr(s, "tstn2"), v.tstn2, err)) {
         errors["tstn2"] = err;
     }
-    if (has("tlbl1") && !sv::parseStationLabel(argStr(s, "tlbl1"), v.tstn1, v.tlbl1, err)) {
+    if (has("sttype1")) {
+        v.sttype1 = static_cast<int>(stations::typeFrom(atoi(argStr(s, "sttype1").c_str())));
+    }
+    if (has("sttype2")) {
+        v.sttype2 = static_cast<int>(stations::typeFrom(atoi(argStr(s, "sttype2").c_str())));
+    }
+    if (has("stmac1") && !sv::parseMac(argStr(s, "stmac1"), v.stmac1, err)) {
+        errors["stmac1"] = err;
+    }
+    if (has("stmac2") && !sv::parseMac(argStr(s, "stmac2"), v.stmac2, err)) {
+        errors["stmac2"] = err;
+    }
+    // The label is required when the slot's own ID is set. Not the label
+    // itself: for Ambient with a blank MAC the label alone makes the page
+    const bool used1 = stations::slotUsed(stations::typeFrom(v.sttype1), v.tstn1, v.stmac1, "");
+    const bool used2 = stations::slotUsed(stations::typeFrom(v.sttype2), v.tstn2, v.stmac2, "");
+    if (has("tlbl1") && !sv::parseStationLabel(argStr(s, "tlbl1"), used1 ? 1 : 0, v.tlbl1, err)) {
         errors["tlbl1"] = err;
     }
-    if (has("tlbl2") && !sv::parseStationLabel(argStr(s, "tlbl2"), v.tstn2, v.tlbl2, err)) {
+    if (has("tlbl2") && !sv::parseStationLabel(argStr(s, "tlbl2"), used2 ? 1 : 0, v.tlbl2, err)) {
         errors["tlbl2"] = err;
     }
     // Custom pages

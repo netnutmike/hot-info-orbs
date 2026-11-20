@@ -22,6 +22,9 @@ public:
     // Picks the stale mark's shape, and gets stale pages a refresh the
     // moment WiFi is back (issue #32, StalePolicy.h)
     void setLinkUp(bool up);
+    // A time sync just worked, so the internet is up: every page whose last
+    // fetch failed refreshes on its next turn on screen, not 10 or 15 min on
+    void timeSynced();
     Widget *getCurrent();
     void next();
     void prev();
@@ -33,7 +36,13 @@ public:
     void setClockPage(Widget *clock);
     bool followOutage();
     void rotate();
-    void buttonPressed(uint8_t buttonId, ButtonState state);
+    // Issue #58 (PageLock.h): while locked the rotation stays on this page
+    // (the clock-only outage rule still wins) and a padlock sits at the
+    // bottom of the middle orb. setPageLock also puts "Locked" / "Unlocked"
+    // on that orb until endLockNote(), which repaints the page without it.
+    void setPageLock(bool locked);
+    void endLockNote();
+    void middleTap();
     void showLoading();
     // true = the boot eyes are still on orbs 2 and 4: the start-up "Loading"
     // lines all go on orb 5 instead of orbs 4 and 5
@@ -42,7 +51,7 @@ public:
     bool initialUpdateDone();
     void initializeAllWidgetsData();
     void setClearScreensOnDrawCurrent();
-    void updateBrightnessByTime(int minuteOfDay); // 0..1439
+    void updateBrightnessByTime(int minuteOfDay); // 0..1439, -1 = no real time yet
     bool panelsAsleep();
     void wakeForAMinute(); // a button press during night-off hours
 
@@ -76,6 +85,11 @@ private:
     void switchWidget();
 
     void drawStaleMark(); // over the page, after every draw of it
+    void drawLockMark(uint8_t filled); // part of drawStaleMark; filled = orbs just wiped
+    bool m_locked = false;
+    bool m_lockMarkOwed = false;
+    const char *m_lockNote = nullptr; // "Locked" / "Unlocked" while it shows
+    bool m_lockNoteOwed = false;
     bool m_wifiOut = false; // down for longer than a roam takes (stale::LinkGrace)
     stale::LinkGrace m_linkGrace;
     stale::LinkWatch m_linkWatch;

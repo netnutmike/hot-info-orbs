@@ -9,9 +9,9 @@ cables carry power only), a computer with **Google Chrome or Microsoft Edge**
 (Safari and Firefox cannot talk to USB devices), and a **2.4 GHz** WiFi
 network.
 
-1. Download the firmware, **[`info_orbs_fw_combo.bin`](https://github.com/scottdube/hot-info-orbs/releases/download/firmware-1.8.0/info_orbs_fw_combo.bin)**
+1. Download the firmware, **[`info_orbs_fw_combo.bin`](https://github.com/scottdube/hot-info-orbs/releases/download/firmware-1.8.3/info_orbs_fw_combo.bin)**
    (click it; it goes to your Downloads folder). It is also on the
-   [firmware release page](https://github.com/scottdube/hot-info-orbs/releases/tag/firmware-1.8.0)
+   [firmware release page](https://github.com/scottdube/hot-info-orbs/releases/tag/firmware-1.8.3)
    under **Assets**, with its checksum.
 2. In Chrome or Edge, open
    **[ESPConnect](https://thelastoutpostworkshop.github.io/ESPConnect/)**.
@@ -51,11 +51,12 @@ After the first install, new versions go in over WiFi with a second, smaller
 file, `firmware.bin`. It replaces only the software and keeps your WiFi, key,
 settings and start-up picture.
 
-1. Download **[`firmware.bin`](https://github.com/scottdube/hot-info-orbs/releases/download/firmware-1.8.0/firmware.bin)**.
+1. Download **[`firmware.bin`](https://github.com/scottdube/hot-info-orbs/releases/download/firmware-1.8.3/firmware.bin)**.
 2. On a phone or computer on the same WiFi, browse to
    `http://<orbs' address>/update` (the address the orbs show at start-up).
 3. Choose `firmware.bin` and press **Upload**. The orbs restart on their own
-   when it is done, with your WiFi, key and settings kept.
+   when it is done, with your WiFi, key and settings kept. The page waits
+   for them and goes back to the settings by itself, about a minute later.
 
 The orbs' own pages help with steps 1 and 2: the first lines of
 the settings page say when a newer version is out (**⬆ Version … is

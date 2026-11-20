@@ -1,5 +1,7 @@
 #include "WifiWidget.h"
+#include "Button.h" // Widget.h no longer brings it (#60)
 #include "DeviceLogStore.h"
+#include "ForgetCountdown.h"
 #include "RoamPolicy.h"
 #include "StalePolicy.h"
 #include "Utils.h"
@@ -11,6 +13,7 @@
 
 const int lineHeight = 40;
 const int statusScreenIndex = 3;
+const int countdownScreenIndex = 2; // orb 3, the middle: easiest to find (#60)
 const int fontSize = 19;
 const int messageDelay = 5000;
 const int maxLineWidth = 200; // clears the round edge on every line the portal screens use
@@ -76,7 +79,44 @@ void WifiWidget::drawConnecting() {
     m_manager.drawCenterString("Connecting", ScreenCenterX, ScreenCenterY - lineHeight, fontSize);
 }
 
-void WifiWidget::begin(bool showConnecting) {
+// On orb 3, the middle, before the boot eyes start, so nothing else draws
+// there meanwhile. Orb 4 keeps its "Connecting".
+void WifiWidget::forgetWifiCountdown() {
+    m_manager.selectScreen(countdownScreenIndex);
+    m_manager.clearScreen();
+    m_manager.drawCenterString("Keep holding", ScreenCenterX, ScreenCenterY - 50, fontSize);
+    m_manager.drawCenterString("to forget WiFi", ScreenCenterX, ScreenCenterY - 22, fontSize);
+    const int numberTop = ScreenCenterY + 5; // the number below, 48 high, centered at +40
+    forgetwifi::Countdown countdown(millis());
+    forgetwifi::State state = forgetwifi::State::Counting;
+    int shown = -1;
+    while (state == forgetwifi::State::Counting) {
+        const uint32_t now = millis();
+        state = countdown.step(now, digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL);
+        const int left = countdown.numberLeft(now);
+        if (state == forgetwifi::State::Counting && left != shown && left > 0) {
+            shown = left;
+            m_manager.fillRect(0, numberTop, ScreenWidth, 70, TFT_BLACK);
+            m_manager.drawCenterString(String(left), ScreenCenterX, ScreenCenterY + 40, 48);
+        }
+        delay(10);
+    }
+    m_manager.fillRect(0, ScreenCenterY - 70, ScreenWidth, 150, TFT_BLACK);
+    if (state == forgetwifi::State::Forget) {
+        wifimgr.resetSettings();
+        Serial.println("Right held through the countdown -> WiFi forgotten");
+        DeviceLog::note("wifi forgotten: right button held at power-up");
+        m_manager.drawCenterString("WiFi forgotten", ScreenCenterX, ScreenCenterY, fontSize);
+        delay(messageDelay);
+    } else {
+        Serial.println("Right let go during the countdown -> WiFi kept");
+        m_manager.drawCenterString("WiFi kept", ScreenCenterX, ScreenCenterY, fontSize);
+        delay(1500);
+    }
+    m_manager.clearScreen(); // the boot picture or the eyes' nose goes here next
+}
+
+bool WifiWidget::begin(bool showConnecting) {
     m_manager.setFont(DEFAULT_FONT);
     m_manager.setFontColor(TFT_WHITE);
     if (showConnecting) {
@@ -145,13 +185,13 @@ void WifiWidget::begin(bool showConnecting) {
     wifimgr.setShowInfoErase(false);
     wifimgr.setMenu(wm_menu);
 
-    // Hold right button when connecting to power to reset wifi settings
-    // these are stored by the ESP WiFi library
+    // Right held at power-up: forget the saved WiFi (stored by the ESP WiFi
+    // library), but only after a "3, 2, 1" (5 s) the hand can still let go
+    // during (ForgetCountdown.h, issue #60)
+    bool countedDown = false;
     if (digitalRead(BUTTON_RIGHT) == Button::PRESSED_LEVEL) {
-        wifimgr.resetSettings();
-        m_manager.selectScreen(statusScreenIndex);
-        m_manager.drawCenterString("Wifi Settings reset", ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
-        delay(messageDelay);
+        forgetWifiCountdown();
+        countedDown = true;
     }
 
     // Set WiFiManager to non-blocking so status and info can be displayed
@@ -172,6 +212,7 @@ void WifiWidget::begin(bool showConnecting) {
     // portal runs, so fewer, shorter attempts lose nothing.
     wifimgr.setConnectTimeout(15); // seconds per attempt
     wifimgr.setConnectRetries(3);
+    return countedDown;
 }
 
 bool WifiWidget::connect() {
@@ -651,9 +692,6 @@ void WifiWidget::draw(bool force) {
         m_manager.drawCenterString(m_connectionString, ScreenCenterX, ScreenCenterY + lineHeight, fontSize);
         delay(messageDelay);
     }
-}
-
-void WifiWidget::buttonPressed(uint8_t buttonId, ButtonState state) {
 }
 
 void WifiWidget::connectionTimedOut() {

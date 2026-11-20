@@ -44,8 +44,8 @@
 | main body back | 1 | print vertical or vertical angle (for those with smaller build volumes) with supports |
 | main body front | 1 | print vertical or vertical angle (for those with smaller build volumes) with supports |
 | rear heel | 2 | optional - use if you don't want your displays tilted |
-| wings right | 1 | no supports necessary |
-| wings left | 1 | no supports necessary |
+| wings right | 1 | print flat side down, *no supports* |
+| wings left | 1 | print flat side down, *no supports* |
 
 ## Filament
 
@@ -53,10 +53,11 @@ Any filament can be used.  The prototypes of this enclosure were printed using P
 The body was printed using a matte finish filament to contrast against the silk finish of the bezels, buttons, and wings.  
 
 The exact filaments used:
-* Polymaker Panchroma Matte PLA Army Blue (CA04008)
-* Polymaker Panchroma Silk PLA Gold (CA03006) - gold tint is more orange than the rendering at the top of the page
+* Polymaker Panchroma Matte PLA Army Blue (CA04008) (Amazon ASIN B0D7ZY2STQ)
+* Miailuy PLA SilkBrass (MIA030) (Amazon ASIN B0FN46RKZW)
 
-Polymaker filament presets for your printer can be downloaded from https://presets.polymaker.com/
+Polymaker filament presets for your printer can be downloaded from https://presets.polymaker.com/.  
+For the Miailuy filament use The Polymaker Panchroma Silk settings.
 
 ## Printing Tips
 

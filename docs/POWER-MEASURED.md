@@ -94,11 +94,12 @@ report and about 45 °C above this board's module on 5 V.
 
 ![Donald Champion's HackerBox 0129, 88.5 °C hottest point](assets/thermal/hackerbox-0129-donald-champion.jpg)
 
-What is and is not known about this reading: the image came from the club's
-design-history slide deck (Nov 2026), and it is the only copy on file. Its
-date, room temperature, run time and camera settings were not recorded with
-it. The deck's speaker notes give 86.6–88.5 °C over three shots and display
-backs at about 24 °C; only this one shot has been seen.
+What is and is not known about this reading: Scott took it with the same
+thermal camera as every other image here. The copy in this repo was taken
+from the club's design-history slide deck (Nov 2026), so it has no date
+stamp. Its date, room temperature and run time were not recorded with it.
+The deck's speaker notes give 86.6–88.5 °C over three shots and display
+backs at about 24 °C; only this one shot is in the repo.
 
 What this does and does not show:
 

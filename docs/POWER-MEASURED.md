@@ -88,6 +88,18 @@ The HackerBox 0129 builder's report was **82 °C on the same module with the
 radio off**. The 52 °C computed above was an estimate; the measurement is
 about 10 °C lower.
 
+**A club member's HackerBox 0129 (Donald Champion's), displays on the
+SuperMini's 3.3 V: 88.5 °C at the hottest point.** That is above the 82 °C
+report and about 45 °C above this board's module on 5 V.
+
+![Donald Champion's HackerBox 0129, 88.5 °C hottest point](assets/thermal/hackerbox-0129-donald-champion.jpg)
+
+What is and is not known about this reading: the image came from the club's
+design-history slide deck (Nov 2026), and it is the only copy on file. Its
+date, room temperature, run time and camera settings were not recorded with
+it. The deck's speaker notes give 86.6–88.5 °C over three shots and display
+backs at about 24 °C; only this one shot has been seen.
+
 What this does and does not show:
 
 - These are surface readings. The silicon inside the chip is hotter than its

@@ -10,7 +10,7 @@ In under three months, starting 27 August 2026, the Hands-On Tech Club turned Br
 
 The original design worked, but three things made it a poor fit for a club kit:
 
-- **Power.** All five displays ran from the ESP32 module's own 3.3 V regulator. One builder reported 82 °C with the radio off.
+- **Power.** All five displays ran from the ESP32 module's own 3.3 V regulator. That is a 1 A AMS1117 on Brett's dev kit, but a much smaller part on the ESP32-S3 SuperMini, the module the HackerBox 0129 kit (a SuperMini version of the same design) and the club's first prototype used. HackerBox builders saw it: one reported 82 °C with the radio off, and Donald Champion's kit measured 88.5 °C.
 - **Configuration.** Every change, including API keys, meant editing `config.h`, rebuilding and reflashing over USB.
 - **Hardware.** A two-layer board for a 30-pin ESP32 dev kit, sized for the module rather than for an enclosure.
 
@@ -68,7 +68,11 @@ The board went through three generations in two months: a v1.1 prototype on an E
 
 ### Decision 1: power each display from 5 V
 
-The first fix was the one that had burned builders. The original design fed all five displays from the module's 3.3 V regulator. At the measured load, that regulator would drop (5.0 − 3.3) V × 342 mA = 581 mW in a SOT-23-5 package, for an estimated junction of 112–170 °C, at or past thermal shutdown.
+The first fix was the one that had burned builders. The original design fed all five displays from the module's 3.3 V regulator. On Brett's ESP32 dev kit that regulator is an AMS1117 rated 1 A, in a SOT-223 package. The club's first prototype used an ESP32-S3 SuperMini, as the HackerBox 0129 kit does, and the SuperMini's regulator is an ME6211-series part in a much smaller SOT-23-5 package. Fed the same way, at the measured load it would drop (5.0 − 3.3) V × 342 mA = 581 mW, for an estimated junction of 112–170 °C, at or past thermal shutdown.
+
+That is what HackerBox builders were seeing. One reported 82 °C with the radio off, and a thermal shot of Donald Champion's HackerBox 0129, with its displays on the SuperMini's 3.3 V, shows 88.5 °C at the hottest point. The 82 °C and 88.5 °C readings are SuperMini readings, not readings of Brett's dev kit.
+
+![Donald Champion's HackerBox 0129, 88.5 °C hottest point](assets/thermal/hackerbox-0129-donald-champion.jpg)
 
 The GC9A01 modules each carry their own regulator, so the club wired 5 V straight to each display. The module's regulator now powers only the ESP32.
 

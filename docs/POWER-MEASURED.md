@@ -88,6 +88,36 @@ The HackerBox 0129 builder's report was **82 °C on the same module with the
 radio off**. The 52 °C computed above was an estimate; the measurement is
 about 10 °C lower.
 
+### A club member's HackerBox 0129 on 3.3 V: 86.6–88.5 °C, 2026-10-27
+
+Donald Champion's HackerBox 0129 build: an ESP32-S3 SuperMini with all five
+displays on the module's own 3.3 V regulator, the wiring this board moved away
+from. Scott took these with the same thermal camera as the rest of this page,
+on 2026-10-27 at 19:57–19:58 (the times are the camera app's file names).
+
+| Shot | Hottest point | Center cross | Coldest point in frame |
+|---|---|---|---|
+| Module, 19:57:31 | **88.1 °C** | 22.4 °C | 21.2 °C |
+| Module, 19:57:35 | **88.5 °C** | 23.9 °C | 21.6 °C |
+| Module, 19:57:55 | **86.6 °C** | 22.4 °C | 21.7 °C |
+| Back of a display, 19:58:43 | **24.1 °C** | 23.4 °C | 20.2 °C |
+| Back of a display, 19:58:46 | **24.0 °C** | 23.4 °C | 20.1 °C |
+
+![HackerBox 0129 module, 88.5 °C hottest point](assets/thermal/hackerbox-0129-module-2026-10-27-2.jpg)
+![HackerBox 0129 module, 88.1 °C hottest point](assets/thermal/hackerbox-0129-module-2026-10-27-1.jpg)
+![HackerBox 0129 module, 86.6 °C hottest point](assets/thermal/hackerbox-0129-module-2026-10-27-3.jpg)
+![HackerBox 0129, back of a display, 24.1 °C hottest](assets/thermal/hackerbox-0129-display-back-2026-10-27-1.jpg)
+![HackerBox 0129, back of a display, 24.0 °C hottest](assets/thermal/hackerbox-0129-display-back-2026-10-27-2.jpg)
+
+The heat is on the module, not the displays: their backs sit within about
+4 °C of the coldest point in the frame. The module reads above the 82 °C
+online report, and about 45 °C above this board's module on 5 V (43.6 °C).
+
+Not recorded: the room temperature (the coldest points in frame, 20.1–21.7 °C,
+are the nearest stand-in), how long the kit had been running, what it was
+displaying, and whether its radio was on. Emissivity was the camera's default,
+as on the rest of this page.
+
 What this does and does not show:
 
 - These are surface readings. The silicon inside the chip is hotter than its

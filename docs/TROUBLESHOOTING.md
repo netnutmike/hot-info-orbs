@@ -28,7 +28,7 @@ Problems during the
 | ESPConnect will not connect at all, or says the browser is not supported | Use Google Chrome or Microsoft Edge on a computer. Safari, Firefox and phones cannot talk to USB devices. |
 | **Connect** lists no port for the orbs | 1. Suspect the cable first: many USB cables carry power only. Try one you know moves data, such as a phone's own cable. 2. Put the XIAO in download mode: unplug, hold the **B** button on the XIAO, plug back in, let go, click **Connect** again. The XIAO's two small buttons are marked B and R; R only restarts it. 3. No driver is needed on Windows or Mac. |
 | Flashing starts, then stops with an error | Put the XIAO in download mode (the row above) and flash again. If it still fails, try another cable or another USB port on the computer. |
-| Flashing finished, but the orbs stay dark | Unplug the USB cable and plug it back in. If they are still dark, flash again and check the two boxes: the file is `info_orbs_fw_combo.bin` and **Flash offset** is `0x0`. The smaller `firmware.bin` is for WiFi updates only; flashed over USB it leaves the orbs dark until the combo file goes in. |
+| Flashing finished, but the orbs stay dark (the backlights may glow, nothing is drawn) | Unplug the USB cable and plug it back in. If they are still dark, flash again and check the two boxes: the file is `info_orbs_fw_combo.bin` and **Flash offset** is `0x0`. The smaller `firmware.bin` is for WiFi updates only; flashed over USB it leaves the orbs dark until the combo file goes in. |
 | The orbs show **Set up WiFi** | Nothing is wrong. That is step 6 of the Quick start. |
 
 ## WiFi setup

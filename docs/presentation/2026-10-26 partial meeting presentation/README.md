@@ -1,6 +1,6 @@
 # Club presentation: HOT Info Orbs intro
 
-`HOT-Info-Orbs-Small-Computers-2026-10-27.pptx` is the 12-slide deck for the
+`HOT-Info-Orbs-Small-Computers-2026-10-27.pptx` is the 13-slide deck for the
 Hands-On Tech Small Computers meeting on Tuesday 2026-10-27 (Rohan Rec
 Center, 6:30 pm). The `.pdf` beside it is a LibreOffice render for anyone
 without PowerPoint. Speaker notes on every slide carry the narration, adapted
@@ -11,6 +11,16 @@ Built on Yang's club template ("HOT template & intro slides.pptx", his
 2026-05-30 email), **SmComp Dark Theme** master, as his README slide asks:
 copy, delete the preface slides, add slides from the right theme group, never
 touch the logos by hand. The logo top right comes from the layout.
+
+## Slide 4: The codebase, by the numbers (added 2026-11-24)
+
+Scott asked for a codebase-highlights slide early in the deck, after the intro
+and before the page tour. It is the fact sheet in
+`~/code/docs/info-orbs-metrics/` on one slide: five orb stats and three
+callouts, measured on main at aa3cd8f (firmware 1.10.1). Re-measure with
+`measure_blame.py` there and update both when re-issuing. The slide is added
+by `build_deck.py` from the Title Only layout and moved to position 4; the
+base `.pptx` still has 12 empty slides.
 
 ## Decisions (Scott, 2026-10-20)
 
@@ -38,7 +48,7 @@ python build_deck.py assets/base-smcomp-dark-12-empty.pptx HOT-Info-Orbs-Small-C
 
 needs python-pptx and Pillow. `assets/base-smcomp-dark-12-empty.pptx` is
 Yang's template with the seven original slides removed and twelve empty slides
-added (Title Slide, 10 × Title Only, Title Slide). `assets/` holds every
+added (Title Slide, 10 × Title Only, Title Slide); the script adds the 13th. `assets/` holds every
 image the script places: frame grabs from the 2026-10-19/20 camera takes
 (`~/Movies/hot-info-orbs-intro/camera`, cropped to the orb band with the
 bezel tops whole, about 15% of an orb of wall above them; a crop that starts

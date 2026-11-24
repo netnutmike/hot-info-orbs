@@ -212,10 +212,10 @@ cols = [
     ('Shipped, not just pushed', '626 commits and 54 merged pull requests since August 27, cut into 14 firmware releases, 1.2.0 through 1.10.1. Seven commits a day.'),
 ]
 for i, (h, b) in enumerate(cols):
-    tb(s, 0.6 + i * 4.15, 4.05, 3.95, 2.3, [(h, 18, True, GOLD), (b, 14, False, WHITE)])
-tb(s, 0.6, 6.5, 12.25, 0.6, [
+    tb(s, 0.6 + i * 4.15, 3.95, 3.95, 2.7, [(h, 22, True, GOLD), (b, 18, False, WHITE)])
+tb(s, 0.6, 6.55, 12.25, 0.7, [
     ('Counted by git blame on main at commit aa3cd8f, November 24, 2026. Project code is firmware, host tests, hardware scripts, tools and CI; '
-     'docs, vendored libraries and eye graphics data are not counted. Past commit rates are no guarantee of future commits.', 11, False, GREY),
+     'docs, vendored libraries and eye graphics data are not counted. Past commit rates are no guarantee of future commits.', 13, False, GREY),
 ])
 notes(s, "Before the tour, a quick look at what is behind the screens, because this is a software project as much as a board. "
       "Since the end of August the club has written about nineteen and a half thousand lines of new code, on top of Brett's original: "

@@ -16,7 +16,7 @@ touch the logos by hand. The logo top right comes from the layout.
 
 Scott asked for a codebase-highlights slide early in the deck, after the intro
 and before the page tour. It is the fact sheet in
-`~/code/docs/info-orbs-metrics/` on one slide: five orb stats and three
+`docs/metrics/` on one slide: five orb stats and three
 callouts, measured on main at aa3cd8f (firmware 1.10.1). Re-measure with
 `measure_blame.py` there and update both when re-issuing. The slide is added
 by `build_deck.py` from the Title Only layout and moved to position 4; the

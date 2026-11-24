@@ -208,6 +208,7 @@ a tag (`git checkout <tag> -- <folder>` brings a folder back):
 | [docs/ENCLOSURE.md](docs/ENCLOSURE.md) | the enclosure design and why it looks the way it does |
 | [docs/VARIANT-XIAO-ESP32S3.md](docs/VARIANT-XIAO-ESP32S3.md) | why the XIAO, and how the board's pins were chosen |
 | [docs/POWER-MEASURED.md](docs/POWER-MEASURED.md) | measured current draw, and why the displays run on 5 V |
+| [docs/metrics/](docs/metrics/) | the codebase by the numbers: lines new vs inherited, tests, releases, with the script that measures them |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | requirements for the settings page and WiFi updates |
 | [docs/TEMPEST-API.md](docs/TEMPEST-API.md) | how the Tempest weather data is read |
 | [docs/DISPLAY-EDGE-TEST.md](docs/DISPLAY-EDGE-TEST.md) | how much of each round display is usable, measured |

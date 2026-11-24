@@ -77,7 +77,8 @@ static const char *NAV_JS =
 // What is on the page and where; the ifdefs match the sections in renderForm
 static String contents() {
     String h = "<div class='toc'>";
-    h += "<div><b><a href='#setup'>Setup</a></b><a href='#keys'>API keys</a><a href='#place'>Time zone and location</a>"
+    h += "<div><b><a href='#setup'>Setup</a></b><a href='#keys'>API keys</a><a href='#name'>Name on the network</a>"
+         "<a href='#place'>Time zone and location</a>"
          "<a href='#stations'>Weather stations</a><a href='#mount'>Mounting</a></div>";
     h += "<div><b><a href='#display'>Display</a></b><a href='#rotation'>Rotation</a><a href='#clock'>Clock</a>"
          "<a href='#weather'>Weather</a>";

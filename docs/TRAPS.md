@@ -1123,3 +1123,9 @@ Three things the copy cannot carry:
 
 If both orbs can be put on USB, cloning the NVS partition (`0x9000`, `0x5000`)
 carries Wi-Fi and every secret in one move and is the better route.
+
+**Since 1.10.0 the form also carries the network name** (`host`, issue #72),
+so a straight copy gives the target the source's name and the two take
+turns answering to it. Drop `host` from the copied fields, or set the
+target's own name in the same POST. The NVS clone has the same problem: the
+name is in NVS now, so a cloned orb must be renamed on its page afterwards.

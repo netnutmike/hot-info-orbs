@@ -275,19 +275,19 @@ altogether, put your WiFi name and password in `secrets.h` before you flash:
 find `//#define WIFI_SSID` and `//#define WIFI_PASS`, delete the `//` from
 both, and fill them in. Every set you flash then joins that network by itself.
 
-**Names: give each set its own.** Every set is called `info-orbs` unless you
-change it, and only one of them can answer to `info-orbs.local`. Before you
-flash a set, open `config.h`, find `//#define OTA_HOSTNAME "info-orbs"`,
-delete the `//`, and change the name, for example to `"orb-office"`. That set
-is then at `http://orb-office.local/settings`, and your router lists it under
-that name. The IP address shown on its screen always works too.
+**Names: give each set its own.** Every set is called `info-orbs` until you
+change it, and only one of them can answer to `info-orbs.local`. Since
+firmware 1.10.0 the name is on the settings page: open the set's page (by
+its IP address), find **Name on the network** under Setup, type a name such
+as `orb-office`, and save. That set is then at
+`http://orb-office.local/settings`, and your router lists it under that
+name. The IP address shown on its screen always works too. The name is kept
+with the other settings, so it survives updates and is not in the software
+file: one build can go to every set.
 
-**The name is built into the software file, so watch it when updating.** The
-name in `config.h` when you build is the name the set gets. If you build once
-and upload the same file to two sets, they both end up with the same name.
-To update several sets, change the name in `config.h`, build, upload to that
-set, and repeat for the next one. Sets installed from the ready-made release
-file are all called `info-orbs`; reach those by IP address.
+`config.h` still has `//#define OTA_HOSTNAME "info-orbs"`. It is only the
+name a set starts with before anyone saves the settings page, so there is no
+need to touch it for each set any more.
 
 **Optional: update from PlatformIO by name.** Settings that belong to your
 computer, such as which USB port to upload to or which set to update over

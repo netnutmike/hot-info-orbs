@@ -486,6 +486,47 @@ inline bool parseHost(const std::string &in, std::string &out, std::string &err)
     return true;
 }
 
+// The orb's own network name (issue #72): the mDNS name, <name>.local, and
+// the hostname it gives the router. One DNS label: lower-case letters, digits
+// and dashes, 1..32 characters (lwIP's hostname limit), no leading or trailing
+// dash. Upper case is folded: mDNS ignores case, so "Orb-Office" and
+// "orb-office" would be the same name shown two ways. A trailing ".local" is
+// dropped, not refused: it is what the page tells people to type in the browser.
+constexpr size_t HOSTNAME_MAX = 32;
+inline bool parseHostname(const std::string &in, std::string &out, std::string &err) {
+    std::string s;
+    for (char c : trim(in)) {
+        s += (char)tolower((unsigned char)c);
+    }
+    if (s.size() > 6 && s.compare(s.size() - 6, 6, ".local") == 0) {
+        s.resize(s.size() - 6);
+    }
+    if (s.empty()) {
+        err = "Enter a name, like orb-office";
+        return false;
+    }
+    if (s.size() > HOSTNAME_MAX) {
+        err = "At most " + std::to_string(HOSTNAME_MAX) + " characters";
+        return false;
+    }
+    for (char c : s) {
+        if (c == '.') {
+            err = "One word, no dots - .local is added for you";
+            return false;
+        }
+        if (!(islower((unsigned char)c) || isdigit((unsigned char)c) || c == '-')) {
+            err = "Letters, digits and dashes only - no spaces or other characters";
+            return false;
+        }
+    }
+    if (s.front() == '-' || s.back() == '-') {
+        err = "Cannot start or end with a dash";
+        return false;
+    }
+    out = s;
+    return true;
+}
+
 inline bool parsePort(const std::string &in, int &out, std::string &err) {
     int v;
     if (!parseInt(in, v) || v < 1 || v > 65535) {

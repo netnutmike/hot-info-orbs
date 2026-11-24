@@ -1,4 +1,5 @@
 #include "InfoPage.h"
+#include "Settings.h"
 #include "Utils.h"
 #include "WidgetSet.h"
 #include "build_id.h"
@@ -94,7 +95,7 @@ infopage::Facts InfoPage::facts(bool linkUp, const bool mqttInUse[2]) const {
         f.rssi = WiFi.RSSI();
         f.channel = WiFi.channel();
         f.ip = WiFi.localIP().toString().c_str();
-        f.localName = OTA_HOSTNAME ".local";
+        f.localName = Settings::get().host + ".local";
     }
     f.upS = static_cast<uint32_t>(esp_timer_get_time() / 1000000); // 64 bit: no wrap at 49 days
     f.start = startOf(esp_reset_reason());

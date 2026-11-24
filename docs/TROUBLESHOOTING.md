@@ -107,7 +107,7 @@ has the full list.
 | What you see | What it means, and what to do |
 |---|---|
 | The browser cannot open `http://<address>/settings` | 1. The phone or computer must be on the **same WiFi** as the orbs. A guest network usually cannot reach them. 2. Read the address again: it can change. Orb 5 shows it at start-up, and orb 3 of the info page shows it any time. 3. Type `http://` at the front. The orbs do not answer `https://`. |
-| `http://info-orbs.local/settings` does not open | Use the numbers instead. The name does not work on every network or every phone, and with more than one set only one of them answers to it. |
+| `http://info-orbs.local/settings` does not open | Use the numbers instead. The name does not work on every network or every phone, and with more than one set only one of them answers to it: give each set its own under **Name on the network** on the settings page. |
 | The browser asks for a user name and password | Whoever built the software set one. The user name is `admin`. |
 | **Save and restart** shows a message beside a field | That value is not allowed, and nothing was saved. Fix the field and save again. |
 | `Not saved: paste the key again` under a key | Another field had an error, so the key you pasted was not kept. Fix the error, paste the key again, and save. |

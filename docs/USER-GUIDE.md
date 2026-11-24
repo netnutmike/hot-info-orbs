@@ -155,8 +155,10 @@ Then browse to:
 For example, `http://192.168.1.57/settings`.
 
 `http://info-orbs.local/settings` often works too, with no numbers to
-remember. Use the numbers if it does not, or if you have more than one set:
-every set installed from the release file answers to the same name.
+remember. Use the numbers if it does not. With more than one set, give each
+its own name under **Name on the network** on the settings page: until you
+do, every set answers to `info-orbs` and only one of them can be reached by
+it.
 
 The address can change after the router restarts. If a bookmark stops
 working, read the address again.
@@ -197,6 +199,7 @@ Your settings stay through restarts, power cuts and
 
 | Section | What is in it |
 |---|---|
+| **Name on the network** | The set's name: `info-orbs` until you change it. Letters, digits and dashes. The set answers at `http://<name>.local/settings`, and your router lists it by this name. With more than one set, give each its own. After a save that changes the name, the page goes on to the new address by itself. |
 | **API keys** | Your free [Visual Crossing](https://www.visualcrossing.com/sign-up) weather key, and your station's keys if you have one (a Tempest token, or Ambient Weather's two keys). Once saved, a key shows as stars. Leave the box alone to keep the key, or paste a new one to replace it. |
 | **Time zone and location** | **Time zone**: pick from the list. Daylight saving is automatic. **Weather location**: your town, such as `Orlando, FL`. The page cannot check the town; a wrong one shows up as an empty weather page. |
 | **Weather stations** | See [Weather from your own station](#weather-from-your-own-station). |

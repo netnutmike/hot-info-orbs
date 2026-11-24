@@ -17,8 +17,10 @@
     #include "config.h"
 #endif
 
-// The orb's network name: the mDNS name (<name>.local) and the DHCP hostname a
-// router may list or publish in its own DNS. Shared by WifiWidget and OtaUpdater.
+// The orb's network name to start with: the mDNS name (<name>.local) and the
+// DHCP hostname a router may list or publish in its own DNS. Only the default
+// of the settings page's Name on the network (issue #72); WifiWidget and
+// OtaUpdater read Settings::get().host, never this.
 #ifndef OTA_HOSTNAME
     #define OTA_HOSTNAME "info-orbs"
 #endif

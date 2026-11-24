@@ -1051,3 +1051,48 @@ nothing here: the 10-17 blank cleared on a reset, this one survived several.
 Side note from the same log: the start-up prints `Wokwi Build` on every XIAO
 orb, because `#if HARDWARE == WOKWI` is `0 == 0` when neither macro is
 defined. Harmless, and not a lead.
+
+**Resolved 2026-11-23, later the same evening:** the board, not the firmware
+and not the modules. Scott had tried to unsolder the XIAO from that board and
+believes he damaged it. He assembled a fresh board; the known-good XIAO on
+the fresh board drives all five panels. The symptom Scott then described
+(left eye and the clock's number and colon both on orb 3, flickering; orb 4's
+right eye steady; orbs 1 and 2 black) is orb 3's panel being selected
+whenever orb 2's should be, which is a CS2/CS3 fault on the board, consistent
+with reworked castellations. Not scoped further: the board is scrap.
+
+## "It flashes but never comes back": `firmware.bin` written at offset 0 (2026-11-23)
+
+A fresh XIAO (MAC 44:bd:8d:75:fe:dc) took a flash, then showed only backlights
+and never answered. Over USB the port appeared and vanished about every
+1.5 s. Caught with a reader that reopens the port whenever it exists
+(`scratchpad/flap_read.py`), the ROM said, every cycle:
+
+    rst:0x7 (TG0WDT_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+    load:0x3c110020,len:0xc58c0
+    load:0x42000020,len:0x105274
+    Invalid image block, can't boot.
+    ets_main.c 329
+
+Those load addresses are an application's DROM/IROM segments; a healthy boot
+loads the second-stage bootloader at `0x3fce3808 / 0x403c9700 / 0x403cc700`.
+`esptool read_flash 0x0 0x40` showed an image header with entry
+`0x40376b88` and an `esp_app_desc` at +0x20, and its first 64 bytes were
+byte-identical to release 1.9.0's `firmware.bin`. So the app-only file had
+been written at `0x0`, where the ROM expects the bootloader, and on its way
+it also overwrote the partition table at `0x8000`. The ROM finds no
+bootloader, the task watchdog fires, and the chip loops; each reset
+re-enumerates USB, hence the flapping port.
+
+**Read it this way:** a port that flaps + `Invalid image block` = wrong
+offset, not a dead board and not a bad binary. **Fix:** write
+`info_orbs_fw_combo.bin` at `0x0` (esptool over USB, 28 s at 921600); it
+carries the bootloader, the table and the app, and pads the rest of 8 MB with
+0xFF. Done here; the orb booted 1.9.0 and opened its `Info-Orbs_DC` portal.
+The README's two files differ only in their offset (`0x0` combo, `0x10000`
+app), and the web flasher takes whatever offset is typed, so this will
+happen to a builder. Added to TROUBLESHOOTING.
+
+**Also learned:** opening the USB port with DTR/RTS toggled resets the S3,
+which is how esptool and my reader capture the ROM lines; on a flapping port
+esptool still connects on the first try, no button needed.

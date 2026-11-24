@@ -1096,3 +1096,30 @@ happen to a builder. Added to TROUBLESHOOTING.
 **Also learned:** opening the USB port with DTR/RTS toggled resets the S3,
 which is how esptool and my reader capture the ROM lines; on a flapping port
 esptool still connects on the first try, no button needed.
+
+## Copying one orb's settings to another: the form carries everything but the secrets (2026-11-23)
+
+There is no export. What works: GET `/settings` on the source orb, parse the
+`sf` form (text/number/hidden inputs, selected options, ticked checkboxes),
+POST the same names to the target's `/settings`. Done 2026-11-23 from the rig
+(.11.123) to a fresh 1.9.0 orb (.11.240): 85 fields, all matched on read-back
+(`scratchpad/parse_settings.py`, `push_settings.py`). The orb restarts after
+the save, so the read-back must wait ~30 s or it gets "connection refused".
+
+Three things the copy cannot carry:
+- **Password fields** (`wxkey`, `tsttok`, `awapp`, `awkey`, `mqpass`,
+  `mq2pass`) render blank and blank means "keep", so they never leave the
+  source. The weather key and Tempest token came from the local `secrets.h`;
+  the Ambient keys and the MQTT password live only in Scott's head and the
+  source orb's NVS. Without the Ambient keys the station-2 page is not built
+  at all, so the target shows 7 pages where the rig shows 8.
+- **Page tick-boxes go by index** (`shw0..shwN`) but are stored by page
+  NAME. A target with a different page set maps the indices to the wrong
+  pages: the first POST un-hid Web Data and hid nothing. Send the `shw`
+  set against the TARGET's own page list, after the pages exist.
+- **The firewall rule for the LRD broker names source IPs** (.27, .185,
+  .10, .123). A new orb's address has to be added in UniFi, with a fixed IP,
+  or MQTT says "can't reach broker" with the right password.
+
+If both orbs can be put on USB, cloning the NVS partition (`0x9000`, `0x5000`)
+carries Wi-Fi and every secret in one move and is the better route.

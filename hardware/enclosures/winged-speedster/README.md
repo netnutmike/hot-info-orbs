@@ -3,20 +3,18 @@
 
 
 <p align="center">
-    <img src="master%20assembly.jpg" alt="Alt text" width="50%">
-<p>
+    <img src="master%20assembly.jpg" alt="Assembled Winged Speedster" width="50%">
+</p>
 
 ![Exploded view](exploded%20master%20assembly.jpg)
 
 ## Directory Contents
 
-## Files
-
 | Folder | File | Description |
 |---|---|---|
-| . | `master assembly.jpg` | rendering of assembled Hot Info Orbs project |
-| . | `master assembly.png` | rendering of assembled Hot Info Orbs project (PNG) |
-| . | `exploded master assembly.jpg` | rendering of Hot Info Orbs project in an exploded view |
+| . | `master assembly.jpg` | rendering of assembled HoT Info Orbs project |
+| . | `master assembly.png` | rendering of assembled HoT Info Orbs project (PNG) |
+| . | `exploded master assembly.jpg` | rendering of HoT Info Orbs project in an exploded view |
 | 3mf | `README.md` | notes on the enclosure print files |
 | 3mf | `button bezel.3mf` | button bezel |
 | 3mf | `button.3mf` | button |
@@ -57,11 +55,11 @@ The exact filaments used:
 * Miailuy PLA SilkBrass (MIA030) (Amazon ASIN B0FN46RKZW)
 
 Polymaker filament presets for your printer can be downloaded from https://presets.polymaker.com/.  
-For the Miailuy filament use The Polymaker Panchroma Silk settings.
+For the Miailuy filament, use the Polymaker Panchroma Silk settings.
 
 ## Printing Tips
 
-Overall: For the best finish, use 0.08 mm or minimum layer height with standard 0.4 mm nozzle.
+Overall: For the best finish, use 0.08 mm or minimum layer height with a standard 0.4 mm nozzle.
 
 | Component | Setting (may vary based on slicer) |
 |---|---|
@@ -92,6 +90,6 @@ Watch crystals are considerably less expensive from China, so the example source
 
 ## Assembly Tips
 - A helpful assembly visualization video is at https://www.youtube.com/watch?v=JYFkHDC2DEo
-- To avoid any accidents with glue, you can instead affix the display bezels to the front body by inserting the bezel and gently melting the bezel pins into the body from the back.
-- Snap in the button bezels and then turn the front body upside down to insert the button plungers.  Align the buttons on the PCB with the plungers and rotate the PCB into place.  The plungers are held in place by the PCB assembly.
-- Be sure the joint sleeve is completely pressed into the wing body.  Insert the joint sleeve into the wing and then turn the joint sleeve side down on a table and press them in firmly.
+- To avoid any accidents with glue, you can instead affix the display bezels to the front body by inserting the bezels and gently melting the bezel pins into the body from the back.
+- Snap in the button bezels and then turn the front body upside down to insert the button plungers. Align the buttons on the PCB with the plungers and rotate the PCB into place. The plungers are held in place by the PCB assembly.
+- Be sure the joint sleeves are completely pressed into the wing bodies. Insert each joint sleeve into its wing, then turn the wing sleeve-side down on a table and press firmly.

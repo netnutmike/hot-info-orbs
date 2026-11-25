@@ -2,7 +2,8 @@
 
 **The finished enclosure is in [hardware/enclosures/](../hardware/enclosures/README.md)**
 (2026-11-12): a print file for each part, the quantities, two Bambu Studio
-projects and the Fusion source. Print from there.
+projects and the Fusion source. Print from there. The assembly video, parts in
+order with the screw sizes, is at https://youtu.be/JYFkHDC2DEo.
 
 The rest of this page is the design history that led to it. It names folders
 under `hardware/enclosure/` (the front mock-up, the decals, the earlier Fusion

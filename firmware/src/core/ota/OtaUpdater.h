@@ -6,7 +6,7 @@
 #include <WebServer.h>
 
 // Over-the-air firmware updates (docs/REQUIREMENTS.md R2), two ways in:
-//   - browser: http://<OTA_HOSTNAME>.local/update, pick firmware.bin, upload
+//   - browser: http://<name>.local/update (the name on the settings page), pick firmware.bin, upload
 //   - PlatformIO: pio run -e ota -t upload   (ArduinoOTA / espota)
 // Both write the idle app slot and switch to it only after the whole image
 // has been written and verified, so an interrupted upload leaves the running

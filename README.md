@@ -9,9 +9,9 @@ cables carry power only), a computer with **Google Chrome or Microsoft Edge**
 (Safari and Firefox cannot talk to USB devices), and a **2.4 GHz** WiFi
 network.
 
-1. Download the firmware, **[`info_orbs_fw_combo.bin`](https://github.com/scottdube/hot-info-orbs/releases/download/firmware-1.9.0/info_orbs_fw_combo.bin)**
+1. Download the firmware, **[`info_orbs_fw_combo.bin`](https://github.com/scottdube/hot-info-orbs/releases/latest/download/info_orbs_fw_combo.bin)**
    (click it; it goes to your Downloads folder). It is also on the
-   [firmware release page](https://github.com/scottdube/hot-info-orbs/releases/tag/firmware-1.9.0)
+   [firmware release page](https://github.com/scottdube/hot-info-orbs/releases/latest)
    under **Assets**, with its checksum.
 2. In Chrome or Edge, open
    **[ESPConnect](https://thelastoutpostworkshop.github.io/ESPConnect/)**.
@@ -51,7 +51,7 @@ After the first install, new versions go in over WiFi with a second, smaller
 file, `firmware.bin`. It replaces only the software and keeps your WiFi, key,
 settings and start-up picture.
 
-1. Download **[`firmware.bin`](https://github.com/scottdube/hot-info-orbs/releases/download/firmware-1.9.0/firmware.bin)**.
+1. Download **[`firmware.bin`](https://github.com/scottdube/hot-info-orbs/releases/latest/download/firmware.bin)**.
 2. On a phone or computer on the same WiFi, browse to
    `http://<orbs' address>/update` (the address the orbs show at start-up).
 3. Choose `firmware.bin` and press **Upload**. The orbs restart on their own
@@ -208,6 +208,7 @@ a tag (`git checkout <tag> -- <folder>` brings a folder back):
 | [docs/ENCLOSURE.md](docs/ENCLOSURE.md) | the enclosure design and why it looks the way it does |
 | [docs/VARIANT-XIAO-ESP32S3.md](docs/VARIANT-XIAO-ESP32S3.md) | why the XIAO, and how the board's pins were chosen |
 | [docs/POWER-MEASURED.md](docs/POWER-MEASURED.md) | measured current draw, and why the displays run on 5 V |
+| [docs/metrics/](docs/metrics/) | the codebase by the numbers: lines new vs inherited, tests, releases, with the script that measures them |
 | [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | requirements for the settings page and WiFi updates |
 | [docs/TEMPEST-API.md](docs/TEMPEST-API.md) | how the Tempest weather data is read |
 | [docs/DISPLAY-EDGE-TEST.md](docs/DISPLAY-EDGE-TEST.md) | how much of each round display is usable, measured |

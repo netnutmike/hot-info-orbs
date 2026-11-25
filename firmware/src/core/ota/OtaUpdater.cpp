@@ -1,5 +1,6 @@
 #include "OtaUpdater.h"
 #include "DeviceLogStore.h"
+#include "Settings.h"
 #include "UpdateCheck.h"
 #include "UploadResult.h"
 #include "Utils.h"
@@ -86,11 +87,11 @@ void OtaUpdater::begin() {
     if (m_started) {
         return;
     }
-    setupArduinoOta(); // starts mDNS with OTA_HOSTNAME
+    setupArduinoOta(); // starts mDNS with the name from the settings page
     setupWebUpdate();
     m_started = true;
     esp_ota_mark_app_valid_cancel_rollback(); // harmless when not pending (e.g. after a USB flash)
-    Serial.printf("OTA ready: http://%s.local/update (%s)\n", OTA_HOSTNAME, WiFi.localIP().toString().c_str());
+    Serial.printf("OTA ready: http://%s.local/update (%s)\n", Settings::get().host.c_str(), WiFi.localIP().toString().c_str());
 #ifndef OTA_PASSWORD
     Serial.println("OTA has no password - anyone on this network can flash the orbs. Set OTA_PASSWORD in secrets.h.");
 #endif
@@ -119,7 +120,8 @@ void OtaUpdater::handle() {
 }
 
 void OtaUpdater::setupArduinoOta() {
-    ArduinoOTA.setHostname(OTA_HOSTNAME);
+    // The settings page name (issue #72); config.h OTA_HOSTNAME is only its default
+    ArduinoOTA.setHostname(Settings::get().host.c_str());
 #ifdef OTA_PASSWORD
     ArduinoOTA.setPassword(OTA_PASSWORD);
 #endif

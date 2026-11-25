@@ -330,6 +330,28 @@ void test_host() {
     TEST_ASSERT_FALSE(parseHost(std::string(65, 'a'), out, err));
 }
 
+void test_hostname() {
+    std::string out, err;
+    TEST_ASSERT_TRUE(parseHostname("orb-office", out, err));
+    TEST_ASSERT_EQUAL_STRING("orb-office", out.c_str());
+    TEST_ASSERT_TRUE(parseHostname(" Orb-Office ", out, err)); // trimmed, lower-cased: mDNS ignores case, URLs should not surprise
+    TEST_ASSERT_EQUAL_STRING("orb-office", out.c_str());
+    TEST_ASSERT_TRUE(parseHostname("orb-office.local", out, err)); // the suffix typed in is dropped, not refused
+    TEST_ASSERT_EQUAL_STRING("orb-office", out.c_str());
+    TEST_ASSERT_TRUE(parseHostname("orbs2", out, err));
+    TEST_ASSERT_TRUE(parseHostname(std::string(32, 'a'), out, err));
+    TEST_ASSERT_FALSE(parseHostname("", out, err));
+    TEST_ASSERT_FALSE(parseHostname("   ", out, err));
+    TEST_ASSERT_FALSE(parseHostname(std::string(33, 'a'), out, err));
+    TEST_ASSERT_FALSE(parseHostname("orb office", out, err)); // a space
+    TEST_ASSERT_FALSE(parseHostname("orb_office", out, err)); // underscore is not a DNS label character
+    TEST_ASSERT_FALSE(parseHostname("orb.office", out, err)); // one word: .local is added
+    TEST_ASSERT_FALSE(parseHostname("-orb", out, err));
+    TEST_ASSERT_FALSE(parseHostname("orb-", out, err));
+    TEST_ASSERT_FALSE(parseHostname(".local", out, err)); // nothing left once the suffix goes
+    TEST_ASSERT_FALSE(parseHostname("http://orb", out, err));
+}
+
 void test_port() {
     int out = 0;
     std::string err;
@@ -539,6 +561,7 @@ int main() {
     RUN_TEST(test_mask_url);
     RUN_TEST(test_web_url);
     RUN_TEST(test_host);
+    RUN_TEST(test_hostname);
     RUN_TEST(test_port);
     RUN_TEST(test_fixed_text_size);
     RUN_TEST(test_optional_text);

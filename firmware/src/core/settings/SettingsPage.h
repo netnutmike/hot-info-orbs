@@ -35,7 +35,7 @@ class SettingsPage {
     void handleBootGet();
     String renderBootSection();
     String renderForm(const SettingsValues &v, const Errors &errors, const String &banner);
-    void sendRestarting(const String &what);
+    void sendRestarting(const String &what, const std::string &newHost = ""); // newHost: the set was just renamed
 
     OtaUpdater &m_ota;
     bool m_started = false;

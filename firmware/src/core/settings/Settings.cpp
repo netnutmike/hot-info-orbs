@@ -20,6 +20,7 @@ bool Settings::s_stored = false;
 
 SettingsValues Settings::defaults() {
     SettingsValues d;
+    d.host = OTA_HOSTNAME; // config_helper.h: "info-orbs" unless config.h says otherwise
 #ifdef WIDGET_CYCLE_DELAY
     d.cycle = WIDGET_CYCLE_DELAY;
 #else
@@ -163,6 +164,7 @@ void Settings::load() {
     if (p.begin(NS, true)) {
         s_stored = p.isKey("schema");
         if (s_stored) {
+            v.host = p.getString("host", v.host.c_str()).c_str(); // added 2026-11-24 (issue #72); absent = the build's name
             v.cycle = p.getInt("cycle", v.cycle);
             v.tickers = p.getString("tickers", v.tickers.c_str()).c_str();
             v.wxloc = p.getString("wxloc", v.wxloc.c_str()).c_str();
@@ -301,7 +303,7 @@ bool Settings::save(const SettingsValues &v) {
               p.putBool("wificlock", v.wificlock);
     // put* returns bytes written; strings compare against their own length
     auto putStr = [&p](const char *k, const std::string &s) { return p.putString(k, s.c_str()) == s.size(); };
-    ok = ok && putStr("wdname", v.wdname) && putStr("wdurl", v.wdurl) && putStr("mqname", v.mqname) &&
+    ok = ok && putStr("host", v.host) && putStr("wdname", v.wdname) && putStr("wdurl", v.wdurl) && putStr("mqname", v.mqname) &&
          putStr("mqhost", v.mqhost) && p.putInt("mqport", v.mqport) && putStr("mquser", v.mquser) &&
          putStr("mqpass", v.mqpass) && putStr("mqsetup", v.mqsetup) && p.putBool("mqfit", v.mqfit) == 1 &&
          p.putBool("mq2fit", v.mq2fit) == 1 && p.putInt("mqsize", v.mqsize) && p.putInt("mq2size", v.mq2size) &&

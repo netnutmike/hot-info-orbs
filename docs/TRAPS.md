@@ -1021,3 +1021,111 @@ orbs (`stale::kRingOuter/kRingInner`). A hold ring there would draw over
 both, and erasing it after a slow tap blanks them too unless the whole page
 redraws, which is a full-screen flicker on every such tap. Settle where it
 goes and how it is erased on the rig before building it.
+
+## New set on 1.9.0: DS1 and DS2 black with backlight on, DS3-DS5 fine — cause OPEN (2026-11-23)
+
+Scott built a new set, flashed release 1.9.0 (the combo, so NVS was wiped:
+`nvs_open failed: NOT_FOUND`, `Settings: config.h defaults`), and displays 1
+and 2 came up black with their backlights on while 3, 4 and 5 showed the
+widgets. His first words were "everything is jammed onto orbs 3, 4 and 5".
+
+**Measured over USB (`/dev/cu.usbmodem101`, 115200, DTR/RTS reset):** the orb
+boots clean, `firmware 1.9.0 commit 5acf156`, and prints the XIAO map:
+`TFT_MOSI:9 TFT_SCLK:7 TFT_DC:8 SCREEN_1_CS:3 SCREEN_2_CS:4 SCREEN_3_CS:5
+SCREEN_4_CS:43 SCREEN_5_CS:44`. Wi-Fi joined (192.168.11.61), widgets
+updated, no panic, no SPI error. The same 1.9.0 image drives all five panels
+on the rig at .11.123, so the firmware and the pin map are ruled out; the
+difference is this board or these modules. Black with the backlight lit means
+5 V reaches the module and the init sequence did not: the backlight is wired
+to VCC (2026-10-17 entry). DS1 and DS2 are the only panels that share nothing
+the good three lack except their own CS nets (XIAO D2/D3, adjacent
+castellations) and their own sockets, so the fault is on one of those paths
+or in the two modules.
+
+**Not established:** which. **Next, with Scott's hands, before any reflow:**
+swap the DS1 module with DS3's. If the black moves with the module, the
+module; if it stays in position 1, the CS1 track, the D2 castellation or the
+header pin. Then the same for DS2. Repeated resets and reflashes tell you
+nothing here: the 10-17 blank cleared on a reset, this one survived several.
+
+Side note from the same log: the start-up prints `Wokwi Build` on every XIAO
+orb, because `#if HARDWARE == WOKWI` is `0 == 0` when neither macro is
+defined. Harmless, and not a lead.
+
+**Resolved 2026-11-23, later the same evening:** the board, not the firmware
+and not the modules. Scott had tried to unsolder the XIAO from that board and
+believes he damaged it. He assembled a fresh board; the known-good XIAO on
+the fresh board drives all five panels. The symptom Scott then described
+(left eye and the clock's number and colon both on orb 3, flickering; orb 4's
+right eye steady; orbs 1 and 2 black) is orb 3's panel being selected
+whenever orb 2's should be, which is a CS2/CS3 fault on the board, consistent
+with reworked castellations. Not scoped further: the board is scrap.
+
+## "It flashes but never comes back": `firmware.bin` written at offset 0 (2026-11-23)
+
+A fresh XIAO (MAC 44:bd:8d:75:fe:dc) took a flash, then showed only backlights
+and never answered. Over USB the port appeared and vanished about every
+1.5 s. Caught with a reader that reopens the port whenever it exists
+(`scratchpad/flap_read.py`), the ROM said, every cycle:
+
+    rst:0x7 (TG0WDT_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+    load:0x3c110020,len:0xc58c0
+    load:0x42000020,len:0x105274
+    Invalid image block, can't boot.
+    ets_main.c 329
+
+Those load addresses are an application's DROM/IROM segments; a healthy boot
+loads the second-stage bootloader at `0x3fce3808 / 0x403c9700 / 0x403cc700`.
+`esptool read_flash 0x0 0x40` showed an image header with entry
+`0x40376b88` and an `esp_app_desc` at +0x20, and its first 64 bytes were
+byte-identical to release 1.9.0's `firmware.bin`. So the app-only file had
+been written at `0x0`, where the ROM expects the bootloader, and on its way
+it also overwrote the partition table at `0x8000`. The ROM finds no
+bootloader, the task watchdog fires, and the chip loops; each reset
+re-enumerates USB, hence the flapping port.
+
+**Read it this way:** a port that flaps + `Invalid image block` = wrong
+offset, not a dead board and not a bad binary. **Fix:** write
+`info_orbs_fw_combo.bin` at `0x0` (esptool over USB, 28 s at 921600); it
+carries the bootloader, the table and the app, and pads the rest of 8 MB with
+0xFF. Done here; the orb booted 1.9.0 and opened its `Info-Orbs_DC` portal.
+The README's two files differ only in their offset (`0x0` combo, `0x10000`
+app), and the web flasher takes whatever offset is typed, so this will
+happen to a builder. Added to TROUBLESHOOTING.
+
+**Also learned:** opening the USB port with DTR/RTS toggled resets the S3,
+which is how esptool and my reader capture the ROM lines; on a flapping port
+esptool still connects on the first try, no button needed.
+
+## Copying one orb's settings to another: the form carries everything but the secrets (2026-11-23)
+
+There is no export. What works: GET `/settings` on the source orb, parse the
+`sf` form (text/number/hidden inputs, selected options, ticked checkboxes),
+POST the same names to the target's `/settings`. Done 2026-11-23 from the rig
+(.11.123) to a fresh 1.9.0 orb (.11.240): 85 fields, all matched on read-back
+(`scratchpad/parse_settings.py`, `push_settings.py`). The orb restarts after
+the save, so the read-back must wait ~30 s or it gets "connection refused".
+
+Three things the copy cannot carry:
+- **Password fields** (`wxkey`, `tsttok`, `awapp`, `awkey`, `mqpass`,
+  `mq2pass`) render blank and blank means "keep", so they never leave the
+  source. The weather key and Tempest token came from the local `secrets.h`;
+  the Ambient keys and the MQTT password live only in Scott's head and the
+  source orb's NVS. Without the Ambient keys the station-2 page is not built
+  at all, so the target shows 7 pages where the rig shows 8.
+- **Page tick-boxes go by index** (`shw0..shwN`) but are stored by page
+  NAME. A target with a different page set maps the indices to the wrong
+  pages: the first POST un-hid Web Data and hid nothing. Send the `shw`
+  set against the TARGET's own page list, after the pages exist.
+- **The firewall rule for the LRD broker names source IPs** (.27, .185,
+  .10, .123). A new orb's address has to be added in UniFi, with a fixed IP,
+  or MQTT says "can't reach broker" with the right password.
+
+If both orbs can be put on USB, cloning the NVS partition (`0x9000`, `0x5000`)
+carries Wi-Fi and every secret in one move and is the better route.
+
+**Since 1.10.0 the form also carries the network name** (`host`, issue #72),
+so a straight copy gives the target the source's name and the two take
+turns answering to it. Drop `host` from the copied fields, or set the
+target's own name in the same POST. The NVS clone has the same problem: the
+name is in NVS now, so a cloned orb must be renamed on its page afterwards.

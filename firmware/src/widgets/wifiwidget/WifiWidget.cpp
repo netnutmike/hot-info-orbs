@@ -3,6 +3,7 @@
 #include "DeviceLogStore.h"
 #include "ForgetCountdown.h"
 #include "RoamPolicy.h"
+#include "Settings.h"
 #include "StalePolicy.h"
 #include "Utils.h"
 #include <Preferences.h>
@@ -167,7 +168,7 @@ bool WifiWidget::begin(bool showConnecting) {
         WiFi.onEvent([](arduino_event_id_t, arduino_event_info_t) { DeviceLog::note("wifi lost its address"); },
                      ARDUINO_EVENT_WIFI_STA_LOST_IP);
     }
-    WiFi.setHostname(OTA_HOSTNAME);
+    WiFi.setHostname(Settings::get().host.c_str()); // the settings page name (issue #72)
     WiFi.mode(WIFI_STA); // For WiFiManager explicitly set mode to station, ESP defaults to STA+AP
     // The default fast scan joins the first AP it hears, not the strongest
     WiFi.setScanMethod(WIFI_ALL_CHANNEL_SCAN);

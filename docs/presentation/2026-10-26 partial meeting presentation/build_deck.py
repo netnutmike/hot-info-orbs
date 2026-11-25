@@ -1,9 +1,14 @@
-"""Fill the 12 empty SmComp-Dark slides of base.pptx with the HOT Info Orbs intro."""
+"""Fill the 12 empty SmComp-Dark slides of base.pptx with the HOT Info Orbs intro.
+
+A 13th slide (The codebase, by the numbers) is added from the Title Only layout
+and moved to position 4; the base stays at 12 slides.
+"""
 import sys, copy
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.shapes import MSO_SHAPE
 from PIL import Image
 
 import os
@@ -17,8 +22,40 @@ FRAME = RGBColor(0x5B, 0x9B, 0xD5)
 GREY = RGBColor(0xBF, 0xC7, 0xD5)
 
 prs = Presentation(src)
+assert len(prs.slides) == 12, len(prs.slides)
+# One more Title Only slide for the numbers, placed 4th (after Where it came from)
+_layout = prs.slides[3].slide_layout
+_num = prs.slides.add_slide(_layout)
+_ids = prs.slides._sldIdLst
+_el = _ids[-1]
+_ids.remove(_el)
+_ids.insert(3, _el)
 slides = list(prs.slides)
-assert len(slides) == 12, len(slides)
+assert len(slides) == 13, len(slides)
+NUMBERS = slides.pop(3)   # the rest of the script keeps its 0..11 indexes
+ORB_GLASS = RGBColor(0x0A, 0x0E, 0x12)
+ORB_RIM = RGBColor(0x2A, 0x33, 0x3C)
+ORB_ORANGE = RGBColor(0xFF, 0x92, 0x00)
+
+
+def orb(slide, cx, cy, d, big, mid, small):
+    """A dark round 'orb' with a big number, a label and a sub-label, like the fact sheet."""
+    sh = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(cx - d / 2), Inches(cy - d / 2), Inches(d), Inches(d))
+    sh.fill.solid(); sh.fill.fore_color.rgb = ORB_GLASS
+    sh.line.color.rgb = ORB_RIM; sh.line.width = Pt(4)
+    sh.shadow.inherit = False
+    tf = sh.text_frame
+    tf.word_wrap = True
+    tf.margin_left = tf.margin_right = Inches(0.05)
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    for i, (text, size, bold, color) in enumerate([(big, 28, True, ORB_ORANGE), (mid, 13, False, WHITE), (small, 11, False, GREY)]):
+        para = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        para.alignment = PP_ALIGN.CENTER
+        para.space_after = Pt(0); para.space_before = Pt(0)
+        r = para.add_run(); r.text = text
+        r.font.name = 'Arial'   # the template font; a mono face would fall back to serif on a Mac without PowerPoint
+        r.font.size = Pt(size); r.font.bold = bold; r.font.color.rgb = color
+    return sh
 
 
 def pic(slide, path, x, y, w=None, h=None, frame=True, fit=None):
@@ -157,7 +194,36 @@ notes(s, "The idea isn't ours. Brett Turner designed the original Info Orbs and 
       "A couple of our members built that kit; these are Donald Champion's photos of his. "
       "We liked it enough to make our own: a new board, new features, and a build anyone in the club can follow.")
 
-# ---------- 4 Pages: clock and weather ----------
+# ---------- 4 The codebase, by the numbers (inserted 2026-11-24) ----------
+s = NUMBERS
+title(s, 'The codebase, by the numbers')
+stats = [
+    ('19,470', 'new lines', 'of project code'),
+    ('73%', 'of the code', 'is new'),
+    ('626', 'commits', 'in 13 weeks'),
+    ('405', 'host tests', 'none inherited'),
+    ('14', 'releases', '1.2.0 to 1.10.1'),
+]
+for i, (a, b, c) in enumerate(stats):
+    orb(s, 1.85 + i * 2.4, 2.65, 2.2, a, b, c)
+cols = [
+    ('Built on good bones', 'Of the 6,627 firmware lines we inherited from Brett’s Info Orbs, 6,005 are still running: 91%. We added to the original; we did not bulldoze it.'),
+    ('Tested before flashed', '405 tests in 18 suites run on a laptop before anything touches an orb. Upstream shipped none, so every one of them is new.'),
+    ('Shipped, not just pushed', '626 commits and 54 merged pull requests since August 27, cut into 14 firmware releases, 1.2.0 through 1.10.1. Seven commits a day.'),
+]
+for i, (h, b) in enumerate(cols):
+    tb(s, 0.6 + i * 4.15, 3.95, 3.95, 2.7, [(h, 22, True, GOLD), (b, 18, False, WHITE)])
+tb(s, 0.6, 6.55, 12.25, 0.7, [
+    ('Counted by git blame on main at commit aa3cd8f, November 24, 2026. Project code is firmware, host tests, hardware scripts, tools and CI; '
+     'docs, vendored libraries and eye graphics data are not counted. Past commit rates are no guarantee of future commits.', 13, False, GREY),
+])
+notes(s, "Before the tour, a quick look at what is behind the screens, because this is a software project as much as a board. "
+      "Since the end of August the club has written about nineteen and a half thousand lines of new code, on top of Brett's original: "
+      "seventy-three percent of what runs on the orb is new, and ninety-one percent of what we inherited is still in service. We built on it rather than replacing it. "
+      "Four hundred host tests run on a laptop before any firmware touches an orb; the original shipped with none. "
+      "And it has shipped: fourteen firmware releases in thirteen weeks, the latest this afternoon. Now the tour.")
+
+# ---------- 5 Pages: clock and weather ----------
 s = slides[3]
 title(s, 'The pages: clock and weather')
 rows = [

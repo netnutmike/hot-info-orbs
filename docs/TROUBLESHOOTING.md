@@ -28,7 +28,7 @@ Problems during the
 | ESPConnect will not connect at all, or says the browser is not supported | Use Google Chrome or Microsoft Edge on a computer. Safari, Firefox and phones cannot talk to USB devices. |
 | **Connect** lists no port for the orbs | 1. Suspect the cable first: many USB cables carry power only. Try one you know moves data, such as a phone's own cable. 2. Put the XIAO in download mode: unplug, hold the **B** button on the XIAO, plug back in, let go, click **Connect** again. The XIAO's two small buttons are marked B and R; R only restarts it. 3. No driver is needed on Windows or Mac. |
 | Flashing starts, then stops with an error | Put the XIAO in download mode (the row above) and flash again. If it still fails, try another cable or another USB port on the computer. |
-| Flashing finished, but the orbs stay dark | Unplug the USB cable and plug it back in. If they are still dark, flash again and check the two boxes: the file is `info_orbs_fw_combo.bin` and **Flash offset** is `0x0`. The smaller `firmware.bin` is for WiFi updates only; flashed over USB it leaves the orbs dark until the combo file goes in. |
+| Flashing finished, but the orbs stay dark (the backlights may glow, nothing is drawn) | Unplug the USB cable and plug it back in. If they are still dark, flash again and check the two boxes: the file is `info_orbs_fw_combo.bin` and **Flash offset** is `0x0`. The smaller `firmware.bin` is for WiFi updates only; flashed over USB it leaves the orbs dark until the combo file goes in. |
 | The orbs show **Set up WiFi** | Nothing is wrong. That is step 6 of the Quick start. |
 
 ## WiFi setup
@@ -107,7 +107,7 @@ has the full list.
 | What you see | What it means, and what to do |
 |---|---|
 | The browser cannot open `http://<address>/settings` | 1. The phone or computer must be on the **same WiFi** as the orbs. A guest network usually cannot reach them. 2. Read the address again: it can change. Orb 5 shows it at start-up, and orb 3 of the info page shows it any time. 3. Type `http://` at the front. The orbs do not answer `https://`. |
-| `http://info-orbs.local/settings` does not open | Use the numbers instead. The name does not work on every network or every phone, and with more than one set only one of them answers to it. |
+| `http://info-orbs.local/settings` does not open | Use the numbers instead. The name does not work on every network or every phone, and with more than one set only one of them answers to it: give each set its own under **Name on the network** on the settings page. |
 | The browser asks for a user name and password | Whoever built the software set one. The user name is `admin`. |
 | **Save and restart** shows a message beside a field | That value is not allowed, and nothing was saved. Fix the field and save again. |
 | `Not saved: paste the key again` under a key | Another field had an error, so the key you pasted was not kept. Fix the error, paste the key again, and save. |

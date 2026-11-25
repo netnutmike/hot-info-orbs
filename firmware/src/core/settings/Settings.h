@@ -10,6 +10,7 @@
 // exactly as the build says. Read once in setup(); a save restarts the orb, so
 // nothing here changes while widgets are running.
 struct SettingsValues {
+    std::string host; // network name: <host>.local and the DHCP hostname (issue #72); default OTA_HOSTNAME
     int cycle; // seconds per widget, 0 = no auto-rotate
     std::string tickers; // "SPY,QQQ" - normalized, 1..5
     std::string wxloc; // weather location as typed, NOT url-encoded

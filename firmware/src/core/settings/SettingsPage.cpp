@@ -77,7 +77,8 @@ static const char *NAV_JS =
 // What is on the page and where; the ifdefs match the sections in renderForm
 static String contents() {
     String h = "<div class='toc'>";
-    h += "<div><b><a href='#setup'>Setup</a></b><a href='#keys'>API keys</a><a href='#place'>Time zone and location</a>"
+    h += "<div><b><a href='#setup'>Setup</a></b><a href='#keys'>API keys</a><a href='#name'>Name on the network</a>"
+         "<a href='#place'>Time zone and location</a>"
          "<a href='#stations'>Weather stations</a><a href='#mount'>Mounting</a></div>";
     h += "<div><b><a href='#display'>Display</a></b><a href='#rotation'>Rotation</a><a href='#clock'>Clock</a>"
          "<a href='#weather'>Weather</a>";
@@ -448,6 +449,15 @@ String SettingsPage::renderForm(const SettingsValues &v, const Errors &errors, c
     h += hint(sv::ambientKeyHint(v.awkey, stored.awkey, ambientSet).c_str()) + errorLine(errors, "awkey");
     h += "</fieldset>";
 
+    // The set's own name (issue #72): the mDNS name and what the router lists.
+    // It was a build-time macro, so sets flashed from one .bin all shared it
+    h += "<fieldset id='name'><legend>Name on the network</legend>";
+    h += textField("host", "Name (letters, digits and dashes)", v.host, d.host,
+                   ". This set answers at <b>http://" + esc(v.host) + ".local/settings</b>, and your router lists it by this name. "
+                   "With more than one set, give each its own: two sets with one name take turns answering to it.",
+                   errors);
+    h += "</fieldset>";
+
     h += "<fieldset id='place'><legend>Time zone and location</legend>";
     // A list, not a text box: the firmware knows only the zones in TimeZones.h.
     // A stored name that is not in the table (typed before 2026-11-09) is kept
@@ -681,6 +691,9 @@ void SettingsPage::handlePost() {
         }
     };
 
+    if (has("host") && !sv::parseHostname(argStr(s, "host"), v.host, err)) {
+        errors["host"] = err;
+    }
     if (has("cycle") && !sv::parseCycle(argStr(s, "cycle"), v.cycle, err)) {
         errors["cycle"] = err;
     }
@@ -904,12 +917,13 @@ void SettingsPage::handlePost() {
         s.send(400, "text/html", renderForm(v, errors, banner));
         return;
     }
+    const std::string oldHost = Settings::get().host;
     if (!Settings::save(v)) {
         String banner = "<div class='banner err'>&#10006; Could not write to the orb's storage. Nothing was changed and it has not restarted.</div>";
         s.send(500, "text/html", renderForm(v, errors, banner));
         return;
     }
-    sendRestarting("Saved");
+    sendRestarting("Saved", v.host != oldHost ? v.host : "");
 }
 
 void SettingsPage::handleReset() {
@@ -1092,12 +1106,29 @@ void SettingsPage::handleBootGet() {
     s.send_P(200, "image/jpeg", (const char *)logo_start, logo_end - logo_start);
 }
 
-void SettingsPage::sendRestarting(const String &what) {
+void SettingsPage::sendRestarting(const String &what, const std::string &newHost) {
+    // A renamed set (issue #72) stops answering to the name the browser came
+    // in on, so the reload goes to the new one. By address nothing changes.
+    // The Host header tells the two apart: an IPv4 address has no letters.
+    String url = "/settings", note;
+    if (!newHost.empty()) {
+        const String here = m_ota.server().hostHeader();
+        bool byName = false;
+        for (unsigned i = 0; i < here.length(); i++) {
+            byName = byName || isalpha((unsigned char)here[i]);
+        }
+        const String fresh = "http://" + esc(newHost) + ".local/settings";
+        note = " Its name is now <b>" + esc(newHost) + "</b>: " +
+               (byName ? "this page goes on to " + fresh + "." : "it also answers at <a href='" + fresh + "'>" + fresh + "</a>.");
+        if (byName) {
+            url = fresh;
+        }
+    }
     // The restart takes about 15 s (measured for OTA); reload after 20
     String h = PAGE_HEAD;
-    h += "<meta http-equiv='refresh' content='20;url=/settings'>";
-    h += "<div class='banner'>&#10004; " + what + ". The orbs are restarting &mdash; this page reloads in 20 seconds.</div>";
-    h += "<p><a href='/settings'>Back to settings</a></p></body></html>";
+    h += "<meta http-equiv='refresh' content='20;url=" + url + "'>";
+    h += "<div class='banner'>&#10004; " + what + ". The orbs are restarting &mdash; this page reloads in 20 seconds." + note + "</div>";
+    h += "<p><a href='" + url + "'>Back to settings</a></p></body></html>";
     m_ota.server().send(200, "text/html", h);
     delay(1000); // let the reply leave before the network goes down
     DeviceLog::beforeRestart(("settings page: " + what).c_str());

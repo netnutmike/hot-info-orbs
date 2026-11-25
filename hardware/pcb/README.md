@@ -8,7 +8,7 @@ rev, is in [HISTORY.md](HISTORY.md).
 
 | Front (displays) | Back (XIAO, buttons, C1, C2, R1) |
 |---|---|
-| ![Front of the board](fab/46mm_top.png) | ![Back of the board](fab/46mm_bottom.png) |
+| ![Front of the board](images/pcb-front.png) | ![Back of the board](images/pcb-back.png) |
 
 ## Parts
 
@@ -71,17 +71,19 @@ allow it. A board whose XIAO was soldered on and then removed came back
 with two displays dead and a third showing the wrong picture, and was
 scrapped ([docs/TRAPS.md](../../docs/TRAPS.md), 2026-11-23). Use the sockets.
 
+
 ## Checks before the first power-up
 
 The test pads between the third and fourth displays are labeled on both faces.
 
 1. **No shorts.** With nothing plugged in, use a meter on continuity between
    GND and 3V3, then GND and 5V. Neither should beep.
-2. **Power with the XIAO only.** Plug in the XIAO, then USB-C. TP3 (5V)
-   should read about 5 V and TP1 (3V3) about 3.3 V, both against TP2 (GND).
-3. **Unplug USB, then plug in the displays,** screens facing out. Plug and
+2. Don't forget to **plug in the antenna** (carefully) for the Xiao ESP32-S3.
+3. **Power with the XIAO only.** Plug in the XIAO, then USB-C. TP3 (5V)
+   should read about 5 V and TP1 (3V3) about 3.3 V, both against TP2 (GND).  
+4. **Unplug USB, then plug in the displays,** screens facing out. Plug and
    unplug displays only with the power off.
-4. Load the software: the
+5. Load the software: the
    [Quick start](../../README.md#quick-start-no-software-to-install-on-your-pc)
    flashes it from Chrome with nothing to install, and
    [docs/SETUP.md](../../docs/SETUP.md) builds it yourself. If a display stays dark, see

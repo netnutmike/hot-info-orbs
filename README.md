@@ -171,18 +171,20 @@ update pages, and how you
 skip this section.*
 
 - **Carrier board:** the KiCad 10 project in
-  [hardware/hot-info-orbs-xiao-46mm/](hardware/hot-info-orbs-xiao-46mm/), with
+  [hardware/pcb/](hardware/pcb/), with
   the displays 46 mm apart to fit the enclosure. Its symbol and footprint
   libraries are inside the project, so you can open it without installing
-  anything. Its README has the board's history, the pin map and the BOM; the
-  files sent to the fab are in its `fab/`.
+  anything. Its README is the assembly guide, with the pin map and the BOM;
+  its HISTORY.md has how each revision came about; the files sent to the
+  fab are in its `fab/`. Until 2026-11-25 the folder was
+  `hardware/hot-info-orbs-xiao-46mm/`.
 - **Enclosure:** 3D-printed, in [hardware/enclosures/](hardware/enclosures/);
   design notes in [docs/ENCLOSURE.md](docs/ENCLOSURE.md).
 - **Power:** a USB-C cable into the XIAO. The displays run from 5 V and each
   one lowers it to 3.3 V on its own little regulator chip, so the XIAO stays
   cool.
 - **Buying displays:** get the round 1.28" GC9A01 display named in the
-  [parts list](hardware/hot-info-orbs-xiao-46mm/bom/). If you buy a different
+  [parts list](hardware/pcb/bom/). If you buy a different
   one, check two things: its pins are in the order VCC, GND, SCL, SDA, DC, CS,
   RST, and the back of the board has a small regulator chip with a capacitor
   on each side.

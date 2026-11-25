@@ -251,7 +251,7 @@ All from the project repository, [github.com/scottdube/hot-info-orbs](https://gi
 
 - [Feature and spec sheet](https://scottdube.github.io/hot-info-orbs/features.html)
 - [README](https://github.com/scottdube/hot-info-orbs/blob/main/README.md)
-- [Board README (46 mm carrier)](https://github.com/scottdube/hot-info-orbs/blob/main/hardware/hot-info-orbs-xiao-46mm/README.md)
+- [Board design history (46 mm carrier)](https://github.com/scottdube/hot-info-orbs/blob/main/hardware/pcb/HISTORY.md)
 - [VARIANT-XIAO-ESP32S3.md](https://github.com/scottdube/hot-info-orbs/blob/main/docs/VARIANT-XIAO-ESP32S3.md) and [VARIANT-ESP32-S3-SUPERMINI.md](https://github.com/scottdube/hot-info-orbs/blob/main/docs/VARIANT-ESP32-S3-SUPERMINI.md)
 - [POWER-MEASURED.md](https://github.com/scottdube/hot-info-orbs/blob/main/docs/POWER-MEASURED.md)
 - [ENCLOSURE.md](https://github.com/scottdube/hot-info-orbs/blob/main/docs/ENCLOSURE.md)

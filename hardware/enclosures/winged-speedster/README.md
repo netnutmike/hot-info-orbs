@@ -88,3 +88,10 @@ Watch crystals are considerably less expensive from China, so the example source
 - https://www.aliexpress.us/item/3256806569387664.html
 - https://www.aliexpress.us/item/3256806569799247.html
 - https://www.aliexpress.us/item/3256804573867849.html
+
+
+## Assembly Tips
+- A helpful assembly visualization video is at https://www.youtube.com/watch?v=JYFkHDC2DEo
+- To avoid any accidents with glue, you can instead affix the display bezels to the front body by inserting the bezel and gently melting the bezel pins into the body from the back.
+- Snap in the button bezels and then turn the front body upside down to insert the button plungers.  Align the buttons on the PCB with the plungers and rotate the PCB into place.  The plungers are held in place by the PCB assembly.
+- Be sure the joint sleeve is completely pressed into the wing body.  Insert the joint sleeve into the wing and then turn the joint sleeve side down on a table and press them in firmly.

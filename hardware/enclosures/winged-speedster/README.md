@@ -72,26 +72,19 @@ Overall: For the best finish, use 0.08 mm or minimum layer height with standard 
 
 ## Optional Bezel Glass
 
-The display bezels are designed to take watch crystals for a more finished look.  Below is the specification for the crystals required and some links for examples of them. 
+The display bezels are designed to take watch crystals for a more finished look. Below is the specification for the crystals required and some links for examples of them.
 
 **Specifications:**
-35.5 mm diameter
-2 mm edge thickness
-double domed
-glass (preferred)
+
+- 35.5 mm diameter
+- 2 mm edge thickness
+- Double domed
+- Glass (preferred)
 
 **Sources:**
-  Watch crystals are considerably less expensive from China, so the example sources are all from Aliexpress.  There are many sources on Aliexpress for these watch crystals. Vendors often sell many sizes and types.  Be careful - it can be easy to order the wrong ones.
 
-https://www.aliexpress.us/item/3256806569387664.html
-https://www.aliexpress.us/item/3256806569799247.html
-https://www.aliexpress.us/item/3256804573867849.html
+Watch crystals are considerably less expensive from China, so the example sources are all from AliExpress. There are many sources on AliExpress for these watch crystals. Vendors often sell many sizes and types. Be careful: it can be easy to order the wrong ones.
 
-
-
-
-
-
-
-
-
+- https://www.aliexpress.us/item/3256806569387664.html
+- https://www.aliexpress.us/item/3256806569799247.html
+- https://www.aliexpress.us/item/3256804573867849.html

@@ -71,16 +71,15 @@ allow it. A board whose XIAO was soldered on and then removed came back
 with two displays dead and a third showing the wrong picture, and was
 scrapped ([docs/TRAPS.md](../../docs/TRAPS.md), 2026-11-23). Use the sockets.
 
-
 ## Checks before the first power-up
 
 The test pads between the third and fourth displays are labeled on both faces.
 
 1. **No shorts.** With nothing plugged in, use a meter on continuity between
    GND and 3V3, then GND and 5V. Neither should beep.
-2. Don't forget to **plug in the antenna** (carefully) for the Xiao ESP32-S3.
+2. Don't forget to **plug in the antenna** (carefully) for the XIAO ESP32-S3.
 3. **Power with the XIAO only.** Plug in the XIAO, then USB-C. TP3 (5V)
-   should read about 5 V and TP1 (3V3) about 3.3 V, both against TP2 (GND).  
+   should read about 5 V and TP1 (3V3) about 3.3 V, both against TP2 (GND).
 4. **Unplug USB, then plug in the displays,** screens facing out. Plug and
    unplug displays only with the power off.
 5. Load the software: the

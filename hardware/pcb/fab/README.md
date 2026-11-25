@@ -19,7 +19,9 @@ is the one to order. Every other run listed below, 2.4 run 1 included
 (JLCPCB has it from the quote), was removed from `main` on 2026-10-25,
 because a second zip one character different is the easiest wrong file
 to upload. Each is byte-identical at tag `board-46mm-rev2.5`:
-`git checkout board-46mm-rev2.5 -- hardware/hot-info-orbs-xiao-46mm/fab/<zip>`.
+`git checkout board-46mm-rev2.5 -- hardware/hot-info-orbs-xiao-46mm/fab/<zip>`
+(that tag predates the folder's rename to `hardware/pcb/`, so the file comes
+back under the old name).
 
 `hot_info_orbs_xiao_46mm_2.5_run2_gerbers.zip` (2026-10-25 11:30) is the same
 copper, mask, outline and drill (diffed: only the timestamp lines differ).

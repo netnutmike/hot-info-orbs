@@ -454,7 +454,7 @@ third-party screenshots, and the repo is public.
 | S16 | XIAO plug in/out, Fusion: `S16-xiao-plug-dark.mp4` + `-transparent.mov`, `sources/fusion_plug.py` | rendered 2026-10-22, in the cut (replaced the placeholder, held to the VO line) |
 | S20 | USB plug-in + boot, Fusion: `S20-usb-plug-dark.mp4` + `-transparent.mov`, `sources/fusion_usb.py` + `fusion_usb_screens.py` | rendered 2026-10-25 |
 | S19 | v1.1 board 3D orbit, kicad-cli: `S19-kicad-orbit-viewer.mp4`, `sources/kicad_orbit.py` | rendered 2026-10-25, matched to the live viewer; the 2D half is the live screen take |
-| S29 | XIAO board 3D render; only the STEP and PCB exist (`hardware/hot-info-orbs-xiao-46mm/`) | to render |
+| S29 | XIAO board 3D render; only the STEP and PCB exist (`hardware/pcb/`) | to render |
 | S20a, S20b | Thermal images, in color, 2026-10-17 at 75 °F room: white and red hottest, blue coolest | on hand, `docs/assets/thermal/` |
 | S02, S33 | HOT logos: `docs/assets/hot-smcomp-logo.png`, `images/hot-logo.jpg` | on hand |
 | S30 | Enclosure concept: `docs/assets/enclosure-concept-3-winged-speedster.png` (main) | on hand |

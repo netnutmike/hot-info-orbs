@@ -1,6 +1,6 @@
 # Variant: Seeed XIAO ESP32-S3 / ESP32-S3 Plus
 
-**2026-10-25: superseded by `hardware/hot-info-orbs-xiao-46mm/`**, the same
+**2026-10-25: superseded by `hardware/pcb/`**, the same
 carrier with the displays 46 mm apart for the enclosure, which went to the
 fab. The board this document describes left `main` that day; its folder
 is at tag `board-xiao-narrow-final`, which is where the
@@ -199,7 +199,7 @@ firmware commit, and whether the R1/C2 reset network was on the breadboard.
 ## Not done
 
 **Out of date (2026-11-11):** this list was written before the board was
-built. Rev 2.5 boards were ordered 25 Oct 2026 (`hardware/hot-info-orbs-xiao-46mm/fab/README.md`),
+built. Rev 2.5 boards were ordered 25 Oct 2026 (`hardware/pcb/fab/README.md`),
 and the test rig has run on an assembled rev 2.5 carrier for weeks, not on
 the breadboard. Items below are kept as written; check each before relying on it.
 

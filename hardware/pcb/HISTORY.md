@@ -1,3 +1,16 @@
+# HoT Info Orbs PCB — design history
+
+How the carrier board got to rev 2.5, oldest change first, with what was
+measured and what was ruled out at each step. Building a board? Use the
+[README](README.md) instead.
+
+This was the board README until 2026-11-25, when it moved here and the README
+became the assembly guide. The folder was `hardware/hot-info-orbs-xiao-46mm/`
+until the same day, so commits, tags and older docs use that name. Paths below
+are relative to this folder. The text is otherwise as it was.
+
+---
+
 # HoT Info Orbs — XIAO carrier at 46 mm display pitch (KiCad project)
 
 **Copy of `hardware/hot-info-orbs-xiao/` made 2026-10-19 (from branch

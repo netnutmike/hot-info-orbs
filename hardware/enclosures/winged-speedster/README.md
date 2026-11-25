@@ -8,6 +8,14 @@
 
 ![Exploded view](exploded%20master%20assembly.jpg)
 
+## Assembly Video
+
+How the parts go together, in assembly order with the screw sizes on screen (33 s):
+
+[![HOT Info Orbs enclosure: exploded view and assembly](https://i.ytimg.com/vi/JYFkHDC2DEo/maxresdefault.jpg)](https://youtu.be/JYFkHDC2DEo)
+
+https://youtu.be/JYFkHDC2DEo
+
 ## Directory Contents
 
 | Folder | File | Description |
